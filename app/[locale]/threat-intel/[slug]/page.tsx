@@ -1,0 +1,160 @@
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { getPostBySlug, getAllSlugs, getRelatedPosts } from "@/lib/content";
+import { compileMDX } from "@/lib/mdx";
+import { ArticleMeta } from "@/components/articles/ArticleMeta";
+import { ArticleCard } from "@/components/articles/ArticleCard";
+import { IOCTable } from "@/components/threat-intel/IOCTable";
+import { MitreMatrix } from "@/components/threat-intel/MitreMatrix";
+import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
+import { useTranslations } from "next-intl";
+
+interface Props {
+  params: Promise<{ locale: string; slug: string }>;
+}
+
+export async function generateStaticParams() {
+  const locales = ["en", "zh"];
+  const params: { locale: string; slug: string }[] = [];
+  for (const locale of locales) {
+    const slugs = getAllSlugs(locale, "threat-intel");
+    slugs.forEach((slug) => params.push({ locale, slug }));
+  }
+  return params;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const article = getPostBySlug(locale, "threat-intel", slug);
+  if (!article) return {};
+  const { frontmatter } = article;
+  return {
+    title: frontmatter.title,
+    description: frontmatter.excerpt,
+  };
+}
+
+export default async function ThreatIntelArticlePage({ params }: Props) {
+  const { locale, slug } = await params;
+  const article = getPostBySlug(locale, "threat-intel", slug);
+  if (!article) notFound();
+
+  const { frontmatter, content, readingTime } = article;
+  const { content: mdxContent, headings } = await compileMDX(content);
+  const related = getRelatedPosts(frontmatter, locale, "threat-intel", 3);
+
+  return (
+    <TIPageContent
+      frontmatter={frontmatter}
+      mdxContent={mdxContent}
+      headings={headings}
+      readingTime={readingTime}
+      related={related}
+      locale={locale}
+    />
+  );
+}
+
+function TIPageContent({
+  frontmatter,
+  mdxContent,
+  headings,
+  readingTime,
+  related,
+  locale,
+}: {
+  frontmatter: import("@/lib/types").ArticleFrontmatter;
+  mdxContent: React.ReactElement;
+  headings: { id: string; text: string; level: number }[];
+  readingTime: number;
+  related: import("@/lib/content").Article[];
+  locale: string;
+}) {
+  const t = useTranslations("article");
+  const featuredImage =
+    frontmatter.featured_image ?? CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
+
+  return (
+    <main className="max-w-7xl mx-auto px-4 py-10">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
+        <article>
+          <header className="mb-8">
+            <ArticleMeta
+              frontmatter={frontmatter}
+              readingTime={readingTime}
+              locale={locale}
+            />
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight mt-4 mb-4">
+              {frontmatter.title}
+            </h1>
+            <p className="text-lg text-muted-foreground">{frontmatter.excerpt}</p>
+          </header>
+
+          {featuredImage && (
+            <div className="mb-8 rounded-lg overflow-hidden border border-border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={featuredImage}
+                alt={frontmatter.featured_image_alt ?? frontmatter.title}
+                className="w-full h-64 object-cover"
+              />
+            </div>
+          )}
+
+          {frontmatter.iocs && frontmatter.iocs.length > 0 && (
+            <div className="mb-8">
+              <IOCTable iocs={frontmatter.iocs} />
+            </div>
+          )}
+
+          {frontmatter.ttp_matrix && frontmatter.ttp_matrix.length > 0 && (
+            <div className="mb-8">
+              <MitreMatrix ttps={frontmatter.ttp_matrix} />
+            </div>
+          )}
+
+          <div className="prose">{mdxContent}</div>
+        </article>
+
+        <aside className="hidden lg:block">
+          {headings.length > 0 && (
+            <div className="sticky top-6 rounded-lg border border-border bg-card p-5">
+              <h3 className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">
+                {t("tableOfContents")}
+              </h3>
+              <nav className="space-y-1">
+                {headings.map((h) => (
+                  <a
+                    key={h.id}
+                    href={`#${h.id}`}
+                    className={`block text-sm hover:text-primary transition-colors ${
+                      h.level === 2 ? "text-foreground" : "text-muted-foreground pl-3"
+                    }`}
+                  >
+                    {h.text}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {related.length > 0 && (
+        <section className="mt-16 pt-10 border-t border-border">
+          <h2 className="text-2xl font-bold mb-6">{t("relatedArticles")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {related.map((post) => (
+              <ArticleCard
+                key={post.frontmatter.slug}
+                article={post}
+                locale={locale}
+                type="threat-intel"
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </main>
+  );
+}

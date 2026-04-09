@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Home",
+    "articles": "Articles",
+    "threatIntel": "Threat Intel",
+    "categories": "Categories",
+    "search": "Search",
+    "switchToZh": "中文"
+  },
+  "home": {
+    "heroTitle": "Cybersecurity & Tech Intelligence",
+    "heroSubtitle": "In-depth threat analysis, vulnerability research, and security news for defenders.",
+    "latestArticles": "Latest Articles",
+    "latestThreatIntel": "Latest Threat Intel",
+    "viewAll": "View All"
+  },
+  "article": {
+    "readingTime": "{minutes} min read",
+    "publishedOn": "Published on",
+    "updatedOn": "Updated on",
+    "by": "By",
+    "tags": "Tags",
+    "relatedArticles": "Related Articles",
+    "tableOfContents": "Table of Contents",
+    "copyIoc": "Copy",
+    "copied": "Copied!",
+    "exportCsv": "Export CSV",
+    "severity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "informational": "Informational"
+    }
+  },
+  "categories": {
+    "threat-intel": "Threat Intel",
+    "vulnerabilities": "Vulnerabilities",
+    "malware": "Malware",
+    "industry": "Industry News",
+    "tools": "Tools & Techniques",
+    "ai": "AI Security"
+  },
+  "search": {
+    "placeholder": "Search articles...",
+    "noResults": "No results found.",
+    "results": "{count} results"
+  },
+  "footer": {
+    "description": "Professional cybersecurity intelligence for enterprise defenders.",
+    "rights": "All rights reserved.",
+    "rss": "RSS Feed",
+    "wechat": "WeChat Feed"
+  }
+}

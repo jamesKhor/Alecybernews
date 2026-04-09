@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "首页",
+    "articles": "文章",
+    "threatIntel": "威胁情报",
+    "categories": "分类",
+    "search": "搜索",
+    "switchToZh": "English"
+  },
+  "home": {
+    "heroTitle": "网络安全与科技情报",
+    "heroSubtitle": "深度威胁分析、漏洞研究与安全资讯，为防御者服务。",
+    "latestArticles": "最新文章",
+    "latestThreatIntel": "最新威胁情报",
+    "viewAll": "查看全部"
+  },
+  "article": {
+    "readingTime": "{minutes} 分钟阅读",
+    "publishedOn": "发布于",
+    "updatedOn": "更新于",
+    "by": "作者",
+    "tags": "标签",
+    "relatedArticles": "相关文章",
+    "tableOfContents": "目录",
+    "copyIoc": "复制",
+    "copied": "已复制！",
+    "exportCsv": "导出 CSV",
+    "severity": {
+      "critical": "严重",
+      "high": "高危",
+      "medium": "中危",
+      "low": "低危",
+      "informational": "信息"
+    }
+  },
+  "categories": {
+    "threat-intel": "威胁情报",
+    "vulnerabilities": "漏洞",
+    "malware": "恶意软件",
+    "industry": "行业动态",
+    "tools": "工具与技术",
+    "ai": "AI 安全"
+  },
+  "search": {
+    "placeholder": "搜索文章...",
+    "noResults": "未找到结果。",
+    "results": "{count} 条结果"
+  },
+  "footer": {
+    "description": "面向企业防御者的专业网络安全情报平台。",
+    "rights": "版权所有。",
+    "rss": "RSS 订阅",
+    "wechat": "微信订阅"
+  }
+}

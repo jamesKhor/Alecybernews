@@ -1,0 +1,140 @@
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import readingTime from "reading-time";
+import { ArticleFrontmatterSchema, type Article, type ArticleFrontmatter } from "./types";
+export type { Article };
+
+const CONTENT_DIR = path.join(process.cwd(), "content");
+
+type ContentType = "posts" | "threat-intel";
+
+function getContentDir(locale: string, type: ContentType): string {
+  return path.join(CONTENT_DIR, locale, type);
+}
+
+function parseArticleFile(filePath: string): Article | null {
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const { data, content } = matter(raw);
+
+    const result = ArticleFrontmatterSchema.safeParse(data);
+    if (!result.success) {
+      console.warn(`[content] Invalid frontmatter in ${filePath}:`, result.error.flatten());
+      return null;
+    }
+
+    const frontmatter = result.data;
+
+    // Skip drafts in production
+    if (frontmatter.draft && process.env.NODE_ENV === "production") {
+      return null;
+    }
+
+    // Skip scheduled articles that haven't published yet
+    if (frontmatter.scheduled_publish) {
+      const publishAt = new Date(frontmatter.scheduled_publish);
+      if (publishAt > new Date()) return null;
+    }
+
+    const { minutes } = readingTime(content);
+
+    return { frontmatter, content, readingTime: Math.ceil(minutes) };
+  } catch (err) {
+    console.warn(`[content] Failed to parse ${filePath}:`, err);
+    return null;
+  }
+}
+
+export function getAllPosts(
+  locale: string,
+  type: ContentType = "posts"
+): Article[] {
+  const dir = getContentDir(locale, type);
+
+  if (!fs.existsSync(dir)) return [];
+
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+
+  const articles = files
+    .map((file) => parseArticleFile(path.join(dir, file)))
+    .filter((a): a is Article => a !== null);
+
+  // Sort by date descending
+  return articles.sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime()
+  );
+}
+
+export function getPostBySlug(
+  locale: string,
+  type: ContentType,
+  slug: string
+): Article | null {
+  const dir = getContentDir(locale, type);
+
+  if (!fs.existsSync(dir)) return null;
+
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+
+  for (const file of files) {
+    const article = parseArticleFile(path.join(dir, file));
+    if (article && article.frontmatter.slug === slug) {
+      return article;
+    }
+  }
+
+  return null;
+}
+
+export function getRelatedPosts(
+  current: ArticleFrontmatter,
+  locale: string,
+  type: ContentType = "posts",
+  count = 3
+): Article[] {
+  const all = getAllPosts(locale, type).filter(
+    (a) => a.frontmatter.slug !== current.slug
+  );
+
+  // Score by tag overlap + same category
+  const scored = all.map((article) => {
+    const tagOverlap = article.frontmatter.tags.filter((t) =>
+      current.tags.includes(t)
+    ).length;
+    const sameCategory = article.frontmatter.category === current.category ? 2 : 0;
+    return { article, score: tagOverlap + sameCategory };
+  });
+
+  return scored
+    .sort((a, b) => b.score - a.score)
+    .slice(0, count)
+    .map((s) => s.article);
+}
+
+export function getAllSlugs(locale: string, type: ContentType): string[] {
+  return getAllPosts(locale, type).map((a) => a.frontmatter.slug);
+}
+
+export function getAllTags(locale: string, type: ContentType = "posts"): string[] {
+  const all = getAllPosts(locale, type);
+  const tags = new Set(all.flatMap((a) => a.frontmatter.tags));
+  return Array.from(tags).sort();
+}
+
+export function getAllCategories(locale: string, type: ContentType = "posts") {
+  const all = getAllPosts(locale, type);
+  const map = new Map<string, number>();
+  for (const a of all) {
+    map.set(a.frontmatter.category, (map.get(a.frontmatter.category) ?? 0) + 1);
+  }
+  return Array.from(map.entries())
+    .map(([category, count]) => ({ category, count }))
+    .sort((a, b) => b.count - a.count);
+}
