@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { FeedArticle, RssSource } from "@/lib/rss/fetch";
 import {
@@ -9,10 +9,11 @@ import {
   Square,
   ExternalLink,
   PenLine,
-  Filter,
   AlertTriangle,
   Loader2,
   Search,
+  X,
+  ShoppingBag,
 } from "lucide-react";
 import sourcesData from "@/data/rss-sources.json";
 
@@ -22,6 +23,13 @@ const categoryColors: Record<string, string> = {
   vulnerabilities: "bg-purple-950 text-purple-400",
 };
 
+// Avatar dot colors by source category
+const categoryDotColors: Record<string, string> = {
+  cybersecurity: "bg-red-500",
+  tech: "bg-orange-400",
+  vulnerabilities: "bg-purple-500",
+};
+
 const severityColors: Record<string, string> = {
   critical: "bg-red-600 text-white",
   high: "bg-orange-500 text-white",
@@ -29,27 +37,50 @@ const severityColors: Record<string, string> = {
   low: "bg-blue-500 text-white",
 };
 
+function getInitials(title: string): string {
+  return title
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 export default function FeedReaderPage() {
   const router = useRouter();
   const sources = sourcesData as RssSource[];
+  const enabledSources = sources.filter((s) => s.enabled);
 
-  const [articles, setArticles] = useState<FeedArticle[]>([]);
+  // Per-source article cache: sourceId → FeedArticle[]
+  const articleCache = useRef<Map<string, FeedArticle[]>>(new Map());
+
+  // Persisted selection across all sources: articleId → FeedArticle
+  const [selectedMap, setSelectedMap] = useState<Map<string, FeedArticle>>(new Map());
+
+  // Current displayed articles (from cache for active source)
+  const [displayedArticles, setDisplayedArticles] = useState<FeedArticle[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [activeSource, setActiveSource] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [loaded, setLoaded] = useState(false);
 
-  const fetchFeed = useCallback(async (sourceId?: string) => {
+  const fetchFeed = useCallback(async (sourceId: string, forceRefresh = false) => {
+    if (!forceRefresh && articleCache.current.has(sourceId)) {
+      const cached = articleCache.current.get(sourceId)!;
+      setDisplayedArticles(cached);
+      setLoaded(true);
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
-      const params = sourceId && sourceId !== "all" ? `?sources=${sourceId}` : "";
+      const params = sourceId !== "all" ? `?sources=${sourceId}` : "";
       const res = await fetch(`/api/admin/feed${params}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as { articles: FeedArticle[] };
-      setArticles(data.articles);
+      articleCache.current.set(sourceId, data.articles);
+      setDisplayedArticles(data.articles);
       setLoaded(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load feed");
@@ -60,32 +91,40 @@ export default function FeedReaderPage() {
 
   const handleSourceChange = (sourceId: string) => {
     setActiveSource(sourceId);
-    setSelected(new Set());
+    setSearchQuery("");
     fetchFeed(sourceId);
   };
 
-  const toggleSelect = (id: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < 5) next.add(id);
+  const toggleSelect = (article: FeedArticle) => {
+    setSelectedMap((prev) => {
+      const next = new Map(prev);
+      if (next.has(article.id)) {
+        next.delete(article.id);
+      } else if (next.size < 5) {
+        next.set(article.id, article);
+      }
       return next;
     });
   };
 
+  const clearSelection = () => setSelectedMap(new Map());
+
   const goCompose = () => {
-    const selectedArticles = articles.filter((a) => selected.has(a.id));
-    sessionStorage.setItem("compose_articles", JSON.stringify(selectedArticles));
+    sessionStorage.setItem(
+      "compose_articles",
+      JSON.stringify(Array.from(selectedMap.values()))
+    );
     router.push("/admin/compose");
   };
 
-  const filtered = articles.filter((a) => {
+  const filtered = displayedArticles.filter((a) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q);
   });
 
-  const enabledSources = sources.filter((s) => s.enabled);
+  const selectedCount = selectedMap.size;
+  const selectedList = Array.from(selectedMap.values());
 
   return (
     <div className="flex h-full">
@@ -124,7 +163,7 @@ export default function FeedReaderPage() {
       {/* Main feed area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Toolbar */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-gray-900/30">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-gray-900/30 flex-wrap shrink-0">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
             <input
@@ -137,7 +176,7 @@ export default function FeedReaderPage() {
           </div>
 
           <button
-            onClick={() => fetchFeed(activeSource)}
+            onClick={() => fetchFeed(activeSource, true)}
             disabled={loading}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 disabled:opacity-50 transition-colors"
           >
@@ -145,29 +184,18 @@ export default function FeedReaderPage() {
             {loading ? "Loading…" : "Refresh"}
           </button>
 
-          {selected.size > 0 && (
-            <button
-              onClick={goCompose}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-medium transition-colors"
-            >
-              <PenLine className="w-3.5 h-3.5" />
-              Compose with {selected.size} article{selected.size > 1 ? "s" : ""}
-            </button>
-          )}
-
-          {selected.size > 0 && (
-            <span className="text-xs text-gray-500">
-              {5 - selected.size} more can be selected
+          {selectedCount < 5 && selectedCount > 0 && (
+            <span className="text-xs text-gray-500 ml-auto">
+              {5 - selectedCount} slot{5 - selectedCount !== 1 ? "s" : ""} left
             </span>
           )}
         </div>
 
-        {/* Articles */}
-        <div className="flex-1 overflow-y-auto">
+        {/* Article list — shrinks to make room for the tray */}
+        <div className="flex-1 overflow-y-auto min-h-0">
           {!loaded && !loading && (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <Filter className="w-8 h-8 mb-3 opacity-40" />
-              <p className="text-sm">Select a source and click Refresh to load articles</p>
+              <p className="text-sm">Select a source or load all feeds to get started</p>
               <button
                 onClick={() => fetchFeed("all")}
                 className="mt-4 px-4 py-2 rounded-md bg-emerald-700 hover:bg-emerald-600 text-sm text-white transition-colors"
@@ -198,8 +226,8 @@ export default function FeedReaderPage() {
 
           <div className="divide-y divide-gray-800/60">
             {filtered.map((article) => {
-              const isSelected = selected.has(article.id);
-              const canSelect = isSelected || selected.size < 5;
+              const isSelected = selectedMap.has(article.id);
+              const canSelect = isSelected || selectedCount < 5;
 
               return (
                 <div
@@ -208,15 +236,14 @@ export default function FeedReaderPage() {
                     isSelected
                       ? "bg-emerald-950/20 border-l-2 border-emerald-500"
                       : "hover:bg-gray-800/40 border-l-2 border-transparent"
-                  } ${!canSelect && !isSelected ? "opacity-50" : ""}`}
+                  } ${!canSelect ? "opacity-40" : ""}`}
                 >
-                  {/* Checkbox */}
                   <button
-                    onClick={() => canSelect && toggleSelect(article.id)}
-                    disabled={!canSelect && !isSelected}
+                    onClick={() => canSelect && toggleSelect(article)}
+                    disabled={!canSelect}
                     className="mt-0.5 flex-shrink-0"
                     title={
-                      !canSelect && !isSelected
+                      !canSelect
                         ? "Max 5 articles per synthesis"
                         : isSelected
                           ? "Deselect"
@@ -230,7 +257,6 @@ export default function FeedReaderPage() {
                     )}
                   </button>
 
-                  {/* Content */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap mb-1">
@@ -286,6 +312,90 @@ export default function FeedReaderPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* ── Selection Tray ── always visible at the bottom */}
+        <div
+          className={`shrink-0 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm transition-all duration-300 ${
+            selectedCount > 0 ? "py-3" : "py-2"
+          }`}
+        >
+          <div className="px-4 flex items-center gap-3">
+            {/* Bucket icon + label */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <ShoppingBag
+                className={`w-4 h-4 transition-colors ${selectedCount > 0 ? "text-emerald-400" : "text-gray-600"}`}
+              />
+              <span
+                className={`text-xs font-medium transition-colors ${selectedCount > 0 ? "text-emerald-400" : "text-gray-600"}`}
+              >
+                {selectedCount}/5
+              </span>
+            </div>
+
+            {/* Empty state */}
+            {selectedCount === 0 && (
+              <p className="text-xs text-gray-600 italic">
+                Tick articles to add them here — selections persist across sources
+              </p>
+            )}
+
+            {/* Article chips */}
+            <div className="flex items-center gap-2 flex-1 overflow-x-auto pb-0.5 min-w-0">
+              {selectedList.map((article) => (
+                <div
+                  key={article.id}
+                  className="group flex items-center gap-2 shrink-0 rounded-lg bg-gray-800 border border-gray-700 hover:border-emerald-700 px-2.5 py-1.5 transition-colors max-w-[200px]"
+                  title={article.title}
+                >
+                  {/* Avatar */}
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0 ${
+                      categoryDotColors[article.sourceCategory] ?? "bg-gray-600"
+                    }`}
+                  >
+                    {getInitials(article.title)}
+                  </div>
+                  {/* Title + source */}
+                  <div className="min-w-0">
+                    <p className="text-xs text-white truncate leading-tight max-w-[120px]">
+                      {article.title}
+                    </p>
+                    <p className="text-[10px] text-gray-500 truncate leading-tight">
+                      {article.sourceName}
+                    </p>
+                  </div>
+                  {/* Remove */}
+                  <button
+                    onClick={() => toggleSelect(article)}
+                    className="shrink-0 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                    title="Remove"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Actions */}
+            {selectedCount > 0 && (
+              <div className="flex items-center gap-2 shrink-0 ml-auto">
+                <button
+                  onClick={clearSelection}
+                  className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={goCompose}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-medium transition-colors"
+                >
+                  <PenLine className="w-3.5 h-3.5" />
+                  Compose
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

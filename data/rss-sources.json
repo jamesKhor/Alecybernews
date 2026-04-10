@@ -27,6 +27,69 @@
     "description": "Security news, tutorials, malware and analysis"
   },
   {
+    "id": "krebsonsecurity",
+    "name": "Krebs on Security",
+    "url": "https://krebsonsecurity.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "In-depth security news and investigation by Brian Krebs"
+  },
+  {
+    "id": "thehackernews",
+    "name": "The Hacker News",
+    "url": "https://feeds.feedburner.com/TheHackersNews",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Cybersecurity news, hacking tutorials and vulnerability disclosures"
+  },
+  {
+    "id": "darkreading",
+    "name": "Dark Reading",
+    "url": "https://www.darkreading.com/rss.xml",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Cybersecurity news and analysis for security professionals"
+  },
+  {
+    "id": "cisa-alerts",
+    "name": "CISA Alerts",
+    "url": "https://www.cisa.gov/uscert/ncas/alerts.xml",
+    "category": "vulnerabilities",
+    "type": "rss",
+    "enabled": true,
+    "description": "Official CISA cybersecurity alerts and advisories"
+  },
+  {
+    "id": "sans-isc",
+    "name": "SANS Internet Storm Center",
+    "url": "https://isc.sans.edu/rssfeed_full.xml",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Daily threat analysis and security diaries from SANS ISC handlers"
+  },
+  {
+    "id": "talos",
+    "name": "Cisco Talos Intelligence",
+    "url": "https://blog.talosintelligence.com/feeds/posts/default",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Threat intelligence and research from Cisco Talos"
+  },
+  {
+    "id": "checkpoint-research",
+    "name": "Check Point Research",
+    "url": "https://research.checkpoint.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Threat intelligence and security research from Check Point"
+  },
+  {
     "id": "cisa-kev",
     "name": "CISA Known Exploited Vulnerabilities",
     "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
