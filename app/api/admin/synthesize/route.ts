@@ -46,9 +46,14 @@ export async function POST(req: NextRequest) {
     targetLength
   ];
 
+  const VALID_CATEGORIES = ["threat-intel", "vulnerabilities", "malware", "industry", "tools", "ai"] as const;
+  type ValidCategory = typeof VALID_CATEGORIES[number];
+  const clampCategory = (cat?: string): ValidCategory =>
+    VALID_CATEGORIES.includes(cat as ValidCategory) ? (cat as ValidCategory) : "threat-intel";
+
   // Build the source context block
   let sourceContext: string;
-  let primaryCategory = "cybersecurity";
+  let primaryCategory: ValidCategory = "threat-intel";
   let autoTags: string[] = [];
   let sourceCount: number;
 
@@ -67,7 +72,7 @@ export async function POST(req: NextRequest) {
   } else if (body.articles && body.articles.length > 0) {
     const { articles } = body;
     sourceCount = articles.length;
-    primaryCategory = articles[0]?.sourceCategory ?? "cybersecurity";
+    primaryCategory = clampCategory(articles[0]?.sourceCategory);
     autoTags = [
       ...new Set(articles.flatMap((a) => a.tags ?? []).filter(Boolean)),
     ].slice(0, 6);

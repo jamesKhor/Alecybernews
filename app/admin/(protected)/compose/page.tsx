@@ -191,7 +191,10 @@ export default function ComposePage() {
       if (data.suggested) {
         setTitle(data.suggested.title);
         setSlug(data.suggested.slug);
-        setCategory(data.suggested.category);
+        // Clamp to valid enum — AI may return values like "cybersecurity" that
+        // Zod rejects at build time, causing the article to be silently skipped
+        const suggestedCat = data.suggested.category;
+        setCategory(CATEGORIES.includes(suggestedCat) ? suggestedCat : "threat-intel");
         setTags(data.suggested.tags.join(", "));
         setExcerpt(data.suggested.excerpt);
       }
