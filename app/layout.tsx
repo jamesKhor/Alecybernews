@@ -22,6 +22,45 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
+  keywords: [
+    "cybersecurity",
+    "threat intelligence",
+    "malware analysis",
+    "vulnerability research",
+    "security news",
+    "CVE",
+    "ransomware",
+    "APT",
+  ],
+  authors: [{ name: "AleCyberNews" }],
+  creator: "AleCyberNews",
+  openGraph: {
+    type: "website",
+    siteName: "AleCyberNews",
+    title: "AleCyberNews",
+    description:
+      "Professional cybersecurity and tech intelligence — threat analysis, vulnerability research, and security news for defenders.",
+    images: [
+      {
+        url: "/images/defaults/og-default.svg",
+        width: 1200,
+        height: 630,
+        alt: "AleCyberNews",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AleCyberNews",
+    description:
+      "Professional cybersecurity and tech intelligence — threat analysis, vulnerability research, and security news for defenders.",
+    images: ["/images/defaults/og-default.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 };
 
 export default function RootLayout({

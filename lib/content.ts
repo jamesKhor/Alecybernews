@@ -59,14 +59,21 @@ export function getAllPosts(
 ): Article[] {
   const dir = getContentDir(locale, type);
 
-  if (!fs.existsSync(dir)) return [];
+  // Fall back to English content if the locale directory is empty or missing
+  const effectiveDir =
+    fs.existsSync(dir) &&
+    fs.readdirSync(dir).some((f) => f.endsWith(".mdx") || f.endsWith(".md"))
+      ? dir
+      : getContentDir("en", type);
+
+  if (!fs.existsSync(effectiveDir)) return [];
 
   const files = fs
-    .readdirSync(dir)
+    .readdirSync(effectiveDir)
     .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
 
   const articles = files
-    .map((file) => parseArticleFile(path.join(dir, file)))
+    .map((file) => parseArticleFile(path.join(effectiveDir, file)))
     .filter((a): a is Article => a !== null);
 
   // Sort by date descending
@@ -82,18 +89,22 @@ export function getPostBySlug(
   type: ContentType,
   slug: string,
 ): Article | null {
-  const dir = getContentDir(locale, type);
+  // Try requested locale first, then fall back to English
+  const localesToTry = locale === "en" ? ["en"] : [locale, "en"];
 
-  if (!fs.existsSync(dir)) return null;
+  for (const l of localesToTry) {
+    const dir = getContentDir(l, type);
+    if (!fs.existsSync(dir)) continue;
 
-  const files = fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+    const files = fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
 
-  for (const file of files) {
-    const article = parseArticleFile(path.join(dir, file));
-    if (article && article.frontmatter.slug === slug) {
-      return article;
+    for (const file of files) {
+      const article = parseArticleFile(path.join(dir, file));
+      if (article && article.frontmatter.slug === slug) {
+        return article;
+      }
     }
   }
 

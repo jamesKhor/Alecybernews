@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { useTranslations } from "next-intl";
@@ -7,6 +8,24 @@ const PAGE_SIZE = 12;
 interface Props {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ page?: string; category?: string; tag?: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const isZh = locale === "zh";
+  const title = isZh ? "文章" : "Articles";
+  const description = isZh
+    ? "浏览所有网络安全文章、分析与研究报告。"
+    : "Browse all cybersecurity articles, analysis, and research.";
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/articles`,
+      languages: { en: "/en/articles", "zh-Hans": "/zh/articles" },
+    },
+    openGraph: { title, description, url: `/${locale}/articles` },
+  };
 }
 
 export default async function ArticlesPage({ params, searchParams }: Props) {

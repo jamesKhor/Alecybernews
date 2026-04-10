@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
@@ -5,6 +6,33 @@ import { Link } from "@/i18n/navigation";
 
 interface Props {
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const isZh = locale === "zh";
+  const title = isZh
+    ? "AleCyberNews — 网络安全与科技情报"
+    : "AleCyberNews — Cybersecurity & Tech Intelligence";
+  const description = isZh
+    ? "深度威胁分析、漏洞研究与安全资讯，为防御者服务。"
+    : "In-depth threat analysis, vulnerability research, and security news for defenders.";
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}`,
+      languages: { en: "/en", "zh-Hans": "/zh" },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `/${locale}`,
+      locale: isZh ? "zh_CN" : "en_US",
+      alternateLocale: isZh ? "en_US" : "zh_CN",
+    },
+  };
 }
 
 export default async function HomePage({ params }: Props) {

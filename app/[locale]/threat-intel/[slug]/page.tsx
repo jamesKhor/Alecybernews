@@ -6,6 +6,7 @@ import { ArticleMeta } from "@/components/articles/ArticleMeta";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { IOCTable } from "@/components/threat-intel/IOCTable";
 import { MitreMatrix } from "@/components/threat-intel/MitreMatrix";
+import { NewsArticleJsonLd } from "@/components/seo/JsonLd";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 
@@ -28,9 +29,49 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = getPostBySlug(locale, "threat-intel", slug);
   if (!article) return {};
   const { frontmatter } = article;
+  const image =
+    frontmatter.featured_image ??
+    CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
+  const canonical = `/${locale}/threat-intel/${slug}`;
+
   return {
     title: frontmatter.title,
     description: frontmatter.excerpt,
+    keywords: [
+      ...(frontmatter.tags ?? []),
+      ...(frontmatter.cve_ids ?? []),
+      frontmatter.threat_actor ?? "",
+    ].filter(Boolean),
+    alternates: {
+      canonical,
+      languages: frontmatter.locale_pair
+        ? {
+            en: `/en/threat-intel/${frontmatter.locale_pair}`,
+            "zh-Hans": `/zh/threat-intel/${frontmatter.locale_pair}`,
+          }
+        : {
+            en: `/en/threat-intel/${slug}`,
+            "zh-Hans": `/zh/threat-intel/${slug}`,
+          },
+    },
+    openGraph: {
+      title: frontmatter.title,
+      description: frontmatter.excerpt,
+      type: "article",
+      url: canonical,
+      publishedTime: frontmatter.date,
+      modifiedTime: frontmatter.updated ?? frontmatter.date,
+      locale: locale === "zh" ? "zh_CN" : "en_US",
+      images: image
+        ? [{ url: image, width: 1200, height: 630, alt: frontmatter.title }]
+        : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: frontmatter.title,
+      description: frontmatter.excerpt,
+      images: image ? [image] : [],
+    },
   };
 }
 
@@ -42,16 +83,33 @@ export default async function ThreatIntelArticlePage({ params }: Props) {
   const { frontmatter, content, readingTime } = article;
   const { content: mdxContent, headings } = await compileMDX(content);
   const related = getRelatedPosts(frontmatter, locale, "threat-intel", 3);
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://alecybernews.vercel.app";
+  const image =
+    frontmatter.featured_image ??
+    CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
 
   return (
-    <TIPageContent
-      frontmatter={frontmatter}
-      mdxContent={mdxContent}
-      headings={headings}
-      readingTime={readingTime}
-      related={related}
-      locale={locale}
-    />
+    <>
+      <NewsArticleJsonLd
+        headline={frontmatter.title}
+        description={frontmatter.excerpt}
+        datePublished={frontmatter.date}
+        dateModified={frontmatter.updated}
+        authorName={frontmatter.author ?? "AleCyberNews"}
+        url={`${siteUrl}/${locale}/threat-intel/${slug}`}
+        image={image ? `${siteUrl}${image}` : undefined}
+        keywords={frontmatter.tags}
+      />
+      <TIPageContent
+        frontmatter={frontmatter}
+        mdxContent={mdxContent}
+        headings={headings}
+        readingTime={readingTime}
+        related={related}
+        locale={locale}
+      />
+    </>
   );
 }
 

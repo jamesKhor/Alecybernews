@@ -1,9 +1,28 @@
+import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { useTranslations } from "next-intl";
 
 interface Props {
   params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const isZh = locale === "zh";
+  const title = isZh ? "威胁情报" : "Threat Intelligence";
+  const description = isZh
+    ? "IOC、TTPs、威胁行为者档案与事件响应报告。"
+    : "IOCs, TTPs, threat actor profiles, and incident response reports.";
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/threat-intel`,
+      languages: { en: "/en/threat-intel", "zh-Hans": "/zh/threat-intel" },
+    },
+    openGraph: { title, description, url: `/${locale}/threat-intel` },
+  };
 }
 
 export default async function ThreatIntelPage({ params }: Props) {

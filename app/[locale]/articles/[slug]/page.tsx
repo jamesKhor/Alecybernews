@@ -6,6 +6,7 @@ import { ArticleMeta } from "@/components/articles/ArticleMeta";
 import { IOCTable } from "@/components/threat-intel/IOCTable";
 import { MitreMatrix } from "@/components/threat-intel/MitreMatrix";
 import { ArticleCard } from "@/components/articles/ArticleCard";
+import { NewsArticleJsonLd } from "@/components/seo/JsonLd";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 
@@ -34,25 +35,41 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const image =
     frontmatter.featured_image ??
     CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
+  const canonical = `/${locale}/articles/${slug}`;
 
   return {
     title: frontmatter.title,
     description: frontmatter.excerpt,
-    openGraph: {
-      title: frontmatter.title,
-      description: frontmatter.excerpt,
-      type: "article",
-      publishedTime: frontmatter.date,
-      modifiedTime: frontmatter.updated,
-      images: image ? [{ url: image, width: 1200, height: 630 }] : [],
-    },
+    keywords: frontmatter.tags,
+    authors: [{ name: frontmatter.author ?? "AleCyberNews" }],
     alternates: {
+      canonical,
       languages: frontmatter.locale_pair
         ? {
             en: `/en/articles/${frontmatter.locale_pair}`,
             "zh-Hans": `/zh/articles/${frontmatter.locale_pair}`,
           }
-        : undefined,
+        : { en: `/en/articles/${slug}`, "zh-Hans": `/zh/articles/${slug}` },
+    },
+    openGraph: {
+      title: frontmatter.title,
+      description: frontmatter.excerpt,
+      type: "article",
+      url: canonical,
+      publishedTime: frontmatter.date,
+      modifiedTime: frontmatter.updated ?? frontmatter.date,
+      authors: [frontmatter.author ?? "AleCyberNews"],
+      tags: frontmatter.tags,
+      locale: locale === "zh" ? "zh_CN" : "en_US",
+      images: image
+        ? [{ url: image, width: 1200, height: 630, alt: frontmatter.title }]
+        : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: frontmatter.title,
+      description: frontmatter.excerpt,
+      images: image ? [image] : [],
     },
   };
 }
@@ -65,16 +82,33 @@ export default async function ArticlePage({ params }: Props) {
   const { frontmatter, content, readingTime } = article;
   const { content: mdxContent, headings } = await compileMDX(content);
   const related = getRelatedPosts(frontmatter, locale, "posts", 3);
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://alecybernews.vercel.app";
+  const image =
+    frontmatter.featured_image ??
+    CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
 
   return (
-    <ArticlePageContent
-      frontmatter={frontmatter}
-      mdxContent={mdxContent}
-      headings={headings}
-      readingTime={readingTime}
-      related={related}
-      locale={locale}
-    />
+    <>
+      <NewsArticleJsonLd
+        headline={frontmatter.title}
+        description={frontmatter.excerpt}
+        datePublished={frontmatter.date}
+        dateModified={frontmatter.updated}
+        authorName={frontmatter.author ?? "AleCyberNews"}
+        url={`${siteUrl}/${locale}/articles/${slug}`}
+        image={image ? `${siteUrl}${image}` : undefined}
+        keywords={frontmatter.tags}
+      />
+      <ArticlePageContent
+        frontmatter={frontmatter}
+        mdxContent={mdxContent}
+        headings={headings}
+        readingTime={readingTime}
+        related={related}
+        locale={locale}
+      />
+    </>
   );
 }
 
