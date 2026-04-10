@@ -37,6 +37,8 @@ yarn-error.log*
 
 # vercel
 .vercel
+# (keep .vercel/project.json committed so GitHub Actions can find the project)
+!.vercel/project.json
 
 # typescript
 *.tsbuildinfo

@@ -1,4 +1,4 @@
-name: Build & Deploy to Cloudflare Pages
+name: Build & Deploy to Vercel
 
 on:
   push:
@@ -31,16 +31,8 @@ jobs:
       - name: Lint check
         run: npm run lint
 
-      - name: Build
-        run: npm run build
+      - name: Deploy to Vercel
+        run: npx vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
         env:
-          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
-          # NextAuth needs a secret even at build time for some imports
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .next --project-name=alecybernews --commit-dirty=true
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
