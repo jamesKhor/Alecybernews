@@ -30,7 +30,10 @@ export function Header({ locale }: Props) {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href={`/${locale}`} className="flex items-center gap-2 font-bold text-foreground">
+        <Link
+          href={`/${locale}`}
+          className="flex items-center gap-2 font-bold text-foreground"
+        >
           <Shield className="h-5 w-5 text-primary" />
           <span className="text-primary">Ale</span>
           <span>CyberNews</span>

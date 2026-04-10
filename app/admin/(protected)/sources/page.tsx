@@ -16,7 +16,8 @@ export default function SourcesPage() {
         <div>
           <h1 className="text-lg font-semibold text-white">RSS Sources</h1>
           <p className="text-sm text-gray-400 mt-0.5">
-            {sources.filter((s) => s.enabled).length} of {sources.length} sources active
+            {sources.filter((s) => s.enabled).length} of {sources.length}{" "}
+            sources active
           </p>
         </div>
       </div>
@@ -26,8 +27,11 @@ export default function SourcesPage() {
         <p className="font-medium mb-1">Adding new sources</p>
         <p className="text-blue-400/80">
           To add or remove sources, edit{" "}
-          <code className="bg-blue-950 px-1 py-0.5 rounded text-xs">data/rss-sources.json</code>{" "}
-          and redeploy. Dynamic source management via UI is planned for a future release.
+          <code className="bg-blue-950 px-1 py-0.5 rounded text-xs">
+            data/rss-sources.json
+          </code>{" "}
+          and redeploy. Dynamic source management via UI is planned for a future
+          release.
         </p>
       </div>
 
@@ -49,7 +53,9 @@ export default function SourcesPage() {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-medium text-white">{source.name}</p>
+                    <p className="text-sm font-medium text-white">
+                      {source.name}
+                    </p>
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full border ${categoryColors[source.category] ?? "bg-gray-800 text-gray-400 border-gray-700"}`}
                     >
@@ -59,7 +65,9 @@ export default function SourcesPage() {
                       {source.type}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">{source.description}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {source.description}
+                  </p>
                   <a
                     href={source.url}
                     target="_blank"
@@ -67,7 +75,9 @@ export default function SourcesPage() {
                     className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-emerald-400 mt-1.5 transition-colors"
                   >
                     <Rss className="w-3 h-3" />
-                    {source.url.length > 60 ? source.url.slice(0, 60) + "…" : source.url}
+                    {source.url.length > 60
+                      ? source.url.slice(0, 60) + "…"
+                      : source.url}
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -93,7 +103,8 @@ export default function SourcesPage() {
       <div className="rounded-lg border border-dashed border-gray-700 p-6 text-center">
         <p className="text-sm text-gray-500 mb-1">Want to add more sources?</p>
         <p className="text-xs text-gray-600">
-          Suggested: TheHackerNews, KrebsOnSecurity, DarkReading, Threatpost, US-CERT
+          Suggested: TheHackerNews, KrebsOnSecurity, DarkReading, Threatpost,
+          US-CERT
         </p>
       </div>
     </div>

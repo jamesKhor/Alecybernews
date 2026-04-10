@@ -1,7 +1,12 @@
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import type { Article } from "@/lib/content";
-import { CATEGORY_DEFAULT_IMAGES, SEVERITY_COLORS, type Category, type Severity } from "@/lib/types";
+import {
+  CATEGORY_DEFAULT_IMAGES,
+  SEVERITY_COLORS,
+  type Category,
+  type Severity,
+} from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {
@@ -16,7 +21,8 @@ export function ArticleCard({ article, locale, type = "posts" }: Props) {
   const { frontmatter, readingTime } = article;
 
   const image =
-    frontmatter.featured_image ?? CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
+    frontmatter.featured_image ??
+    CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
   const href = `/${locale}/${type === "threat-intel" ? "threat-intel" : "articles"}/${frontmatter.slug}`;
 
   return (
@@ -36,7 +42,8 @@ export function ArticleCard({ article, locale, type = "posts" }: Props) {
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="font-mono text-muted-foreground text-xs">
-              // {frontmatter.category}
+              {"// "}
+              {frontmatter.category}
             </span>
           </div>
         )}

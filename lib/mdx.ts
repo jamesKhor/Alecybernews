@@ -26,7 +26,7 @@ export async function compileMDX(source: string): Promise<{
 }
 
 function extractHeadings(
-  source: string
+  source: string,
 ): { id: string; text: string; level: number }[] {
   const headingRegex = /^(#{2,3})\s+(.+)$/gm;
   const headings: { id: string; text: string; level: number }[] = [];

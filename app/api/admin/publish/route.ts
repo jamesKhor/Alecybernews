@@ -32,7 +32,7 @@ author: "${req.author ?? "AleCyberNews"}"
 async function commitToGitHub(
   path: string,
   content: string,
-  message: string
+  message: string,
 ): Promise<{ url: string }> {
   const token = process.env.GITHUB_TOKEN;
   const repo = process.env.GITHUB_REPO; // e.g. "jamesKhor/Alecybernews"
@@ -87,7 +87,8 @@ async function commitToGitHub(
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = (await req.json()) as PublishRequest;
   const { title, slug, content, locale = "en", type = "posts" } = body;
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
   if (!title || !slug || !content) {
     return NextResponse.json(
       { error: "title, slug and content are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -111,7 +112,8 @@ export async function POST(req: NextRequest) {
       success: true,
       path: filePath,
       githubUrl: url,
-      message: "Article committed to GitHub. Cloudflare Pages will deploy shortly.",
+      message:
+        "Article committed to GitHub. Cloudflare Pages will deploy shortly.",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

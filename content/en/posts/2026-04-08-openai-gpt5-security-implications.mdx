@@ -4,7 +4,8 @@ slug: "gpt5-security-implications-enterprise"
 date: "2026-04-08"
 excerpt: "OpenAI's GPT-5 raises the bar for AI-assisted cyberattacks — spear-phishing at scale, automated exploit generation, and deepfake social engineering. Here's what security teams need to know and do."
 category: "ai"
-tags: ["ai", "llm", "gpt-5", "phishing", "social-engineering", "threat-modeling"]
+tags:
+  ["ai", "llm", "gpt-5", "phishing", "social-engineering", "threat-modeling"]
 language: "en"
 author: "AleCyberNews"
 draft: false
@@ -47,11 +48,11 @@ No technical IOCs apply to this advisory — this is a capability assessment, no
 
 From a threat modeling perspective, GPT-5 enhances attacker capability across:
 
-| Tactic | Technique | AI Enhancement |
-|--------|-----------|----------------|
-| Initial Access | Phishing (T1566) | Higher quality, personalized lures |
-| Resource Development | Develop Capabilities (T1587) | Faster exploit development |
-| Execution | User Execution (T1204) | More convincing social engineering |
+| Tactic               | Technique                    | AI Enhancement                     |
+| -------------------- | ---------------------------- | ---------------------------------- |
+| Initial Access       | Phishing (T1566)             | Higher quality, personalized lures |
+| Resource Development | Develop Capabilities (T1587) | Faster exploit development         |
+| Execution            | User Execution (T1204)       | More convincing social engineering |
 
 ## Threat Actor Context
 
@@ -81,16 +82,19 @@ Operation=Send
 ## Mitigations & Recommendations
 
 **Immediate (0–24 hours)**
+
 1. Update phishing simulation baselines to use GPT-5-quality content
 2. Brief finance and executive assistants on improved voice deepfake capabilities
 3. Enforce call-back verification procedures for wire transfer requests
 
 **Short-term (1–7 days)**
+
 1. Evaluate AI email security vendors that use behavioral analysis rather than content signatures
 2. Implement DMARC enforcement (p=reject) if not already deployed
 3. Review MFA coverage for all email accounts, particularly executives
 
 **Long-term**
+
 1. Develop an AI-use policy covering acceptable use of frontier models for employees
 2. Invest in continuous security awareness training calibrated to AI-enhanced threats
 3. Participate in industry threat intelligence sharing on LLM-assisted attack patterns

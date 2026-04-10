@@ -31,12 +31,18 @@ export function Footer({ locale }: Props) {
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href={`/${locale}/articles`} className="hover:text-primary transition-colors">
+                <a
+                  href={`/${locale}/articles`}
+                  className="hover:text-primary transition-colors"
+                >
                   Articles
                 </a>
               </li>
               <li>
-                <a href={`/${locale}/threat-intel`} className="hover:text-primary transition-colors">
+                <a
+                  href={`/${locale}/threat-intel`}
+                  className="hover:text-primary transition-colors"
+                >
                   Threat Intel
                 </a>
               </li>
@@ -50,6 +56,7 @@ export function Footer({ locale }: Props) {
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                 <a
                   href="/api/feed"
                   className="flex items-center gap-1.5 hover:text-primary transition-colors"
@@ -59,6 +66,7 @@ export function Footer({ locale }: Props) {
                 </a>
               </li>
               <li>
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                 <a
                   href="/api/wechat?locale=zh"
                   className="hover:text-primary transition-colors"

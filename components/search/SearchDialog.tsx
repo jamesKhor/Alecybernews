@@ -67,7 +67,11 @@ export function SearchDialog({ locale }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        open ? handleClose() : handleOpen();
+        if (open) {
+          handleClose();
+        } else {
+          handleOpen();
+        }
       }
       if (e.key === "Escape" && open) handleClose();
     };
@@ -93,7 +97,7 @@ export function SearchDialog({ locale }: Props) {
         }
         const search = await window.pagefind.search(query);
         const resolved = await Promise.all(
-          search.results.slice(0, 8).map((r) => r.data())
+          search.results.slice(0, 8).map((r) => r.data()),
         );
         if (!cancelled) setResults(resolved);
       } catch {
@@ -141,7 +145,10 @@ export function SearchDialog({ locale }: Props) {
           className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4"
           onClick={(e) => e.target === e.currentTarget && handleClose()}
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={handleClose}
+          />
 
           <div className="relative w-full max-w-xl bg-background border border-border rounded-xl shadow-2xl overflow-hidden">
             {/* Input */}
@@ -171,13 +178,17 @@ export function SearchDialog({ locale }: Props) {
             <div className="max-h-80 overflow-y-auto">
               {!query && (
                 <p className="text-xs text-muted-foreground text-center py-8">
-                  {locale === "zh" ? "输入关键词搜索文章" : "Type to search articles"}
+                  {locale === "zh"
+                    ? "输入关键词搜索文章"
+                    : "Type to search articles"}
                 </p>
               )}
 
               {query && results.length === 0 && !loading && (
                 <p className="text-xs text-muted-foreground text-center py-8">
-                  {locale === "zh" ? `没有找到 "${query}" 的结果` : `No results for "${query}"`}
+                  {locale === "zh"
+                    ? `没有找到 "${query}" 的结果`
+                    : `No results for "${query}"`}
                 </p>
               )}
 
@@ -204,15 +215,21 @@ export function SearchDialog({ locale }: Props) {
 
             <div className="px-4 py-2 border-t border-border flex items-center gap-3 text-xs text-muted-foreground">
               <span>
-                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">↑↓</kbd>{" "}
+                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">
+                  ↑↓
+                </kbd>{" "}
                 navigate
               </span>
               <span>
-                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">↵</kbd>{" "}
+                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">
+                  ↵
+                </kbd>{" "}
                 open
               </span>
               <span>
-                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">esc</kbd>{" "}
+                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">
+                  esc
+                </kbd>{" "}
                 close
               </span>
             </div>

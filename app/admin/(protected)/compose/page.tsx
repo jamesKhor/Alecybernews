@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import type { FeedArticle } from "@/lib/rss/fetch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -56,13 +57,17 @@ export default function ComposePage() {
   const [sourceArticles, setSourceArticles] = useState<FeedArticle[]>([]);
 
   // Paste mode state
-  const [pasteBlocks, setPasteBlocks] = useState<PasteBlock[]>([newPasteBlock()]);
+  const [pasteBlocks, setPasteBlocks] = useState<PasteBlock[]>([
+    newPasteBlock(),
+  ]);
 
   // Shared generation state
   const [generating, setGenerating] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [genError, setGenError] = useState("");
-  const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
+  const [publishResult, setPublishResult] = useState<PublishResult | null>(
+    null,
+  );
   const [customPrompt, setCustomPrompt] = useState("");
 
   // Generated content state
@@ -73,7 +78,9 @@ export default function ComposePage() {
   const [tags, setTags] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [locale, setLocale] = useState<"en" | "zh">("en");
-  const [targetLength, setTargetLength] = useState<"short" | "medium" | "long">("medium");
+  const [targetLength, setTargetLength] = useState<"short" | "medium" | "long">(
+    "medium",
+  );
 
   useEffect(() => {
     const stored = sessionStorage.getItem("compose_articles");
@@ -90,13 +97,21 @@ export default function ComposePage() {
 
   // Paste block helpers
   const addPasteBlock = () => {
-    if (pasteBlocks.length < 5) setPasteBlocks((prev) => [...prev, newPasteBlock()]);
+    if (pasteBlocks.length < 5)
+      setPasteBlocks((prev) => [...prev, newPasteBlock()]);
   };
   const removePasteBlock = (id: string) => {
-    if (pasteBlocks.length > 1) setPasteBlocks((prev) => prev.filter((b) => b.id !== id));
+    if (pasteBlocks.length > 1)
+      setPasteBlocks((prev) => prev.filter((b) => b.id !== id));
   };
-  const updatePasteBlock = (id: string, field: keyof PasteBlock, value: string) => {
-    setPasteBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)));
+  const updatePasteBlock = (
+    id: string,
+    field: keyof PasteBlock,
+    value: string,
+  ) => {
+    setPasteBlocks((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)),
+    );
   };
 
   const handleGenerate = async (mode: "feed" | "paste") => {
@@ -119,11 +134,18 @@ export default function ComposePage() {
     try {
       const body =
         mode === "feed"
-          ? { articles: sourceArticles, targetLength, customPrompt: customPrompt.trim() || undefined }
+          ? {
+              articles: sourceArticles,
+              targetLength,
+              customPrompt: customPrompt.trim() || undefined,
+            }
           : {
               pastedTexts: pasteBlocks
                 .filter((b) => b.text.trim())
-                .map((b) => ({ label: b.label.trim() || "Source", text: b.text.trim() })),
+                .map((b) => ({
+                  label: b.label.trim() || "Source",
+                  text: b.text.trim(),
+                })),
               targetLength,
               customPrompt: customPrompt.trim() || undefined,
             };
@@ -161,7 +183,10 @@ export default function ComposePage() {
 
   const handlePublish = async () => {
     if (!content || !title || !slug) {
-      setPublishResult({ success: false, error: "Title, slug and content are required." });
+      setPublishResult({
+        success: false,
+        error: "Title, slug and content are required.",
+      });
       return;
     }
     setPublishing(true);
@@ -177,7 +202,10 @@ export default function ComposePage() {
           content,
           excerpt,
           category,
-          tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
+          tags: tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
           locale,
           type: "posts",
         }),
@@ -201,14 +229,18 @@ export default function ComposePage() {
   // Shared settings + generate panel
   const SettingsPanel = ({ mode }: { mode: "feed" | "paste" }) => (
     <div className="px-4 py-4 border-t border-gray-800 space-y-3">
-      <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Settings</p>
+      <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+        Settings
+      </p>
 
       <div className="space-y-1">
         <label className="text-xs text-gray-500">Length</label>
         <div className="relative">
           <select
             value={targetLength}
-            onChange={(e) => setTargetLength(e.target.value as typeof targetLength)}
+            onChange={(e) =>
+              setTargetLength(e.target.value as typeof targetLength)
+            }
             className="w-full appearance-none px-3 py-1.5 rounded-md bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
           >
             <option value="short">Short (400–600 words)</option>
@@ -297,7 +329,10 @@ export default function ComposePage() {
           </TabsList>
 
           {/* FROM FEED TAB */}
-          <TabsContent value="feed" className="flex flex-col flex-1 mt-0 min-h-0">
+          <TabsContent
+            value="feed"
+            className="flex flex-col flex-1 mt-0 min-h-0"
+          >
             <div className="px-4 py-3 border-b border-gray-800 shrink-0">
               <p className="text-xs text-gray-500">
                 {sourceArticles.length === 0
@@ -311,9 +346,12 @@ export default function ComposePage() {
                 <div className="rounded-lg border border-dashed border-gray-700 p-4 text-center">
                   <p className="text-xs text-gray-500">
                     Go to{" "}
-                    <a href="/admin/feed" className="text-emerald-400 hover:underline">
+                    <Link
+                      href="/admin/feed"
+                      className="text-emerald-400 hover:underline"
+                    >
                       Feed Reader
-                    </a>{" "}
+                    </Link>{" "}
                     and select 1–5 articles to synthesize.
                   </p>
                 </div>
@@ -355,7 +393,10 @@ export default function ComposePage() {
           </TabsContent>
 
           {/* PASTE & COMPOSE TAB */}
-          <TabsContent value="paste" className="flex flex-col flex-1 mt-0 min-h-0">
+          <TabsContent
+            value="paste"
+            className="flex flex-col flex-1 mt-0 min-h-0"
+          >
             <div className="px-4 py-3 border-b border-gray-800 shrink-0 flex items-center justify-between">
               <p className="text-xs text-gray-500">
                 Paste text from any source — AI will rewrite into one article.
@@ -384,13 +425,17 @@ export default function ComposePage() {
                   <input
                     type="text"
                     value={block.label}
-                    onChange={(e) => updatePasteBlock(block.id, "label", e.target.value)}
+                    onChange={(e) =>
+                      updatePasteBlock(block.id, "label", e.target.value)
+                    }
                     placeholder="Source name (optional)"
                     className="w-full px-2 py-1 rounded bg-gray-900 border border-gray-700 text-xs text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                   <textarea
                     value={block.text}
-                    onChange={(e) => updatePasteBlock(block.id, "text", e.target.value)}
+                    onChange={(e) =>
+                      updatePasteBlock(block.id, "text", e.target.value)
+                    }
                     rows={5}
                     placeholder="Paste article text here…"
                     className="w-full px-2 py-2 rounded bg-gray-900 border border-gray-700 text-xs text-gray-200 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-y leading-relaxed font-mono"
@@ -506,7 +551,9 @@ export default function ComposePage() {
               </div>
             </div>
             <div className="col-span-2 space-y-1">
-              <label className="text-xs text-gray-500">Tags (comma separated)</label>
+              <label className="text-xs text-gray-500">
+                Tags (comma separated)
+              </label>
               <input
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}

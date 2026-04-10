@@ -150,6 +150,7 @@ CommandLine="*FromBase64String*$env:*"
 ```
 
 ### Key Log Sources
+
 - Windows Sysmon (Events 1, 7, 10, 11, 13)
 - VPN appliance authentication logs (failed + successful)
 - EDR telemetry for LSASS memory access
@@ -158,18 +159,21 @@ CommandLine="*FromBase64String*$env:*"
 ## Mitigations & Recommendations
 
 **Immediate (0–24 hours)**
+
 1. Apply CVE-2025-4821 and CVE-2025-3301 patches to all VPN appliances
 2. Block outbound connections to known TOR exit nodes at the firewall
 3. Disable unnecessary RDP exposure; enforce Network Level Authentication
 4. Hunt for `fontdrvhost.dll` outside `C:\Windows\System32\`
 
 **Short-term (1–7 days)**
+
 1. Enforce VPN multi-factor authentication
 2. Deploy application control rules blocking DLL loads from `C:\ProgramData\`
 3. Review and limit service account privileges
 4. Validate LSASS protection settings (`RunAsPPL`)
 
 **Long-term**
+
 1. Implement network segmentation between clinical and administrative VLANs
 2. Deploy immutable backup solutions with air-gapped copies
 3. Conduct tabletop exercises for ransomware scenarios specific to healthcare workflows

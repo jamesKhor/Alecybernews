@@ -59,7 +59,10 @@ function LoginForm() {
           )}
 
           <div className="space-y-1">
-            <label className="text-xs text-gray-400 font-medium" htmlFor="username">
+            <label
+              className="text-xs text-gray-400 font-medium"
+              htmlFor="username"
+            >
               Username
             </label>
             <input
@@ -75,7 +78,10 @@ function LoginForm() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-gray-400 font-medium" htmlFor="password">
+            <label
+              className="text-xs text-gray-400 font-medium"
+              htmlFor="password"
+            >
               Password
             </label>
             <input

@@ -23,7 +23,10 @@ export function ArticleMeta({ frontmatter, readingTime, locale }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
       {/* Category badge */}
-      <Badge variant="secondary" className="text-primary border-primary/20 bg-primary/10">
+      <Badge
+        variant="secondary"
+        className="text-primary border-primary/20 bg-primary/10"
+      >
         {tCats(frontmatter.category)}
       </Badge>
 

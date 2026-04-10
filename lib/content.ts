@@ -2,7 +2,11 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
-import { ArticleFrontmatterSchema, type Article, type ArticleFrontmatter } from "./types";
+import {
+  ArticleFrontmatterSchema,
+  type Article,
+  type ArticleFrontmatter,
+} from "./types";
 export type { Article };
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -20,7 +24,10 @@ function parseArticleFile(filePath: string): Article | null {
 
     const result = ArticleFrontmatterSchema.safeParse(data);
     if (!result.success) {
-      console.warn(`[content] Invalid frontmatter in ${filePath}:`, result.error.flatten());
+      console.warn(
+        `[content] Invalid frontmatter in ${filePath}:`,
+        result.error.flatten(),
+      );
       return null;
     }
 
@@ -48,7 +55,7 @@ function parseArticleFile(filePath: string): Article | null {
 
 export function getAllPosts(
   locale: string,
-  type: ContentType = "posts"
+  type: ContentType = "posts",
 ): Article[] {
   const dir = getContentDir(locale, type);
 
@@ -66,14 +73,14 @@ export function getAllPosts(
   return articles.sort(
     (a, b) =>
       new Date(b.frontmatter.date).getTime() -
-      new Date(a.frontmatter.date).getTime()
+      new Date(a.frontmatter.date).getTime(),
   );
 }
 
 export function getPostBySlug(
   locale: string,
   type: ContentType,
-  slug: string
+  slug: string,
 ): Article | null {
   const dir = getContentDir(locale, type);
 
@@ -97,18 +104,19 @@ export function getRelatedPosts(
   current: ArticleFrontmatter,
   locale: string,
   type: ContentType = "posts",
-  count = 3
+  count = 3,
 ): Article[] {
   const all = getAllPosts(locale, type).filter(
-    (a) => a.frontmatter.slug !== current.slug
+    (a) => a.frontmatter.slug !== current.slug,
   );
 
   // Score by tag overlap + same category
   const scored = all.map((article) => {
     const tagOverlap = article.frontmatter.tags.filter((t) =>
-      current.tags.includes(t)
+      current.tags.includes(t),
     ).length;
-    const sameCategory = article.frontmatter.category === current.category ? 2 : 0;
+    const sameCategory =
+      article.frontmatter.category === current.category ? 2 : 0;
     return { article, score: tagOverlap + sameCategory };
   });
 
@@ -122,7 +130,10 @@ export function getAllSlugs(locale: string, type: ContentType): string[] {
   return getAllPosts(locale, type).map((a) => a.frontmatter.slug);
 }
 
-export function getAllTags(locale: string, type: ContentType = "posts"): string[] {
+export function getAllTags(
+  locale: string,
+  type: ContentType = "posts",
+): string[] {
   const all = getAllPosts(locale, type);
   const tags = new Set(all.flatMap((a) => a.frontmatter.tags));
   return Array.from(tags).sort();

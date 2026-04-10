@@ -51,7 +51,9 @@ async function fetchRssFeed(source: RssSource): Promise<FeedArticle[]> {
       sourceCategory: source.category,
       title: item.title ?? "Untitled",
       url: item.link ?? "",
-      excerpt: stripHtml(item.contentSnippet ?? item.content ?? item.summary ?? "").slice(0, 280),
+      excerpt: stripHtml(
+        item.contentSnippet ?? item.content ?? item.summary ?? "",
+      ).slice(0, 280),
       publishedAt: item.pubDate ?? item.isoDate ?? new Date().toISOString(),
       author: item.creator ?? item.author,
       tags: item.categories ?? [],
@@ -101,13 +103,17 @@ async function fetchCisaKev(source: RssSource): Promise<FeedArticle[]> {
   }
 }
 
-export async function fetchAllFeeds(sourceIds?: string[]): Promise<FeedArticle[]> {
+export async function fetchAllFeeds(
+  sourceIds?: string[],
+): Promise<FeedArticle[]> {
   const sources = getEnabledSources().filter(
-    (s) => !sourceIds || sourceIds.includes(s.id)
+    (s) => !sourceIds || sourceIds.includes(s.id),
   );
 
   const results = await Promise.allSettled(
-    sources.map((s) => (s.type === "cisa-kev" ? fetchCisaKev(s) : fetchRssFeed(s)))
+    sources.map((s) =>
+      s.type === "cisa-kev" ? fetchCisaKev(s) : fetchRssFeed(s),
+    ),
   );
 
   const articles: FeedArticle[] = [];
@@ -117,10 +123,14 @@ export async function fetchAllFeeds(sourceIds?: string[]): Promise<FeedArticle[]
 
   // Sort by date descending
   return articles.sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    (a, b) =>
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
 }
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }

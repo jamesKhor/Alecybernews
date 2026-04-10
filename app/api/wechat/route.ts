@@ -29,6 +29,6 @@ export async function GET(request: NextRequest) {
         "Cache-Control": "public, max-age=3600",
         "Access-Control-Allow-Origin": "*",
       },
-    }
+    },
   );
 }

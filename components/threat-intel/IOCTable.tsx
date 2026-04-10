@@ -29,7 +29,9 @@ interface Props {
 export function IOCTable({ iocs }: Props) {
   const t = useTranslations("article");
   const [filter, setFilter] = useState<string>("all");
-  const [sortCol, setSortCol] = useState<"type" | "value" | "confidence">("type");
+  const [sortCol, setSortCol] = useState<"type" | "value" | "confidence">(
+    "type",
+  );
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -39,7 +41,8 @@ export function IOCTable({ iocs }: Props) {
   }, [iocs]);
 
   const filtered = useMemo(() => {
-    const base = filter === "all" ? iocs : iocs.filter((i) => i.type === filter);
+    const base =
+      filter === "all" ? iocs : iocs.filter((i) => i.type === filter);
     return [...base].sort((a, b) => {
       const av = a[sortCol] ?? "";
       const bv = b[sortCol] ?? "";
@@ -67,7 +70,7 @@ export function IOCTable({ iocs }: Props) {
     const header = "type,value,description,confidence,first_seen";
     const rows = filtered.map(
       (i) =>
-        `${i.type},"${i.value}","${i.description ?? ""}",${i.confidence ?? ""},${i.first_seen ?? ""}`
+        `${i.type},"${i.value}","${i.description ?? ""}",${i.confidence ?? ""},${i.first_seen ?? ""}`,
     );
     const blob = new Blob([[header, ...rows].join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -94,7 +97,7 @@ export function IOCTable({ iocs }: Props) {
           >
             {types.map((t) => (
               <option key={t} value={t}>
-                {t === "all" ? "All Types" : TYPE_LABELS[t] ?? t}
+                {t === "all" ? "All Types" : (TYPE_LABELS[t] ?? t)}
               </option>
             ))}
           </select>
@@ -123,7 +126,8 @@ export function IOCTable({ iocs }: Props) {
                 className="px-4 py-2 text-left text-xs text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                 onClick={() => toggleSort("value")}
               >
-                Value {sortCol === "value" ? (sortDir === "asc" ? "↑" : "↓") : ""}
+                Value{" "}
+                {sortCol === "value" ? (sortDir === "asc" ? "↑" : "↓") : ""}
               </th>
               <th className="px-4 py-2 text-left text-xs text-muted-foreground font-medium">
                 Description
@@ -132,7 +136,12 @@ export function IOCTable({ iocs }: Props) {
                 className="px-4 py-2 text-left text-xs text-muted-foreground font-medium cursor-pointer hover:text-foreground select-none"
                 onClick={() => toggleSort("confidence")}
               >
-                Conf {sortCol === "confidence" ? (sortDir === "asc" ? "↑" : "↓") : ""}
+                Conf{" "}
+                {sortCol === "confidence"
+                  ? sortDir === "asc"
+                    ? "↑"
+                    : "↓"
+                  : ""}
               </th>
               <th className="px-4 py-2" />
             </tr>

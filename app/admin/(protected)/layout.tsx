@@ -6,7 +6,6 @@ import {
   Rss,
   Newspaper,
   PenLine,
-  FileText,
   LogOut,
   ShieldCheck,
 } from "lucide-react";

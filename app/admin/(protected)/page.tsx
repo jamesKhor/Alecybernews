@@ -1,7 +1,13 @@
 import { getSources } from "@/lib/rss/fetch";
 import { getAllPosts } from "@/lib/content";
 import Link from "next/link";
-import { Rss, Newspaper, PenLine, ExternalLink, TrendingUp } from "lucide-react";
+import {
+  Rss,
+  Newspaper,
+  PenLine,
+  ExternalLink,
+  TrendingUp,
+} from "lucide-react";
 
 export default async function AdminDashboard() {
   const sources = getSources();
@@ -79,7 +85,9 @@ export default async function AdminDashboard() {
               <p className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">
                 Browse Feed
               </p>
-              <p className="text-xs text-gray-500">Read latest from all sources</p>
+              <p className="text-xs text-gray-500">
+                Read latest from all sources
+              </p>
             </div>
           </Link>
           <Link
@@ -117,7 +125,10 @@ export default async function AdminDashboard() {
           {recentPosts.length === 0 && (
             <p className="text-sm text-gray-500 py-4 text-center">
               No articles published yet. Go to{" "}
-              <Link href="/admin/feed" className="text-emerald-400 hover:underline">
+              <Link
+                href="/admin/feed"
+                className="text-emerald-400 hover:underline"
+              >
                 Feed Reader
               </Link>{" "}
               to get started.
@@ -129,7 +140,9 @@ export default async function AdminDashboard() {
               className="flex items-center justify-between p-3 rounded-lg bg-gray-900 border border-gray-800"
             >
               <div className="min-w-0">
-                <p className="text-sm text-white truncate">{post.frontmatter.title}</p>
+                <p className="text-sm text-white truncate">
+                  {post.frontmatter.title}
+                </p>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {post.frontmatter.category} ·{" "}
                   {new Date(post.frontmatter.date).toLocaleDateString("en-US", {

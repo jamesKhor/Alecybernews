@@ -9,6 +9,7 @@ This file gives Claude full context to continue working on this project from any
 ## What This Project Is
 
 A professional cybersecurity and tech news site that:
+
 - Serves **English and Simplified Chinese** articles with bilingual routing
 - Uses **Git + MDX files** as the CMS (no database, no GUI CMS)
 - Runs an **AI-powered pipeline** that ingests RSS feeds, generates articles with DeepSeek-V3, translates to Chinese with Kimi K2, and commits them automatically via GitHub Actions
@@ -22,21 +23,21 @@ A professional cybersecurity and tech news site that:
 
 ## Tech Stack
 
-| Layer | Package |
-|---|---|
-| Framework | Next.js 16 (App Router, TypeScript) |
-| Styling | Tailwind CSS v4 + shadcn/ui |
-| Content | gray-matter + next-mdx-remote |
-| MDX plugins | remark-gfm, rehype-highlight, rehype-slug |
-| i18n | next-intl v4 (EN/ZH routing) |
-| AI text — articles | DeepSeek-V3 via `@ai-sdk/openai-compatible` |
+| Layer                         | Package                                               |
+| ----------------------------- | ----------------------------------------------------- |
+| Framework                     | Next.js 16 (App Router, TypeScript)                   |
+| Styling                       | Tailwind CSS v4 + shadcn/ui                           |
+| Content                       | gray-matter + next-mdx-remote                         |
+| MDX plugins                   | remark-gfm, rehype-highlight, rehype-slug             |
+| i18n                          | next-intl v4 (EN/ZH routing)                          |
+| AI text — articles            | DeepSeek-V3 via `@ai-sdk/openai-compatible`           |
 | AI text — Chinese translation | Kimi K2 (Moonshot AI) via `@ai-sdk/openai-compatible` |
-| AI images (Phase 2) | fal.ai FLUX.1-schnell (~$0.003/image) |
-| Web search | Brave Search API or Tavily |
-| Schema validation | Zod v4 |
-| Script runner | tsx |
-| Locale middleware | `proxy.ts` (Next.js 16 renamed middleware → proxy) |
-| Deploy | Cloudflare Pages via `cloudflare/wrangler-action` |
+| AI images (Phase 2)           | fal.ai FLUX.1-schnell (~$0.003/image)                 |
+| Web search                    | Brave Search API or Tavily                            |
+| Schema validation             | Zod v4                                                |
+| Script runner                 | tsx                                                   |
+| Locale middleware             | `proxy.ts` (Next.js 16 renamed middleware → proxy)    |
+| Deploy                        | Cloudflare Pages via `cloudflare/wrangler-action`     |
 
 ---
 
@@ -116,33 +117,33 @@ Every `.mdx` article must have this frontmatter (validated by `lib/types.ts`):
 ---
 title: "Article Title"
 slug: "url-slug"
-date: "2026-04-09"           # ISO 8601
-updated: "2026-04-10"        # optional
+date: "2026-04-09" # ISO 8601
+updated: "2026-04-10" # optional
 excerpt: "1-2 sentence summary for cards and meta tags"
-category: "threat-intel"     # threat-intel|vulnerabilities|malware|industry|tools|ai
+category: "threat-intel" # threat-intel|vulnerabilities|malware|industry|tools|ai
 tags: ["ransomware", "apt"]
-language: "en"               # en|zh
-locale_pair: "slug-of-other-language-version"  # optional
+language: "en" # en|zh
+locale_pair: "slug-of-other-language-version" # optional
 source_urls: ["https://..."]
-author: "AI-generated"       # or human name
-featured_image: "/images/articles/slug.webp"   # optional, overrides default
+author: "AI-generated" # or human name
+featured_image: "/images/articles/slug.webp" # optional, overrides default
 draft: false
-scheduled_publish: "2026-04-10T09:00:00Z"      # optional, hides until this time
+scheduled_publish: "2026-04-10T09:00:00Z" # optional, hides until this time
 
 # Threat intel fields (optional on regular posts)
 threat_actor: "LockBit 4.0"
 threat_actor_origin: "Russia"
 campaign: "HL-SECTOR-2026-Q1"
-severity: "critical"         # critical|high|medium|low|informational
+severity: "critical" # critical|high|medium|low|informational
 cvss_score: 9.8
 cve_ids: ["CVE-2026-1234"]
 affected_sectors: ["healthcare"]
 affected_regions: ["North America"]
 iocs:
-  - type: "ip"               # ip|domain|hash_md5|hash_sha1|hash_sha256|url|email|registry_key|file_path
+  - type: "ip" # ip|domain|hash_md5|hash_sha1|hash_sha256|url|email|registry_key|file_path
     value: "1.2.3.4"
     description: "C2 server"
-    confidence: "high"       # high|medium|low
+    confidence: "high" # high|medium|low
     first_seen: "2026-04-01"
 ttp_matrix:
   - tactic: "Initial Access"
@@ -215,9 +216,11 @@ npx tsc --noEmit   # type-check only
 ## Phase Completion Status
 
 ### ✅ Phase 0 — Bootstrap (DONE)
+
 Next.js 16, Tailwind v4, shadcn/ui, all dependencies, `proxy.ts` locale middleware.
 
 ### ✅ Phase 1 — Content Layer (DONE)
+
 - `lib/types.ts` — Zod schemas for all frontmatter fields
 - `lib/content.ts` — `getAllPosts`, `getPostBySlug`, `getRelatedPosts`, `getAllTags`
 - `lib/mdx.ts` — `compileMDX` with remark-gfm, rehype-highlight, rehype-slug
@@ -226,6 +229,7 @@ Next.js 16, Tailwind v4, shadcn/ui, all dependencies, `proxy.ts` locale middlewa
 - Pagination on listing pages
 
 ### ✅ Phase 2 — Core UI Components (DONE)
+
 - `Header.tsx` — sticky nav, locale switcher (EN↔中文), mobile hamburger
 - `Footer.tsx` — links, RSS/WeChat feed links
 - `ArticleCard.tsx` — thumbnail, category badge, severity overlay, reading time
@@ -238,6 +242,7 @@ Next.js 16, Tailwind v4, shadcn/ui, all dependencies, `proxy.ts` locale middlewa
 - 2 sample articles: LockBit TI report (with real IOCs/TTPs), GPT-5 security analysis
 
 ### 🔲 Phase 3 — Search & Additional Pages (TODO)
+
 - Install and configure `pagefind` for static full-text search
 - Build `components/search/SearchDialog.tsx` (Cmd/Ctrl+K modal)
 - Add search page `app/[locale]/search/page.tsx`
@@ -246,6 +251,7 @@ Next.js 16, Tailwind v4, shadcn/ui, all dependencies, `proxy.ts` locale middlewa
 - `app/sitemap.ts` and `app/robots.ts`
 
 ### 🔲 Phase 4 — AI Content Pipeline (TODO)
+
 This is the most important remaining phase. Build `scripts/` directory:
 
 ```
@@ -275,6 +281,7 @@ scripts/
 ```
 
 **AI Provider setup** (both use OpenAI-compatible API format):
+
 ```typescript
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
@@ -292,6 +299,7 @@ export const translationModel = kimi("moonshot-v1-32k");
 ```
 
 **RSS Feed Sources** to include in `scripts/sources/feeds.ts`:
+
 - https://krebsonsecurity.com/feed/
 - https://www.bleepingcomputer.com/feed/
 - https://feeds.feedburner.com/TheHackersNews
@@ -302,6 +310,7 @@ export const translationModel = kimi("moonshot-v1-32k");
 - https://research.checkpoint.com/feed/
 
 **Article generation prompt** (use in `scripts/ai/prompts/article.ts`):
+
 ```
 You are a senior cybersecurity analyst and technical writer for AleCyberNews.
 Write at the level of Krebs on Security — accurate, technically precise, no marketing language.
@@ -323,9 +332,11 @@ Map TTPs to MITRE ATT&CK technique IDs where possible.
 ```
 
 ### 🔲 Phase 5 — GitHub Actions (TODO)
+
 Create `.github/workflows/`:
 
 **`build-deploy.yml`** — triggers on push to main, deploys to Cloudflare Pages:
+
 ```yaml
 on:
   push:
@@ -337,7 +348,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
+        with: { node-version: "22", cache: "npm" }
       - run: npm ci
       - run: npm run build
         env:
@@ -350,14 +361,15 @@ jobs:
 ```
 
 **`ai-content-pipeline.yml`** — runs daily, generates articles, commits, triggers build:
+
 ```yaml
 on:
   schedule:
-    - cron: '0 2 * * *'
-    - cron: '0 14 * * *'
+    - cron: "0 2 * * *"
+    - cron: "0 14 * * *"
   workflow_dispatch:
     inputs:
-      max_articles: { default: '5' }
+      max_articles: { default: "5" }
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -366,7 +378,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'npm' }
+        with: { node-version: "22", cache: "npm" }
       - run: npm ci
       - run: npx tsx scripts/pipeline/index.ts --max-articles=${{ inputs.max_articles || '5' }}
         env:
@@ -383,6 +395,7 @@ jobs:
 ```
 
 ### 🔲 Phase 6 — SEO & Performance (TODO)
+
 - `generateMetadata` in every `page.tsx` with og:image, hreflang (`zh-Hans`)
 - `app/sitemap.ts` — XML sitemap from all posts
 - `app/robots.ts`
@@ -405,6 +418,7 @@ jobs:
 ## How to Continue in a New Session
 
 Tell Claude:
+
 > "Read CLAUDE.md and continue from Phase [3/4/5/6]"
 
 Claude will read this file and have full context to continue immediately.

@@ -120,7 +120,8 @@ body {
   color: hsl(var(--foreground));
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
   padding-left: 1.5rem;
   margin-bottom: 1.25rem;
   color: hsl(210 30% 85%);
@@ -163,11 +164,28 @@ body {
   background: transparent !important;
   color: hsl(210 40% 90%) !important;
 }
-.hljs-keyword { color: hsl(199 89% 60%) !important; }
-.hljs-string { color: hsl(142 71% 55%) !important; }
-.hljs-comment { color: hsl(215 20% 45%) !important; font-style: italic; }
-.hljs-number { color: hsl(25 95% 65%) !important; }
-.hljs-function { color: hsl(280 65% 75%) !important; }
-.hljs-title { color: hsl(45 93% 65%) !important; }
-.hljs-attr { color: hsl(199 89% 60%) !important; }
-.hljs-variable { color: hsl(0 72% 70%) !important; }
+.hljs-keyword {
+  color: hsl(199 89% 60%) !important;
+}
+.hljs-string {
+  color: hsl(142 71% 55%) !important;
+}
+.hljs-comment {
+  color: hsl(215 20% 45%) !important;
+  font-style: italic;
+}
+.hljs-number {
+  color: hsl(25 95% 65%) !important;
+}
+.hljs-function {
+  color: hsl(280 65% 75%) !important;
+}
+.hljs-title {
+  color: hsl(45 93% 65%) !important;
+}
+.hljs-attr {
+  color: hsl(199 89% 60%) !important;
+}
+.hljs-variable {
+  color: hsl(0 72% 70%) !important;
+}

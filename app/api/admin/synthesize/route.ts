@@ -30,15 +30,21 @@ type SynthesizeRequest =
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (!process.env.DEEPSEEK_API_KEY) {
-    return NextResponse.json({ error: "DEEPSEEK_API_KEY not configured" }, { status: 503 });
+    return NextResponse.json(
+      { error: "DEEPSEEK_API_KEY not configured" },
+      { status: 503 },
+    );
   }
 
   const body = (await req.json()) as SynthesizeRequest;
   const { targetLength = "medium", customPrompt } = body;
-  const wordCount = { short: "400-600", medium: "700-900", long: "1000-1300" }[targetLength];
+  const wordCount = { short: "400-600", medium: "700-900", long: "1000-1300" }[
+    targetLength
+  ];
 
   // Build the source context block
   let sourceContext: string;
@@ -55,18 +61,20 @@ export async function POST(req: NextRequest) {
     sourceContext = validBlocks
       .map(
         (b, i) =>
-          `SOURCE ${i + 1}${b.label ? ` (${b.label})` : ""}:\n${b.text.trim()}`
+          `SOURCE ${i + 1}${b.label ? ` (${b.label})` : ""}:\n${b.text.trim()}`,
       )
       .join("\n\n---\n\n");
   } else if (body.articles && body.articles.length > 0) {
     const { articles } = body;
     sourceCount = articles.length;
     primaryCategory = articles[0]?.sourceCategory ?? "cybersecurity";
-    autoTags = [...new Set(articles.flatMap((a) => a.tags ?? []).filter(Boolean))].slice(0, 6);
+    autoTags = [
+      ...new Set(articles.flatMap((a) => a.tags ?? []).filter(Boolean)),
+    ].slice(0, 6);
     sourceContext = articles
       .map(
         (a, i) =>
-          `SOURCE ${i + 1}: "${a.title}" (from ${a.sourceName})\n${a.excerpt}`
+          `SOURCE ${i + 1}: "${a.title}" (from ${a.sourceName})\n${a.excerpt}`,
       )
       .join("\n\n---\n\n");
   } else {
@@ -128,11 +136,18 @@ Now write the synthesized article in markdown. Do not include a title — return
         slug: `${today}-${slugBase}`,
         category: primaryCategory,
         tags: autoTags,
-        excerpt: text.split("\n").find((l) => l.trim().length > 80)?.slice(0, 200) ?? "",
+        excerpt:
+          text
+            .split("\n")
+            .find((l) => l.trim().length > 80)
+            ?.slice(0, 200) ?? "",
       },
     });
   } catch (err) {
     console.error("[api/admin/synthesize]", err);
-    return NextResponse.json({ error: "AI generation failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "AI generation failed" },
+      { status: 500 },
+    );
   }
 }

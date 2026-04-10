@@ -25,7 +25,6 @@ function HomeContent({
   tiPosts: Awaited<ReturnType<typeof getAllPosts>>;
 }) {
   const t = useTranslations("home");
-  const tNav = useTranslations("nav");
 
   return (
     <main className="flex-1">
@@ -50,7 +49,9 @@ function HomeContent({
         {posts.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-foreground">{t("latestArticles")}</h2>
+              <h2 className="text-2xl font-bold text-foreground">
+                {t("latestArticles")}
+              </h2>
               <Link
                 href="/articles"
                 locale={locale as "en" | "zh"}
@@ -61,7 +62,11 @@ function HomeContent({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {posts.map((post) => (
-                <ArticleCard key={post.frontmatter.slug} article={post} locale={locale} />
+                <ArticleCard
+                  key={post.frontmatter.slug}
+                  article={post}
+                  locale={locale}
+                />
               ))}
             </div>
           </section>
@@ -85,7 +90,12 @@ function HomeContent({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {tiPosts.map((post) => (
-                <ArticleCard key={post.frontmatter.slug} article={post} locale={locale} type="threat-intel" />
+                <ArticleCard
+                  key={post.frontmatter.slug}
+                  article={post}
+                  locale={locale}
+                  type="threat-intel"
+                />
               ))}
             </div>
           </section>
@@ -93,8 +103,10 @@ function HomeContent({
 
         {posts.length === 0 && tiPosts.length === 0 && (
           <div className="text-center py-24 text-muted-foreground">
-            <p className="text-xl font-mono">// No articles yet</p>
-            <p className="mt-2 text-sm">Run the AI pipeline or add MDX files to content/</p>
+            <p className="text-xl font-mono">{"// No articles yet"}</p>
+            <p className="mt-2 text-sm">
+              Run the AI pipeline or add MDX files to content/
+            </p>
           </div>
         )}
       </div>

@@ -72,7 +72,8 @@ function TIPageContent({
 }) {
   const t = useTranslations("article");
   const featuredImage =
-    frontmatter.featured_image ?? CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
+    frontmatter.featured_image ??
+    CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-10">
@@ -87,7 +88,9 @@ function TIPageContent({
             <h1 className="text-3xl md:text-4xl font-bold leading-tight mt-4 mb-4">
               {frontmatter.title}
             </h1>
-            <p className="text-lg text-muted-foreground">{frontmatter.excerpt}</p>
+            <p className="text-lg text-muted-foreground">
+              {frontmatter.excerpt}
+            </p>
           </header>
 
           {featuredImage && (
@@ -128,7 +131,9 @@ function TIPageContent({
                     key={h.id}
                     href={`#${h.id}`}
                     className={`block text-sm hover:text-primary transition-colors ${
-                      h.level === 2 ? "text-foreground" : "text-muted-foreground pl-3"
+                      h.level === 2
+                        ? "text-foreground"
+                        : "text-muted-foreground pl-3"
                     }`}
                   >
                     {h.text}

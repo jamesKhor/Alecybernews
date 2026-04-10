@@ -31,7 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return {};
 
   const { frontmatter } = article;
-  const image = frontmatter.featured_image ?? CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
+  const image =
+    frontmatter.featured_image ??
+    CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
 
   return {
     title: frontmatter.title,
@@ -93,7 +95,8 @@ function ArticlePageContent({
 }) {
   const t = useTranslations("article");
   const featuredImage =
-    frontmatter.featured_image ?? CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
+    frontmatter.featured_image ??
+    CATEGORY_DEFAULT_IMAGES[frontmatter.category as Category];
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-10">

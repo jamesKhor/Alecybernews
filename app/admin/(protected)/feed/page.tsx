@@ -54,7 +54,9 @@ export default function FeedReaderPage() {
   const articleCache = useRef<Map<string, FeedArticle[]>>(new Map());
 
   // Persisted selection across all sources: articleId → FeedArticle
-  const [selectedMap, setSelectedMap] = useState<Map<string, FeedArticle>>(new Map());
+  const [selectedMap, setSelectedMap] = useState<Map<string, FeedArticle>>(
+    new Map(),
+  );
 
   // Current displayed articles (from cache for active source)
   const [displayedArticles, setDisplayedArticles] = useState<FeedArticle[]>([]);
@@ -64,30 +66,33 @@ export default function FeedReaderPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loaded, setLoaded] = useState(false);
 
-  const fetchFeed = useCallback(async (sourceId: string, forceRefresh = false) => {
-    if (!forceRefresh && articleCache.current.has(sourceId)) {
-      const cached = articleCache.current.get(sourceId)!;
-      setDisplayedArticles(cached);
-      setLoaded(true);
-      return;
-    }
+  const fetchFeed = useCallback(
+    async (sourceId: string, forceRefresh = false) => {
+      if (!forceRefresh && articleCache.current.has(sourceId)) {
+        const cached = articleCache.current.get(sourceId)!;
+        setDisplayedArticles(cached);
+        setLoaded(true);
+        return;
+      }
 
-    setLoading(true);
-    setError("");
-    try {
-      const params = sourceId !== "all" ? `?sources=${sourceId}` : "";
-      const res = await fetch(`/api/admin/feed${params}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as { articles: FeedArticle[] };
-      articleCache.current.set(sourceId, data.articles);
-      setDisplayedArticles(data.articles);
-      setLoaded(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load feed");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      setLoading(true);
+      setError("");
+      try {
+        const params = sourceId !== "all" ? `?sources=${sourceId}` : "";
+        const res = await fetch(`/api/admin/feed${params}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as { articles: FeedArticle[] };
+        articleCache.current.set(sourceId, data.articles);
+        setDisplayedArticles(data.articles);
+        setLoaded(true);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load feed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const handleSourceChange = (sourceId: string) => {
     setActiveSource(sourceId);
@@ -112,7 +117,7 @@ export default function FeedReaderPage() {
   const goCompose = () => {
     sessionStorage.setItem(
       "compose_articles",
-      JSON.stringify(Array.from(selectedMap.values()))
+      JSON.stringify(Array.from(selectedMap.values())),
     );
     router.push("/admin/compose");
   };
@@ -120,7 +125,9 @@ export default function FeedReaderPage() {
   const filtered = displayedArticles.filter((a) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q);
+    return (
+      a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q)
+    );
   });
 
   const selectedCount = selectedMap.size;
@@ -131,7 +138,9 @@ export default function FeedReaderPage() {
       {/* Source sidebar */}
       <div className="w-44 flex-shrink-0 border-r border-gray-800 bg-gray-900/50 flex flex-col">
         <div className="px-3 py-3 border-b border-gray-800">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Sources</p>
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+            Sources
+          </p>
         </div>
         <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
           <button
@@ -180,7 +189,9 @@ export default function FeedReaderPage() {
             disabled={loading}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 disabled:opacity-50 transition-colors"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
+            />
             {loading ? "Loading…" : "Refresh"}
           </button>
 
@@ -195,7 +206,9 @@ export default function FeedReaderPage() {
         <div className="flex-1 overflow-y-auto min-h-0">
           {!loaded && !loading && (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <p className="text-sm">Select a source or load all feeds to get started</p>
+              <p className="text-sm">
+                Select a source or load all feeds to get started
+              </p>
               <button
                 onClick={() => fetchFeed("all")}
                 className="mt-4 px-4 py-2 rounded-md bg-emerald-700 hover:bg-emerald-600 text-sm text-white transition-colors"
@@ -273,12 +286,15 @@ export default function FeedReaderPage() {
                           </span>
                         )}
                         <span className="text-xs text-gray-600">
-                          {new Date(article.publishedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(article.publishedAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
                         </span>
                       </div>
                       <a
@@ -290,7 +306,9 @@ export default function FeedReaderPage() {
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     </div>
-                    <p className="text-sm text-white leading-snug">{article.title}</p>
+                    <p className="text-sm text-white leading-snug">
+                      {article.title}
+                    </p>
                     {article.excerpt && (
                       <p className="text-xs text-gray-400 mt-1 leading-relaxed line-clamp-2">
                         {article.excerpt}
@@ -337,7 +355,8 @@ export default function FeedReaderPage() {
             {/* Empty state */}
             {selectedCount === 0 && (
               <p className="text-xs text-gray-600 italic">
-                Tick articles to add them here — selections persist across sources
+                Tick articles to add them here — selections persist across
+                sources
               </p>
             )}
 
