@@ -8,6 +8,7 @@ import {
   type Severity,
 } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import { stripMarkdown } from "@/lib/utils";
 
 interface Props {
   article: Article;
@@ -85,7 +86,7 @@ export function ArticleCard({ article, locale, type = "posts" }: Props) {
 
         {/* Excerpt */}
         <p className="text-sm text-muted-foreground line-clamp-2 flex-1 leading-relaxed">
-          {frontmatter.excerpt}
+          {stripMarkdown(frontmatter.excerpt)}
         </p>
 
         {/* Footer */}

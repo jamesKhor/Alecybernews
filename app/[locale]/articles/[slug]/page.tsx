@@ -9,6 +9,7 @@ import { ArticleCard } from "@/components/articles/ArticleCard";
 import { NewsArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
+import { stripMarkdown } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -158,7 +159,7 @@ function ArticlePageContent({
               {frontmatter.title}
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              {frontmatter.excerpt}
+              {stripMarkdown(frontmatter.excerpt)}
             </p>
           </header>
 

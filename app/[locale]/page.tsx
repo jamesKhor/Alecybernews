@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { HomeJsonLd } from "@/components/seo/JsonLd";
+import { stripMarkdown } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -266,7 +267,7 @@ function LatestGrid({
             {lead.frontmatter.title}
           </h2>
           <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
-            {lead.frontmatter.excerpt}
+            {stripMarkdown(lead.frontmatter.excerpt)}
           </p>
           <span className="text-xs text-muted-foreground">
             {tArt("readingTime", { minutes: lead.readingTime })}

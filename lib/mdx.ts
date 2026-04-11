@@ -3,6 +3,7 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import type { ReactElement } from "react";
+import { MDXCode } from "@/components/cve/CVEBadge";
 
 export async function compileMDX(source: string): Promise<{
   content: ReactElement;
@@ -16,7 +17,10 @@ export async function compileMDX(source: string): Promise<{
         rehypePlugins: [rehypeHighlight, rehypeSlug],
       },
     },
-    // Components are passed at render site via MDXComponents.tsx
+    components: {
+      // Intercept inline code — upgrades CVE-XXXX-XXXXX to a hover badge
+      code: MDXCode,
+    },
   });
 
   // Extract headings for Table of Contents

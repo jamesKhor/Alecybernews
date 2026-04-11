@@ -154,7 +154,7 @@ Return ONLY the article body in markdown. Do not include a title or frontmatter.
 {
   "title": "<SEO headline: put primary keyword near the start, 50-70 characters, no clickbait>",
   "category": "<one of the exact values below>",
-  "excerpt": "<meta description: 1-2 sentences, include primary keyword, state the key fact clearly, 120-160 characters>",
+  "excerpt": "<meta description: plain text only, NO markdown, 1-2 sentences, include primary keyword, state the key fact clearly, 120-160 characters>",
   "tags": ["<5-8 specific lowercase tags: CVE IDs, threat actor names, tools, techniques — avoid generic terms like 'cybersecurity' or 'hacking'>"]
 }
 
