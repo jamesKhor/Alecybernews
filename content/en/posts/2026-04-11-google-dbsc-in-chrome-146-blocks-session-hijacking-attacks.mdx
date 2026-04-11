@@ -1,0 +1,56 @@
+---
+title: "Google DBSC in Chrome 146 Blocks Session Hijacking Attacks"
+slug: "2026-04-11-google-dbsc-in-chrome-146-blocks-session-hijacking-attacks"
+date: "2026-04-11"
+excerpt: "Google's Device Bound Session Credentials (DBSC) in Chrome 146 cryptographically binds session cookies to devices, neutralizing infostealing malware that steals cookies to hijack accounts."
+category: "tools"
+tags:
+  - device-bound session credentials
+  - dbsc
+  - chrome 146
+  - session hijacking
+  - session cookie theft
+  - infostealing malware
+  - browser security
+  - authentication security
+language: "en"
+locale_pair: "2026-04-11-google-dbsc-in-chrome-146-blocks-session-hijacking-attacks"
+author: "AleCyberNews"
+draft: false
+---
+
+Google has made Device Bound Session Credentials (DBSC) generally available in Chrome 146 for Windows, delivering on a long-promised security mechanism designed to neutralize session hijacking attacks that have plagued users for years. The rollout marks the first major browser-level defense against infostealing malware that specifically targets session cookies, a primary attack vector leveraged by threat actors to bypass authentication and hijack legitimate user accounts.
+
+## How DBSC Blocks Session Cookie Theft
+
+Device Bound Session Credentials represent a fundamental shift in how Chrome manages authentication sessions. According to Google's Account Security and Chrome teams, the protection works by cryptographically binding session tokens to the user's device rather than allowing them to float freely across the browser environment.
+
+When a user authenticates to a service, DBSC generates a public-private key pair stored locally on the device. The session cookie becomes tied to this key pair, meaning that even if an attacker manages to exfiltrate the session cookie through malware, they cannot use it on their own machine. The cryptographic binding ensures that stolen cookies are effectively useless outside the original device, neutralizing one of the most prolific attack methods used by infostealers such as **RedLine**, **Vidar**, and **Raccoon**.
+
+The feature has been in open beta testing for several months before its public rollout to all Windows users running Chrome 146. macOS support is expected to follow, though Google has not specified an exact timeline for when Apple device owners will receive the protection.
+
+## Impact on Enterprise Security and User Protection
+
+Session hijacking has consistently ranked among the top methods for account compromise across web applications. Attackers have increasingly turned to infostealing malware-as-a-service operations, which automate the collection and exfiltration of authentication tokens, browser history, and saved credentials. These stolen sessions can be monetized directly or used for credential stuffing attacks against additional services.
+
+The introduction of DBSC addresses a critical gap in browser security that has existed for decades. Traditional session management relied on cookies that, once stolen, provided unconditional access regardless of where they were used. By binding credentials to device hardware, Google has introduced a proactive defense that does not require users to change their behavior or for websites to implement additional authentication factors.
+
+For enterprise users, the timing is particularly significant. Organizations that have struggled with persistent session-based attacks may see a reduction in account takeovers stemming from malware-infected endpoints. The protection operates at the browser level, meaning it does not require IT departments to deploy additional software or configure complex policies.
+
+Separately, Google announced that Gmail end-to-end encryption is now available on all Android and iOS devices for enterprise users, allowing read and compose functionality without additional tools. While distinct from DBSC, the encryption feature represents another layer of protection for sensitive communications, addressing data residency and compliance requirements that have driven demand for client-side encryption.
+
+## Detection and Security Considerations
+
+While DBSC provides robust protection against session cookie theft, security teams should understand its limitations and complementary requirements. The protection specifically targets session cookie exfiltration through infostealing malware—it does not prevent phishing attacks that trick users into entering credentials directly, nor does it protect against password reuse attacks where credentials themselves are stolen rather than active sessions.
+
+Organizations should continue monitoring for signs of infostealer infections on endpoints. Common indicators include unexpected processes spawning browser executables, unusual network connections to known malware command-and-control infrastructure, and suspicious browser extensions installed without user consent. Endpoint detection and response tools should be tuned to alert on behavior patterns characteristic of information-stealing malware, such as bulk file collection from browser profile directories.
+
+Security teams should also verify that Chrome is configured to automatically update to version 146 or later on managed Windows devices. Group policies can enforce update compliance to ensure the protection is active across the organization.
+
+## Key Takeaways
+
+- **Enable or verify Chrome 146+ deployment** on all Windows endpoints to activate Device Bound Session Credentials protection against session hijacking attacks.
+- **Continue maintaining anti-malware defenses**—DBSC protects session cookies but does not prevent credential theft through phishing or keylogging.
+- **Monitor for infostealer activity** on endpoints, as attackers may shift tactics toward stealing credentials directly rather than relying on session cookies.
+- **Plan for macOS coverage** when Google releases DBSC support for Apple devices, ensuring consistent protection across mixed operating system environments.
+- **Leverage Gmail E2EE on mobile** for enterprise users requiring additional email confidentiality, complementing browser-level session protection with message content encryption.
