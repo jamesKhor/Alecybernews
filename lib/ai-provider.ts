@@ -1,48 +1,194 @@
 /**
  * AI Provider Factory — Free-first with paid fallback
  *
- * Generation priority for article writing:
- *   1. OpenRouter free models — tried in order (best quality first)
- *      If one is rate-limited (429) or unavailable (404/503), move to next
- *   2. openrouter/free router — OpenRouter's own catch-all free router
- *   3. DeepSeek — paid fallback; returned result includes usedPaidFallback=true
- *      so the admin can be notified of paid API usage
+ * Generation flow:
+ *   1. Fetch live free models from OpenRouter API (5-min in-process cache)
+ *   2. Filter: effective params ≥ 12B, context ≥ 32k, no tiny MoE active layers
+ *   3. Sort: largest effective params first (best quality first)
+ *   4. Try each in order — skip on 404/429/503, stop on auth/fatal errors
+ *   5. DeepSeek (paid) as absolute last resort — admin gets a warning toast
  *
- * Translation priority:
- *   1. OpenRouter: qwen3 (best ZH quality) → gemma-3-27b fallback
- *   2. DeepSeek: deepseek-chat
+ * Filtering logic for "effective params":
+ *   - Parse param count from model ID (e.g. "70b" → 70, "120b" → 120)
+ *   - For MoE models with "-aXb" active-param suffix, use the ACTIVE count
+ *     e.g. "80b-a3b" → 3B effective (too small), "120b-a12b" → 12B (ok)
+ *   - Models with no parseable size (e.g. "minimax-m2.5") are included —
+ *     they are known large models but don't encode size in their name
+ *   - Minimum effective params: 12B
+ *   - Minimum context window: 32k (need room for 2k-token article output)
  */
 
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { generateText } from "ai";
 import type { LanguageModel } from "ai";
 
-// ─── OpenRouter free write models ────────────────────────────────────────────
-// Ordered by quality & context window. All are ≥12B params, 65k+ context.
-// These rotate — if one disappears or is rate-limited we try the next.
-export const FREE_WRITE_MODELS = [
-  "openai/gpt-oss-120b:free", // 120B, 131k ctx — best quality
-  "nvidia/nemotron-3-super-120b-a12b:free", // 120B, 262k ctx
-  "minimax/minimax-m2.5:free", // large, 196k ctx
-  "meta-llama/llama-3.3-70b-instruct:free", // 70B, 65k ctx — reliable
-  "google/gemma-3-27b-it:free", // 27B, 131k ctx
-  "google/gemma-4-31b-it:free", // 31B, 262k ctx — newer
-  "nousresearch/hermes-3-llama-3.1-405b:free", // 405B when available
-  "openrouter/free", // catch-all: OpenRouter picks any free model
-] as const;
-
-// Translation models — Qwen is native Chinese, highest ZH quality
-export const FREE_TRANSLATE_MODELS = [
-  "qwen/qwen3-next-80b-a3b-instruct:free", // best Chinese quality
-  "qwen/qwen3-coder:free", // good alt Qwen
-  "openai/gpt-oss-120b:free", // strong multilingual fallback
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "openrouter/free",
-] as const;
-
 // ─── DeepSeek model IDs ───────────────────────────────────────────────────────
 export const DEEPSEEK_WRITE_MODEL = "deepseek-chat";
 export const DEEPSEEK_TRANSLATE_MODEL = "deepseek-chat";
+
+// ─── Minimum thresholds for "usable" free models ─────────────────────────────
+const MIN_EFFECTIVE_PARAMS_B = 12; // anything under 12B is useless for articles
+const MIN_CONTEXT_LENGTH = 32_000; // need at least 32k for long prompts + output
+
+/**
+ * Extract effective parameter count (in billions) from a model ID string.
+ *
+ * Rules:
+ *   - If the ID contains "-aXb" (active params in MoE), return X (active wins)
+ *     e.g. "nemotron-3-nano-30b-a3b" → 3B (3B active, not 30B total)
+ *   - Otherwise return the last explicit Xb number found in the ID
+ *     e.g. "llama-3.3-70b-instruct" → 70B
+ *   - If no number found, return null (unknown → include by default,
+ *     these are usually known-large models like minimax-m2.5)
+ */
+function parseEffectiveParams(modelId: string): number | null {
+  // Strip the ":free" suffix and provider prefix for cleaner matching
+  const id =
+    modelId
+      .replace(/:free$/, "")
+      .split("/")
+      .pop() ?? modelId;
+
+  // Check for MoE active-param pattern "-aXb" (X can be decimal like 3.5)
+  const activeMatch = id.match(/-a(\d+(?:\.\d+)?)b(?:-|$)/i);
+  if (activeMatch) {
+    return parseFloat(activeMatch[1]);
+  }
+
+  // Otherwise find all "Xb" occurrences and take the last one (most relevant)
+  const allMatches = [...id.matchAll(/(\d+(?:\.\d+)?)b(?:-|_|\.|$)/gi)];
+  if (allMatches.length > 0) {
+    return parseFloat(allMatches[allMatches.length - 1][1]);
+  }
+
+  // No size found — treat as unknown (include, these tend to be large)
+  return null;
+}
+
+/**
+ * Returns true if this model is usable for article generation.
+ * Excludes: tiny models, MoE with tiny active layers, small context windows.
+ */
+function isUsableWriteModel(model: {
+  id: string;
+  context_length: number;
+}): boolean {
+  // Minimum context window — we need room for the full prompt + output
+  if (model.context_length < MIN_CONTEXT_LENGTH) return false;
+
+  const effective = parseEffectiveParams(model.id);
+
+  // Unknown size → include (e.g. minimax/minimax-m2.5, arcee-ai/trinity-large)
+  if (effective === null) return true;
+
+  return effective >= MIN_EFFECTIVE_PARAMS_B;
+}
+
+// ─── In-process cache: live model list from OpenRouter (5-min TTL) ────────────
+type CachedModelList = {
+  writeModels: string[]; // sorted: largest effective params first
+  translateModels: string[]; // Qwen/multilingual first, then write models
+  fetchedAt: number;
+};
+
+let _modelCache: CachedModelList | null = null;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Fetch and filter live free models from OpenRouter.
+ * Results cached for 5 minutes per process instance.
+ */
+async function getLiveFreeModels(): Promise<CachedModelList> {
+  const now = Date.now();
+  if (_modelCache && now - _modelCache.fetchedAt < CACHE_TTL_MS) {
+    return _modelCache;
+  }
+
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/models", {
+      headers: {
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      },
+      // Don't block generation for more than 4 seconds waiting for model list
+      signal: AbortSignal.timeout(4000),
+    });
+
+    if (!res.ok) throw new Error(`OpenRouter models API: ${res.status}`);
+
+    const data = (await res.json()) as {
+      data: { id: string; context_length: number; name: string }[];
+    };
+
+    const freeModels = data.data.filter(
+      (m) => m.id.endsWith(":free") && m.id !== "openrouter/free",
+    );
+
+    // Filter to usable models only
+    const usable = freeModels.filter(isUsableWriteModel);
+
+    // Sort by effective params descending (best quality first)
+    // Unknown size models (null) go last — they're wildcards
+    usable.sort((a, b) => {
+      const ea = parseEffectiveParams(a.id) ?? 999; // unknown = very large, put first
+      const eb = parseEffectiveParams(b.id) ?? 999;
+      return eb - ea;
+    });
+
+    const writeModels = usable.map((m) => m.id);
+
+    // Translation: prefer Qwen (best ZH), then multilingual large models
+    const translateModels = [
+      ...usable.filter((m) => m.id.includes("qwen")).map((m) => m.id),
+      ...usable.filter((m) => !m.id.includes("qwen")).map((m) => m.id),
+    ];
+
+    console.log(
+      `[ai-provider] Loaded ${writeModels.length} usable free models from OpenRouter`,
+    );
+
+    _modelCache = { writeModels, translateModels, fetchedAt: now };
+    return _modelCache;
+  } catch (err) {
+    console.warn(
+      `[ai-provider] Could not fetch OpenRouter model list (${err instanceof Error ? err.message : err}), using hardcoded fallback list`,
+    );
+
+    // Hardcoded fallback — curated list of known-good models as of Apr 2026
+    // All are ≥12B effective params, confirmed usable
+    const hardcodedWrite = [
+      "openai/gpt-oss-120b:free", // 120B
+      "nvidia/nemotron-3-super-120b-a12b:free", // 120B / 12B active
+      "nousresearch/hermes-3-llama-3.1-405b:free", // 405B
+      "meta-llama/llama-3.3-70b-instruct:free", // 70B
+      "qwen/qwen3-coder:free", // 480B / 35B active
+      "minimax/minimax-m2.5:free", // large
+      "google/gemma-4-31b-it:free", // 31B
+      "google/gemma-3-27b-it:free", // 27B
+      "openai/gpt-oss-20b:free", // 20B
+      "cognitivecomputations/dolphin-mistral-24b-venice-edition:free", // 24B
+      "z-ai/glm-4.5-air:free", // large
+      "arcee-ai/trinity-large-preview:free", // large
+      "nvidia/nemotron-nano-12b-v2-vl:free", // 12B
+      "google/gemma-3-12b-it:free", // 12B
+    ];
+
+    const hardcodedTranslate = [
+      "qwen/qwen3-coder:free",
+      "openai/gpt-oss-120b:free",
+      "meta-llama/llama-3.3-70b-instruct:free",
+      "google/gemma-4-31b-it:free",
+      "google/gemma-3-27b-it:free",
+      "openai/gpt-oss-20b:free",
+    ];
+
+    _modelCache = {
+      writeModels: hardcodedWrite,
+      translateModels: hardcodedTranslate,
+      fetchedAt: now,
+    };
+    return _modelCache;
+  }
+}
 
 // ─── Provider detection ───────────────────────────────────────────────────────
 export type AIProvider = "openrouter" | "deepseek" | "none";
@@ -53,7 +199,7 @@ export function getActiveProvider(): AIProvider {
   return "none";
 }
 
-// ─── OpenRouter client factory ────────────────────────────────────────────────
+// ─── Client factories ─────────────────────────────────────────────────────────
 function makeOpenRouterClient() {
   return createOpenAICompatible({
     name: "openrouter",
@@ -75,83 +221,93 @@ function makeDeepSeekClient() {
   });
 }
 
-// ─── generateWithFallback ─────────────────────────────────────────────────────
-/**
- * Tries OpenRouter free models in order. Falls back to DeepSeek (paid) if all fail.
- *
- * Returns:
- *   text             — the generated text
- *   modelUsed        — the model ID that succeeded
- *   usedPaidFallback — true if DeepSeek was used (so admin can be notified)
- */
+// ─── Core fallback runner ─────────────────────────────────────────────────────
 export type GenerateResult = {
   text: string;
   modelUsed: string;
   usedPaidFallback: boolean;
 };
 
+async function runWithFallback(
+  modelIds: string[],
+  prompt: string,
+  minResponseLength: number,
+  options: { maxOutputTokens: number; temperature: number },
+): Promise<Omit<GenerateResult, "usedPaidFallback"> & { errors: string[] }> {
+  const errors: string[] = [];
+  const or = makeOpenRouterClient();
+
+  for (const modelId of modelIds) {
+    try {
+      const model: LanguageModel = or(modelId);
+      const result = await generateText({
+        model,
+        prompt,
+        maxOutputTokens: options.maxOutputTokens,
+        temperature: options.temperature,
+      });
+
+      if (result.text && result.text.trim().length >= minResponseLength) {
+        return { text: result.text, modelUsed: modelId, errors };
+      }
+      errors.push(
+        `${modelId}: response too short (${result.text.trim().length} chars)`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const isTransient =
+        msg.includes("404") ||
+        msg.includes("429") ||
+        msg.includes("503") ||
+        msg.toLowerCase().includes("rate") ||
+        msg.includes("No endpoints") ||
+        msg.includes("temporarily") ||
+        msg.includes("Provider returned error");
+
+      errors.push(`${modelId}: ${msg.slice(0, 140)}`);
+
+      if (!isTransient) {
+        // Fatal error (bad API key, malformed request) — stop trying OpenRouter
+        break;
+      }
+      // Transient — try next model
+    }
+  }
+
+  throw new Error(`__all_models_failed__\n${errors.join("\n")}`);
+}
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+/**
+ * Generate article text using free OpenRouter models, falling back to DeepSeek.
+ * Model list is fetched live from OpenRouter and filtered to ≥12B effective params.
+ */
 export async function generateWithFallback(
   prompt: string,
   options: { maxOutputTokens?: number; temperature?: number } = {},
 ): Promise<GenerateResult> {
   const { maxOutputTokens = 2000, temperature = 0.6 } = options;
-  const errors: string[] = [];
 
-  // ── Step 1: Try OpenRouter free models in order ────────────────────────────
   if (process.env.OPENROUTER_API_KEY) {
-    const or = makeOpenRouterClient();
+    const { writeModels } = await getLiveFreeModels();
 
-    for (const modelId of FREE_WRITE_MODELS) {
-      try {
-        const model: LanguageModel = or(modelId);
-        const result = await generateText({
-          model,
-          prompt,
-          maxOutputTokens,
-          temperature,
-        });
-
-        // Sanity check — free router sometimes returns near-empty responses
-        if (result.text && result.text.trim().length > 100) {
-          return {
-            text: result.text,
-            modelUsed: modelId,
-            usedPaidFallback: false,
-          };
-        }
-        errors.push(
-          `${modelId}: response too short (${result.text.trim().length} chars)`,
-        );
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        // 404 = model removed, 429 = rate limited, 503 = unavailable → try next
-        // Any other error (auth, malformed) → stop trying OpenRouter
-        if (
-          msg.includes("404") ||
-          msg.includes("429") ||
-          msg.includes("503") ||
-          msg.includes("rate") ||
-          msg.includes("Rate") ||
-          msg.includes("No endpoints") ||
-          msg.includes("temporarily") ||
-          msg.includes("Provider returned error")
-        ) {
-          errors.push(`${modelId}: ${msg.slice(0, 120)}`);
-          continue; // try next model
-        }
-        // Fatal error (e.g. invalid API key) — stop and fall through to DeepSeek
-        errors.push(`${modelId}: fatal — ${msg.slice(0, 120)}`);
-        break;
-      }
+    try {
+      const result = await runWithFallback(writeModels, prompt, 100, {
+        maxOutputTokens,
+        temperature,
+      });
+      return { ...result, usedPaidFallback: false };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (!msg.startsWith("__all_models_failed__")) throw err; // unexpected error
+      console.warn(
+        `[ai-provider] All ${writeModels.length} free write models failed — falling back to DeepSeek (paid)`,
+      );
     }
   }
 
-  // ── Step 2: DeepSeek paid fallback ────────────────────────────────────────
   if (process.env.DEEPSEEK_API_KEY) {
-    console.warn(
-      `[ai-provider] All free models failed — using DeepSeek (paid). Failures:\n` +
-        errors.map((e) => `  • ${e}`).join("\n"),
-    );
     const ds = makeDeepSeekClient();
     const model: LanguageModel = ds(DEEPSEEK_WRITE_MODEL);
     const result = await generateText({
@@ -168,67 +324,39 @@ export async function generateWithFallback(
   }
 
   throw new Error(
-    `All AI providers failed.\n${errors.join("\n")}\n\nSet OPENROUTER_API_KEY or DEEPSEEK_API_KEY.`,
+    "No AI provider configured. Set OPENROUTER_API_KEY or DEEPSEEK_API_KEY.",
   );
 }
 
 /**
- * Same fallback pattern but for translation (EN → ZH).
- * Uses Qwen-first order (best native Chinese quality).
+ * Translate text (EN → ZH) using free OpenRouter models, falling back to DeepSeek.
+ * Uses Qwen-first ordering for best Chinese quality.
  */
 export async function translateWithFallback(
   prompt: string,
   options: { maxOutputTokens?: number; temperature?: number } = {},
 ): Promise<GenerateResult> {
   const { maxOutputTokens = 4000, temperature = 0.3 } = options;
-  const errors: string[] = [];
 
   if (process.env.OPENROUTER_API_KEY) {
-    const or = makeOpenRouterClient();
+    const { translateModels } = await getLiveFreeModels();
 
-    for (const modelId of FREE_TRANSLATE_MODELS) {
-      try {
-        const model: LanguageModel = or(modelId);
-        const result = await generateText({
-          model,
-          prompt,
-          maxOutputTokens,
-          temperature,
-        });
-        if (result.text && result.text.trim().length > 50) {
-          return {
-            text: result.text,
-            modelUsed: modelId,
-            usedPaidFallback: false,
-          };
-        }
-        errors.push(`${modelId}: response too short`);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        if (
-          msg.includes("404") ||
-          msg.includes("429") ||
-          msg.includes("503") ||
-          msg.includes("rate") ||
-          msg.includes("Rate") ||
-          msg.includes("No endpoints") ||
-          msg.includes("temporarily") ||
-          msg.includes("Provider returned error")
-        ) {
-          errors.push(`${modelId}: ${msg.slice(0, 120)}`);
-          continue;
-        }
-        errors.push(`${modelId}: fatal — ${msg.slice(0, 120)}`);
-        break;
-      }
+    try {
+      const result = await runWithFallback(translateModels, prompt, 50, {
+        maxOutputTokens,
+        temperature,
+      });
+      return { ...result, usedPaidFallback: false };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (!msg.startsWith("__all_models_failed__")) throw err;
+      console.warn(
+        `[ai-provider] All ${translateModels.length} free translate models failed — falling back to DeepSeek (paid)`,
+      );
     }
   }
 
   if (process.env.DEEPSEEK_API_KEY) {
-    console.warn(
-      `[ai-provider] All free translate models failed — using DeepSeek (paid). Failures:\n` +
-        errors.map((e) => `  • ${e}`).join("\n"),
-    );
     const ds = makeDeepSeekClient();
     const model: LanguageModel = ds(DEEPSEEK_TRANSLATE_MODEL);
     const result = await generateText({
@@ -244,16 +372,17 @@ export async function translateWithFallback(
     };
   }
 
-  throw new Error(`All translation providers failed.\n${errors.join("\n")}`);
+  throw new Error(
+    "No AI provider configured. Set OPENROUTER_API_KEY or DEEPSEEK_API_KEY.",
+  );
 }
 
 // ─── Legacy single-model getters (kept for backward compat) ──────────────────
-// These are still used by any code that hasn't migrated to generateWithFallback
 
 /** @deprecated Use generateWithFallback() instead */
 export function getWriteModel(): LanguageModel {
   if (process.env.OPENROUTER_API_KEY) {
-    return makeOpenRouterClient()(FREE_WRITE_MODELS[0]);
+    return makeOpenRouterClient()("openai/gpt-oss-120b:free");
   }
   if (process.env.DEEPSEEK_API_KEY) {
     return makeDeepSeekClient()(DEEPSEEK_WRITE_MODEL);
@@ -264,7 +393,7 @@ export function getWriteModel(): LanguageModel {
 /** @deprecated Use translateWithFallback() instead */
 export function getTranslateModel(): LanguageModel {
   if (process.env.OPENROUTER_API_KEY) {
-    return makeOpenRouterClient()(FREE_TRANSLATE_MODELS[0]);
+    return makeOpenRouterClient()("qwen/qwen3-coder:free");
   }
   if (process.env.DEEPSEEK_API_KEY) {
     return makeDeepSeekClient()(DEEPSEEK_TRANSLATE_MODEL);
@@ -273,7 +402,8 @@ export function getTranslateModel(): LanguageModel {
 }
 
 export function getProviderLabel(): string {
-  if (process.env.OPENROUTER_API_KEY) return "OpenRouter (free models)";
+  if (process.env.OPENROUTER_API_KEY)
+    return "OpenRouter (free models, live filtered)";
   if (process.env.DEEPSEEK_API_KEY) return "DeepSeek (deepseek-chat)";
   return "none";
 }
