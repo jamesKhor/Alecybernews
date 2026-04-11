@@ -1,0 +1,56 @@
+---
+title: "Google DBSC 在 Chrome 146 中阻止会话劫持攻击"
+slug: "2026-04-11-google-dbsc-in-chrome-146-blocks-session-hijacking-attacks"
+date: "2026-04-11"
+excerpt: "Google 在 Chrome 146 中推出的设备绑定会话凭证（DBSC）通过加密方式将会话 Cookie 绑定到设备，从而阻止窃取 Cookie 的恶意软件劫持账户。"
+category: "tools"
+tags:
+  - device-bound session credentials
+  - dbsc
+  - chrome 146
+  - session hijacking
+  - session cookie theft
+  - infostealing malware
+  - browser security
+  - authentication security
+language: "zh"
+locale_pair: "2026-04-11-google-dbsc-in-chrome-146-blocks-session-hijacking-attacks"
+author: "AleCyberNews"
+draft: false
+---
+
+Google已在Chrome 146 for Windows中正式推出Device Bound Session Credentials（DBSC），兑现了长期以来承诺的安全机制，旨在消除困扰用户多年的会话劫持攻击。此次发布标志着浏览器首次针对专门窃取会话Cookie的信息窃取恶意软件提供主要防御措施，而会话Cookie正是威胁行为者用来绕过身份验证并劫持合法用户账户的主要攻击向量。
+
+## DBSC如何阻止会话Cookie窃取
+
+Device Bound Session Credentials代表了Chrome管理身份验证会话方式的根本性转变。根据Google账户安全和Chrome团队的说明，该保护机制通过加密方式将会话令牌绑定到用户的设备上，而不是让它们在浏览器环境中自由流转。
+
+当用户向服务进行身份验证时，DBSC会在本地设备上生成一个公私钥对。会话Cookie与此密钥对绑定，这意味着即使攻击者通过恶意软件成功窃取了会话Cookie，也无法在他们的机器上使用它。加密绑定确保了被盗的Cookie在原始设备之外基本上毫无用处，从而消除了**RedLine**、**Vidar**和**Raccoon**等信息窃取者使用的一种最常见的攻击方法。
+
+该功能在公开beta测试中运行了数月，然后才向所有运行Chrome 146的Windows用户推出。预计后续将支持macOS，但Google尚未确定Apple设备用户获得该保护的具体时间表。
+
+## 对企业安全和用户保护的影响
+
+会话劫持一直是Web应用程序账户被盗的顶级方法之一。攻击者越来越多地转向信息窃取恶意软件即服务运营，这些服务自动化收集和窃取身份验证令牌、浏览器历史记录和保存的凭据。这些被盗的会话可以直接变现，或用于对其他服务进行凭证填充攻击。
+
+DBSC的引入解决了浏览器安全中数十年来存在的关键空白。传统的会话管理依赖于Cookie，这些Cookie一旦被盗，无论在哪里使用都能提供无条件的访问权限。通过将凭据绑定到设备硬件，Google引入了一种主动防御机制，无需用户改变行为，也不需要网站实施额外的身份验证因素。
+
+对于企业用户来说，时机尤为重要。一直在努力应对持续性基于会话的攻击的组织可能会看到来自受恶意软件感染的终端设备的账户接管有所减少。该保护在浏览器级别运行，意味着不需要IT部门部署额外软件或配置复杂策略。
+
+此外，Google宣布Gmail端到端加密现在已面向所有Android和iOS设备的企业用户推出，允许在无需额外工具的情况下进行阅读和编写功能。虽然与DBSC不同，但加密功能代表了敏感通信的另一层保护，解决了推动客户端加密需求的数据驻留和合规要求。
+
+## 检测和安全注意事项
+
+虽然DBSC为防止会话Cookie窃取提供了强有力的保护，但安全团队应了解其局限性和补充要求。该保护专门针对通过信息窃取恶意软件窃取会话Cookie的行为——它不能防止诱骗用户直接输入凭据的网络钓鱼攻击，也不能保护凭据本身被盗而非活动会话被劫持的密码重用攻击。
+
+组织应继续监控终端设备上是否存在信息窃取者感染的迹象。常见指标包括浏览器可执行文件意外生成进程、与已知恶意软件命令和控制基础设施建立异常网络连接，以及未经用户同意安装的可疑浏览器扩展。端点检测和响应工具应针对信息窃取恶意软件的典型行为模式进行调优，例如从浏览器配置文件目录批量收集文件。
+
+安全团队还应验证Chrome是否配置为在受管理的Windows设备上自动更新到146或更高版本。组策略可以强制执行更新合规性，以确保整个组织都启用了该保护。
+
+## 关键要点
+
+- **在所有Windows终端设备上启用或验证Chrome 146+部署**，以激活Device Bound Session Credentials保护，防御会话劫持攻击。
+- **继续维护反恶意软件防御**——DBSC保护会话Cookie，但不能防止通过网络钓鱼或键盘记录窃取凭据。
+- **监控终端设备上的信息窃取者活动**，因为攻击者可能会转向直接窃取凭据，而不是依赖会话Cookie。
+- **规划macOS覆盖范围**，当Google为Apple设备发布DBSC支持时，确保在混合操作系统环境中提供一致的保护。
+- **在移动设备上利用Gmail E2EE**，为需要额外邮件保密性的企业用户提供支持，通过消息内容加密补充浏览器级别的会话保护。
