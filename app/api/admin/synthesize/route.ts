@@ -1,8 +1,7 @@
 import { auth } from "@/auth";
-import { generateText } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import type { FeedArticle } from "@/lib/rss/fetch";
-import { getWriteModel, getActiveProvider } from "@/lib/ai-provider";
+import { generateWithFallback, getActiveProvider } from "@/lib/ai-provider";
 
 type PastedText = { label?: string; text: string };
 
@@ -105,13 +104,14 @@ export async function POST(req: NextRequest) {
     ? `\nADDITIONAL INSTRUCTIONS FROM EDITOR:\n${customPrompt.trim()}\n`
     : "";
 
-  const model = getWriteModel();
-
   try {
-    // Step 1: Generate article body
-    const { text: articleBody } = await generateText({
-      model,
-      prompt: `You are a senior cybersecurity journalist and SEO writer for AleCyberNews, a professional threat intelligence news site.
+    // Step 1: Generate article body — tries free models first, DeepSeek as last resort
+    const {
+      text: articleBody,
+      modelUsed: bodyModel,
+      usedPaidFallback: bodyWasPaid,
+    } = await generateWithFallback(
+      `You are a senior cybersecurity journalist and SEO writer for AleCyberNews, a professional threat intelligence news site.
 
 Synthesize the following ${sourceCount} source(s) into ONE original, SEO-optimised article that:
 
@@ -142,14 +142,17 @@ SOURCES:
 ${sourceContext}
 
 Return ONLY the article body in markdown. Do not include a title or frontmatter.`,
-      maxOutputTokens: 2000,
-      temperature: 0.6,
-    });
+      { maxOutputTokens: 2000, temperature: 0.6 },
+    );
 
     // Step 2: Generate SEO-optimised title + category + excerpt + tags
-    const { text: metaRaw } = await generateText({
-      model,
-      prompt: `You are an SEO specialist for a cybersecurity news site. Based on this article, return a JSON object:
+    // Reuse same model family that succeeded for step 1 (no extra retries needed)
+    const {
+      text: metaRaw,
+      modelUsed: metaModel,
+      usedPaidFallback: metaWasPaid,
+    } = await generateWithFallback(
+      `You are an SEO specialist for a cybersecurity news site. Based on this article, return a JSON object:
 
 {
   "title": "<SEO headline: put primary keyword near the start, 50-70 characters, no clickbait>",
@@ -179,9 +182,8 @@ Return ONLY the JSON object, no markdown fences, no explanation.
 
 ARTICLE:
 ${articleBody.slice(0, 1200)}`,
-      maxOutputTokens: 300,
-      temperature: 0.2,
-    });
+      { maxOutputTokens: 400, temperature: 0.2 },
+    );
 
     // Parse meta — fall back to safe defaults if AI returns garbage
     let aiTitle = "";
@@ -235,6 +237,10 @@ ${articleBody.slice(0, 1200)}`,
 
     const today = new Date().toISOString().split("T")[0];
 
+    // usedPaidFallback=true if either step used DeepSeek — admin gets notified
+    const usedPaidFallback = bodyWasPaid || metaWasPaid;
+    const modelsUsed = [...new Set([bodyModel, metaModel])];
+
     return NextResponse.json({
       content: articleBody,
       suggested: {
@@ -244,12 +250,13 @@ ${articleBody.slice(0, 1200)}`,
         tags: aiTags,
         excerpt: aiExcerpt,
       },
+      // Admin notification fields
+      usedPaidFallback,
+      modelsUsed,
     });
   } catch (err) {
     console.error("[api/admin/synthesize]", err);
-    return NextResponse.json(
-      { error: "AI generation failed" },
-      { status: 500 },
-    );
+    const message = err instanceof Error ? err.message : "AI generation failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -262,6 +262,8 @@ export default function ComposePage() {
         content?: string;
         suggested?: SuggestedMeta;
         error?: string;
+        usedPaidFallback?: boolean;
+        modelsUsed?: string[];
       };
 
       if (!res.ok || data.error) {
@@ -282,6 +284,19 @@ export default function ComposePage() {
         );
         setTags(data.suggested.tags.join(", "));
         setExcerpt(data.suggested.excerpt);
+      }
+
+      // Notify admin if paid DeepSeek API was used as fallback
+      if (data.usedPaidFallback) {
+        toast.warning("⚠️ Paid API used", {
+          description: `All free OpenRouter models were unavailable. DeepSeek (paid) was used as fallback. Models attempted: ${data.modelsUsed?.join(", ") ?? "unknown"}`,
+          duration: Infinity,
+        });
+      } else {
+        toast.success("Generated!", {
+          description: `Model: ${data.modelsUsed?.[0] ?? "free"}`,
+          duration: 3000,
+        });
       }
     } catch (err) {
       setGenError(err instanceof Error ? err.message : "Network error");
@@ -379,6 +394,7 @@ export default function ComposePage() {
         enGithubUrl?: string;
         zhGithubUrl?: string;
         error?: string;
+        usedPaidFallback?: boolean;
       };
       if (!res.ok || data.error) {
         toast.error("Publish failed", {
@@ -389,6 +405,13 @@ export default function ComposePage() {
         toast.success("Published EN + ZH!", {
           description: "Both versions committed to GitHub",
         });
+        if (data.usedPaidFallback) {
+          toast.warning("⚠️ Paid API used for translation", {
+            description:
+              "All free OpenRouter translation models were unavailable. DeepSeek (paid) was used as fallback.",
+            duration: Infinity,
+          });
+        }
         localStorage.removeItem(DRAFT_KEY);
         setDraftSavedAt(null);
       }

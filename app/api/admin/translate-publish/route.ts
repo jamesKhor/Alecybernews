@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { generateText } from "ai";
-import { getTranslateModel, getActiveProvider } from "@/lib/ai-provider";
+import { translateWithFallback, getActiveProvider } from "@/lib/ai-provider";
 
 type TranslatePublishRequest = {
   title: string;
@@ -20,7 +19,10 @@ const GH_HEADERS = {
   "Content-Type": "application/json",
 };
 
-async function getFileSha(apiUrl: string, token: string): Promise<string | undefined> {
+async function getFileSha(
+  apiUrl: string,
+  token: string,
+): Promise<string | undefined> {
   const res = await fetch(apiUrl, {
     headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
   });
@@ -37,7 +39,8 @@ async function commitToGitHub(
 ): Promise<{ url: string }> {
   const token = process.env.GITHUB_TOKEN;
   const repo = process.env.GITHUB_REPO;
-  if (!token || !repo) throw new Error("GITHUB_TOKEN or GITHUB_REPO not configured");
+  if (!token || !repo)
+    throw new Error("GITHUB_TOKEN or GITHUB_REPO not configured");
 
   const encoded = Buffer.from(content, "utf-8").toString("base64");
   const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
@@ -78,9 +81,10 @@ async function commitToGitHub(
 
 function buildMdx(frontmatter: Record<string, unknown>, body: string): string {
   const date = new Date().toISOString().split("T")[0];
-  const tags = Array.isArray(frontmatter.tags) && frontmatter.tags.length
-    ? `\n  - ${(frontmatter.tags as string[]).join("\n  - ")}`
-    : " []";
+  const tags =
+    Array.isArray(frontmatter.tags) && frontmatter.tags.length
+      ? `\n  - ${(frontmatter.tags as string[]).join("\n  - ")}`
+      : " []";
   return `---
 title: "${String(frontmatter.title).replace(/"/g, '\\"')}"
 slug: "${frontmatter.slug}"
@@ -99,32 +103,43 @@ ${body}`;
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = (await req.json()) as TranslatePublishRequest;
-  const { title, slug, content, excerpt, category, tags, type = "posts", author } = body;
+  const {
+    title,
+    slug,
+    content,
+    excerpt,
+    category,
+    tags,
+    type = "posts",
+    author,
+  } = body;
 
   if (!title || !slug || !content) {
-    return NextResponse.json({ error: "title, slug and content are required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "title, slug and content are required" },
+      { status: 400 },
+    );
   }
 
   if (getActiveProvider() === "none") {
     return NextResponse.json(
-      { error: "No AI provider configured. Set OPENROUTER_API_KEY or DEEPSEEK_API_KEY." },
+      {
+        error:
+          "No AI provider configured. Set OPENROUTER_API_KEY or DEEPSEEK_API_KEY.",
+      },
       { status: 500 },
     );
   }
 
-  const translateModel = getTranslateModel();
-
   // Translate title + excerpt
-  const metaRes = await generateText({
-    model: translateModel,
-    messages: [{
-      role: "user",
-      content: `Translate these to Simplified Chinese. Keep threat actor names, malware names, ALL-CAPS acronyms (EDR, VPN, APT, CVE, IOC, TTP etc), product names in English. Return ONLY valid JSON: {"title": "...", "excerpt": "..."}\n\nTitle: ${title}\nExcerpt: ${excerpt}`
-    }],
-  });
+  const metaRes = await translateWithFallback(
+    `Translate these to Simplified Chinese. Keep threat actor names, malware names, ALL-CAPS acronyms (EDR, VPN, APT, CVE, IOC, TTP etc), product names in English. Return ONLY valid JSON: {"title": "...", "excerpt": "..."}\n\nTitle: ${title}\nExcerpt: ${excerpt}`,
+    { maxOutputTokens: 300, temperature: 0.2 },
+  );
 
   let zhTitle = title;
   let zhExcerpt = excerpt;
@@ -133,30 +148,47 @@ export async function POST(req: NextRequest) {
     const parsed = JSON.parse(clean) as { title: string; excerpt: string };
     zhTitle = parsed.title;
     zhExcerpt = parsed.excerpt;
-  } catch { /* fallback to EN */ }
+  } catch {
+    /* fallback to EN */
+  }
 
   // Translate body
-  const bodyRes = await generateText({
-    model: translateModel,
-    messages: [{
-      role: "system",
-      content: `You are a professional cybersecurity translator. Translate English to Simplified Chinese.
+  const bodyRes = await translateWithFallback(
+    `You are a professional cybersecurity translator. Translate English to Simplified Chinese.
 NEVER translate: threat actor names (LockBit, APT41, Lazarus Group etc), malware names (Mimikatz, Cobalt Strike etc), ALL-CAPS acronyms (EDR, VPN, RDP, CVE, IOC, TTP, APT, C2, LSASS, DLL, RaaS, WAF, SIEM etc), product/vendor names (Microsoft, Cisco, CrowdStrike etc), CVE IDs, hashes, IPs, domains, code blocks.
-Keep all Markdown formatting intact. Output ONLY the translated markdown, no explanation.`
-    }, {
-      role: "user",
-      content: `Translate this article body to Simplified Chinese:\n\n${content}`
-    }],
-  });
+Keep all Markdown formatting intact. Output ONLY the translated markdown, no explanation.
+
+Translate this article body to Simplified Chinese:
+
+${content}`,
+    { maxOutputTokens: 4000, temperature: 0.3 },
+  );
 
   const date = new Date().toISOString().split("T")[0];
   const filename = `${date}-${slug.replace(/^[\d-]+-/, "")}.mdx`;
 
-  const enFrontmatter = { title, slug, excerpt, category, tags, language: "en", author: author ?? "AleCyberNews" };
-  const zhFrontmatter = { title: zhTitle, slug, excerpt: zhExcerpt, category, tags, language: "zh", author: author ?? "AleCyberNews" };
+  const enFrontmatter = {
+    title,
+    slug,
+    excerpt,
+    category,
+    tags,
+    language: "en",
+    author: author ?? "AleCyberNews",
+  };
+  const zhFrontmatter = {
+    title: zhTitle,
+    slug,
+    excerpt: zhExcerpt,
+    category,
+    tags,
+    language: "zh",
+    author: author ?? "AleCyberNews",
+  };
 
   const enMdx = buildMdx(enFrontmatter, content);
   const zhMdx = buildMdx(zhFrontmatter, bodyRes.text.trim());
+  const usedPaidFallback = metaRes.usedPaidFallback || bodyRes.usedPaidFallback;
 
   try {
     // Commits must be sequential — parallel commits both read the same branch
@@ -177,6 +209,7 @@ Keep all Markdown formatting intact. Output ONLY the translated markdown, no exp
       enGithubUrl: enResult.url,
       zhGithubUrl: zhResult.url,
       message: "Published EN + ZH. Vercel is deploying.",
+      usedPaidFallback,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
