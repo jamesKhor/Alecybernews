@@ -10,7 +10,7 @@
  */
 
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import type { LanguageModelV1 } from "ai";
+import type { LanguageModel } from "ai";
 
 // ─── OpenRouter free model IDs ────────────────────────────────────────────────
 // Best for article writing (EN cybersecurity content)
@@ -19,7 +19,8 @@ export const OPENROUTER_WRITE_MODEL =
 
 // Best for EN → Simplified Chinese translation (Qwen native Chinese training)
 export const OPENROUTER_TRANSLATE_MODEL =
-  process.env.OPENROUTER_TRANSLATE_MODEL ?? "qwen/qwen3-next-80b-a3b-instruct:free";
+  process.env.OPENROUTER_TRANSLATE_MODEL ??
+  "qwen/qwen3-next-80b-a3b-instruct:free";
 
 // ─── DeepSeek model IDs ───────────────────────────────────────────────────────
 export const DEEPSEEK_WRITE_MODEL = "deepseek-chat";
@@ -40,14 +41,15 @@ export function getActiveProvider(): AIProvider {
  * Returns the model to use for article writing/synthesis.
  * Throws if no API key is configured.
  */
-export function getWriteModel(): LanguageModelV1 {
+export function getWriteModel(): LanguageModel {
   if (process.env.OPENROUTER_API_KEY) {
     const openrouter = createOpenAICompatible({
       name: "openrouter",
       baseURL: "https://openrouter.ai/api/v1",
       apiKey: process.env.OPENROUTER_API_KEY,
       headers: {
-        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "https://alecybernews.vercel.app",
+        "HTTP-Referer":
+          process.env.NEXT_PUBLIC_SITE_URL ?? "https://alecybernews.vercel.app",
         "X-Title": "AleCyberNews",
       },
     });
@@ -72,14 +74,15 @@ export function getWriteModel(): LanguageModelV1 {
  * Returns the model to use for EN → ZH translation.
  * Uses Qwen on OpenRouter (superior Chinese quality) or DeepSeek as fallback.
  */
-export function getTranslateModel(): LanguageModelV1 {
+export function getTranslateModel(): LanguageModel {
   if (process.env.OPENROUTER_API_KEY) {
     const openrouter = createOpenAICompatible({
       name: "openrouter",
       baseURL: "https://openrouter.ai/api/v1",
       apiKey: process.env.OPENROUTER_API_KEY,
       headers: {
-        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "https://alecybernews.vercel.app",
+        "HTTP-Referer":
+          process.env.NEXT_PUBLIC_SITE_URL ?? "https://alecybernews.vercel.app",
         "X-Title": "AleCyberNews",
       },
     });

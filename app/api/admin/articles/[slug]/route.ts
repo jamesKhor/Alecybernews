@@ -1,0 +1,229 @@
+import { auth } from "@/auth";
+import { NextRequest, NextResponse } from "next/server";
+import matter from "gray-matter";
+
+const GH_HEADERS = {
+  Accept: "application/vnd.github+json",
+  "X-GitHub-Api-Version": "2022-11-28",
+  "Content-Type": "application/json",
+};
+
+function getToken() {
+  const token = process.env.GITHUB_TOKEN;
+  const repo = process.env.GITHUB_REPO;
+  if (!token || !repo)
+    throw new Error("GITHUB_TOKEN or GITHUB_REPO not configured");
+  return { token, repo };
+}
+
+function buildApiUrl(repo: string, locale: string, type: string, slug: string) {
+  const branch = process.env.GITHUB_BRANCH ?? "main";
+  return {
+    url: `https://api.github.com/repos/${repo}/contents/content/${locale}/${type}/${slug}.mdx`,
+    branch,
+  };
+}
+
+// ─── GET: fetch raw file from GitHub for editing ─────────────────────────────
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const session = await auth();
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { slug } = await params;
+  const sp = req.nextUrl.searchParams;
+  const locale = sp.get("locale") ?? "en";
+  const type = sp.get("type") ?? "posts";
+
+  try {
+    const { token, repo } = getToken();
+    const { url } = buildApiUrl(repo, locale, type, slug);
+
+    const res = await fetch(url, {
+      headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: `File not found (${res.status})` },
+        { status: 404 },
+      );
+    }
+
+    const data = (await res.json()) as {
+      content: string;
+      sha: string;
+      html_url: string;
+    };
+    const raw = Buffer.from(data.content, "base64").toString("utf-8");
+    const { data: frontmatter, content: body } = matter(raw);
+
+    return NextResponse.json({
+      sha: data.sha,
+      html_url: data.html_url,
+      frontmatter,
+      body: body.trim(),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// ─── PATCH: update frontmatter (and optionally body) on GitHub ───────────────
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const session = await auth();
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { slug } = await params;
+
+  try {
+    const { token, repo } = getToken();
+    const body = (await req.json()) as {
+      locale: string;
+      type: string;
+      frontmatter: Record<string, unknown>;
+      body?: string;
+    };
+
+    const { locale, type, frontmatter: updatedFm, body: updatedBody } = body;
+    const { url, branch } = buildApiUrl(repo, locale, type, slug);
+
+    // Fetch current file to get SHA + original body if not provided
+    const getRes = await fetch(url, {
+      headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
+    });
+    if (!getRes.ok) {
+      return NextResponse.json(
+        { error: "File not found on GitHub" },
+        { status: 404 },
+      );
+    }
+
+    const getData = (await getRes.json()) as { content: string; sha: string };
+    const sha = getData.sha;
+    const rawOriginal = Buffer.from(getData.content, "base64").toString(
+      "utf-8",
+    );
+    const { data: originalFm, content: originalBody } = matter(rawOriginal);
+
+    // Merge frontmatter
+    const mergedFm = { ...originalFm, ...updatedFm };
+    const bodyToUse =
+      updatedBody !== undefined ? updatedBody : originalBody.trim();
+
+    // Rebuild the file using gray-matter stringify
+    const newRaw = matter.stringify(`\n${bodyToUse}`, mergedFm);
+
+    const encoded = Buffer.from(newRaw, "utf-8").toString("base64");
+    const putRes = await fetch(url, {
+      method: "PUT",
+      headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        message: `content: update "${mergedFm.title}" [${locale}]`,
+        content: encoded,
+        sha,
+        branch,
+      }),
+    });
+
+    if (!putRes.ok) {
+      const errText = await putRes.text();
+      return NextResponse.json(
+        { error: `GitHub error ${putRes.status}: ${errText}` },
+        { status: 500 },
+      );
+    }
+
+    const putData = (await putRes.json()) as { content: { html_url: string } };
+    return NextResponse.json({
+      success: true,
+      html_url: putData.content.html_url,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// ─── DELETE: delete file(s) from GitHub ─────────────────────────────────────
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const session = await auth();
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { slug } = await params;
+
+  try {
+    const { token, repo } = getToken();
+    const body = (await req.json()) as {
+      locale: string;
+      type: string;
+      deleteAll?: boolean; // delete both EN and ZH
+    };
+
+    const { locale, type, deleteAll } = body;
+    const branch = process.env.GITHUB_BRANCH ?? "main";
+
+    const localesToDelete = deleteAll ? ["en", "zh"] : [locale];
+    const results: { locale: string; status: string }[] = [];
+
+    for (const loc of localesToDelete) {
+      const { url } = buildApiUrl(repo, loc, type, slug);
+
+      // Get SHA first
+      const getRes = await fetch(url, {
+        headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
+      });
+
+      if (!getRes.ok) {
+        // File doesn't exist in this locale — skip
+        results.push({ locale: loc, status: "not_found" });
+        continue;
+      }
+
+      const getData = (await getRes.json()) as { sha: string };
+      const sha = getData.sha;
+
+      const delRes = await fetch(url, {
+        method: "DELETE",
+        headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          message: `content: remove "${slug}" [${loc}]`,
+          sha,
+          branch,
+        }),
+      });
+
+      if (!delRes.ok) {
+        const errText = await delRes.text();
+        results.push({ locale: loc, status: `error: ${errText}` });
+      } else {
+        results.push({ locale: loc, status: "deleted" });
+      }
+    }
+
+    const anyError = results.some((r) => r.status.startsWith("error"));
+    if (anyError) {
+      return NextResponse.json(
+        { error: "Some deletions failed", results },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json({ success: true, results });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}

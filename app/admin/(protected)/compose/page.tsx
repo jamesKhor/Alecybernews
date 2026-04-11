@@ -79,6 +79,19 @@ function newPasteBlock(): PasteBlock {
   return { id: crypto.randomUUID(), label: "", text: "" };
 }
 
+function titleToSlug(title: string): string {
+  const date = new Date().toISOString().split("T")[0];
+  const part = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 60)
+    .replace(/-$/, "");
+  return part ? `${date}-${part}` : "";
+}
+
 type DraftData = {
   title: string;
   slug: string;
@@ -95,7 +108,9 @@ export default function ComposePage() {
   const [sourceArticles, setSourceArticles] = useState<FeedArticle[]>([]);
 
   // Paste mode state
-  const [pasteBlocks, setPasteBlocks] = useState<PasteBlock[]>([newPasteBlock()]);
+  const [pasteBlocks, setPasteBlocks] = useState<PasteBlock[]>([
+    newPasteBlock(),
+  ]);
 
   // Shared generation state
   const [generating, setGenerating] = useState(false);
@@ -103,16 +118,21 @@ export default function ComposePage() {
   const [publishingBoth, setPublishingBoth] = useState(false);
   const [genError, setGenError] = useState("");
   const [customPrompt, setCustomPrompt] = useState("");
-  const [targetLength, setTargetLength] = useState<"short" | "medium" | "long">("medium");
+  const [targetLength, setTargetLength] = useState<"short" | "medium" | "long">(
+    "medium",
+  );
 
   // Generated content state
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [category, setCategory] = useState("threat-intel");
   const [tags, setTags] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [articleType, setArticleType] = useState<"posts" | "threat-intel">("posts");
+  const [articleType, setArticleType] = useState<"posts" | "threat-intel">(
+    "posts",
+  );
 
   // UI state
   const [previewMode, setPreviewMode] = useState<"edit" | "preview">("edit");
@@ -122,7 +142,9 @@ export default function ComposePage() {
   useEffect(() => {
     const stored = sessionStorage.getItem("compose_articles");
     if (stored) {
-      try { setSourceArticles(JSON.parse(stored) as FeedArticle[]); } catch {}
+      try {
+        setSourceArticles(JSON.parse(stored) as FeedArticle[]);
+      } catch {}
     }
 
     const draft = localStorage.getItem(DRAFT_KEY);
@@ -146,7 +168,16 @@ export default function ComposePage() {
   // Auto-save draft to localStorage (debounced 2s)
   const saveDraft = useCallback(() => {
     if (!content && !title) return;
-    const draft: DraftData = { title, slug, category, tags, excerpt, content, articleType, savedAt: Date.now() };
+    const draft: DraftData = {
+      title,
+      slug,
+      category,
+      tags,
+      excerpt,
+      content,
+      articleType,
+      savedAt: Date.now(),
+    };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
     setDraftSavedAt(Date.now());
   }, [title, slug, category, tags, excerpt, content, articleType]);
@@ -158,43 +189,97 @@ export default function ComposePage() {
 
   const clearDraft = () => {
     localStorage.removeItem(DRAFT_KEY);
-    setTitle(""); setSlug(""); setCategory("threat-intel"); setTags("");
-    setExcerpt(""); setContent(""); setDraftSavedAt(null);
+    setTitle("");
+    setSlug("");
+    setCategory("threat-intel");
+    setTags("");
+    setExcerpt("");
+    setContent("");
+    setDraftSavedAt(null);
     setGenError("");
+    setSlugManuallyEdited(false);
   };
 
-  const removeSource = (id: string) => setSourceArticles((prev) => prev.filter((a) => a.id !== id));
+  const removeSource = (id: string) =>
+    setSourceArticles((prev) => prev.filter((a) => a.id !== id));
 
-  const addPasteBlock = () => { if (pasteBlocks.length < 5) setPasteBlocks((prev) => [...prev, newPasteBlock()]); };
-  const removePasteBlock = (id: string) => { if (pasteBlocks.length > 1) setPasteBlocks((prev) => prev.filter((b) => b.id !== id)); };
-  const updatePasteBlock = (id: string, field: keyof PasteBlock, value: string) => {
-    setPasteBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)));
+  const addPasteBlock = () => {
+    if (pasteBlocks.length < 5)
+      setPasteBlocks((prev) => [...prev, newPasteBlock()]);
+  };
+  const removePasteBlock = (id: string) => {
+    if (pasteBlocks.length > 1)
+      setPasteBlocks((prev) => prev.filter((b) => b.id !== id));
+  };
+  const updatePasteBlock = (
+    id: string,
+    field: keyof PasteBlock,
+    value: string,
+  ) => {
+    setPasteBlocks((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)),
+    );
   };
 
   const handleGenerate = async (mode: "feed" | "paste") => {
-    if (mode === "feed" && sourceArticles.length === 0) { setGenError("Add at least one source article from the Feed Reader."); return; }
-    if (mode === "paste" && !pasteBlocks.some((b) => b.text.trim())) { setGenError("Paste at least one article text."); return; }
+    if (mode === "feed" && sourceArticles.length === 0) {
+      setGenError("Add at least one source article from the Feed Reader.");
+      return;
+    }
+    if (mode === "paste" && !pasteBlocks.some((b) => b.text.trim())) {
+      setGenError("Paste at least one article text.");
+      return;
+    }
 
-    setGenerating(true); setGenError("");
+    setGenerating(true);
+    setGenError("");
 
     try {
-      const body = mode === "feed"
-        ? { articles: sourceArticles, targetLength, customPrompt: customPrompt.trim() || undefined }
-        : { pastedTexts: pasteBlocks.filter((b) => b.text.trim()).map((b) => ({ label: b.label.trim() || "Source", text: b.text.trim() })), targetLength, customPrompt: customPrompt.trim() || undefined };
+      const body =
+        mode === "feed"
+          ? {
+              articles: sourceArticles,
+              targetLength,
+              customPrompt: customPrompt.trim() || undefined,
+            }
+          : {
+              pastedTexts: pasteBlocks
+                .filter((b) => b.text.trim())
+                .map((b) => ({
+                  label: b.label.trim() || "Source",
+                  text: b.text.trim(),
+                })),
+              targetLength,
+              customPrompt: customPrompt.trim() || undefined,
+            };
 
-      const res = await fetch("/api/admin/synthesize", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      const data = (await res.json()) as { content?: string; suggested?: SuggestedMeta; error?: string };
+      const res = await fetch("/api/admin/synthesize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = (await res.json()) as {
+        content?: string;
+        suggested?: SuggestedMeta;
+        error?: string;
+      };
 
-      if (!res.ok || data.error) { setGenError(data.error ?? "Generation failed"); return; }
+      if (!res.ok || data.error) {
+        setGenError(data.error ?? "Generation failed");
+        return;
+      }
 
       setContent(data.content ?? "");
       if (data.suggested) {
         setTitle(data.suggested.title);
         setSlug(data.suggested.slug);
+        setSlugManuallyEdited(false); // AI provided the slug, re-enable auto-sync
         // Clamp to valid enum — AI may return values like "cybersecurity" that
         // Zod rejects at build time, causing the article to be silently skipped
         const suggestedCat = data.suggested.category;
-        setCategory(CATEGORIES.includes(suggestedCat) ? suggestedCat : "threat-intel");
+        setCategory(
+          CATEGORIES.includes(suggestedCat) ? suggestedCat : "threat-intel",
+        );
         setTags(data.suggested.tags.join(", "));
         setExcerpt(data.suggested.excerpt);
       }
@@ -207,31 +292,56 @@ export default function ComposePage() {
 
   const handlePublish = async () => {
     if (!content || !title || !slug) {
-      toast.error("Publish failed", { description: "Title, slug and content are required.", duration: Infinity });
+      toast.error("Publish failed", {
+        description: "Title, slug and content are required.",
+        duration: Infinity,
+      });
       return;
     }
     setPublishing(true);
 
     try {
       const res = await fetch("/api/admin/publish", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, slug, content, excerpt, category, tags: tags.split(",").map((t) => t.trim()).filter(Boolean), locale: "en", type: articleType }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          slug,
+          content,
+          excerpt,
+          category,
+          tags: tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          locale: "en",
+          type: articleType,
+        }),
       });
       const data = (await res.json()) as PublishResult & { message?: string };
       if (!res.ok) {
-        toast.error("Publish failed", { description: data.error, duration: Infinity });
+        toast.error("Publish failed", {
+          description: data.error,
+          duration: Infinity,
+        });
       } else {
         toast.success("Published! Vercel is deploying.", {
           description: "View on GitHub",
           action: data.githubUrl
-            ? { label: "Open", onClick: () => window.open(data.githubUrl, "_blank") }
+            ? {
+                label: "Open",
+                onClick: () => window.open(data.githubUrl, "_blank"),
+              }
             : undefined,
         });
         localStorage.removeItem(DRAFT_KEY);
         setDraftSavedAt(null);
       }
     } catch (err) {
-      toast.error("Publish failed", { description: err instanceof Error ? err.message : "Network error", duration: Infinity });
+      toast.error("Publish failed", {
+        description: err instanceof Error ? err.message : "Network error",
+        duration: Infinity,
+      });
     } finally {
       setPublishing(false);
     }
@@ -239,26 +349,54 @@ export default function ComposePage() {
 
   const handlePublishBoth = async () => {
     if (!content || !title || !slug) {
-      toast.error("Publish failed", { description: "Title, slug and content are required.", duration: Infinity });
+      toast.error("Publish failed", {
+        description: "Title, slug and content are required.",
+        duration: Infinity,
+      });
       return;
     }
     setPublishingBoth(true);
 
     try {
       const res = await fetch("/api/admin/translate-publish", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, slug, content, excerpt, category, tags: tags.split(",").map((t) => t.trim()).filter(Boolean), type: articleType }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          slug,
+          content,
+          excerpt,
+          category,
+          tags: tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          type: articleType,
+        }),
       });
-      const data = (await res.json()) as { success?: boolean; enGithubUrl?: string; zhGithubUrl?: string; error?: string };
+      const data = (await res.json()) as {
+        success?: boolean;
+        enGithubUrl?: string;
+        zhGithubUrl?: string;
+        error?: string;
+      };
       if (!res.ok || data.error) {
-        toast.error("Publish failed", { description: data.error, duration: Infinity });
+        toast.error("Publish failed", {
+          description: data.error,
+          duration: Infinity,
+        });
       } else {
-        toast.success("Published EN + ZH!", { description: "Both versions committed to GitHub" });
+        toast.success("Published EN + ZH!", {
+          description: "Both versions committed to GitHub",
+        });
         localStorage.removeItem(DRAFT_KEY);
         setDraftSavedAt(null);
       }
     } catch (err) {
-      toast.error("Publish failed", { description: err instanceof Error ? err.message : "Network error", duration: Infinity });
+      toast.error("Publish failed", {
+        description: err instanceof Error ? err.message : "Network error",
+        duration: Infinity,
+      });
     } finally {
       setPublishingBoth(false);
     }
@@ -268,25 +406,37 @@ export default function ComposePage() {
 
   const SettingsPanel = ({ mode }: { mode: "feed" | "paste" }) => (
     <div className="px-4 py-4 border-t border-gray-800 space-y-3">
-      <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Settings</p>
+      <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+        Settings
+      </p>
 
       <div className="space-y-1">
         <Label className="text-xs text-gray-500">Length</Label>
-        <Select value={targetLength} onValueChange={(v) => setTargetLength(v as typeof targetLength)}>
+        <Select
+          value={targetLength}
+          onValueChange={(v) => setTargetLength(v as typeof targetLength)}
+        >
           <SelectTrigger className="bg-gray-800 border-gray-700 text-xs text-white h-8">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-gray-800 border-gray-700">
-            <SelectItem value="short" className="text-xs text-white">Short (400–600 words)</SelectItem>
-            <SelectItem value="medium" className="text-xs text-white">Medium (700–900 words)</SelectItem>
-            <SelectItem value="long" className="text-xs text-white">Long (1000–1300 words)</SelectItem>
+            <SelectItem value="short" className="text-xs text-white">
+              Short (400–600 words)
+            </SelectItem>
+            <SelectItem value="medium" className="text-xs text-white">
+              Medium (700–900 words)
+            </SelectItem>
+            <SelectItem value="long" className="text-xs text-white">
+              Long (1000–1300 words)
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-1">
         <Label className="text-xs text-gray-500">
-          Additional instructions <span className="text-gray-600">(optional)</span>
+          Additional instructions{" "}
+          <span className="text-gray-600">(optional)</span>
         </Label>
         <Textarea
           value={customPrompt}
@@ -297,9 +447,16 @@ export default function ComposePage() {
         />
       </div>
 
-      <button onClick={() => handleGenerate(mode)} disabled={generating}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-sm font-medium text-white transition-colors">
-        {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+      <button
+        onClick={() => handleGenerate(mode)}
+        disabled={generating}
+        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-sm font-medium text-white transition-colors"
+      >
+        {generating ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Sparkles className="w-4 h-4" />
+        )}
         {generating ? "Generating…" : "Generate with AI"}
       </button>
 
@@ -326,38 +483,79 @@ export default function ComposePage() {
         <div className="w-72 flex-shrink-0 border-r border-gray-800 flex flex-col bg-gray-900/30">
           <Tabs defaultValue="feed" className="flex flex-col flex-1 min-h-0">
             <TabsList className="w-full rounded-none border-b border-gray-800 bg-gray-900/60 h-10 px-2 shrink-0">
-              <TabsTrigger value="feed" className="flex-1 text-xs gap-1.5 data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400">
-                <Newspaper className="w-3.5 h-3.5" />From Feed
+              <TabsTrigger
+                value="feed"
+                className="flex-1 text-xs gap-1.5 data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+              >
+                <Newspaper className="w-3.5 h-3.5" />
+                From Feed
               </TabsTrigger>
-              <TabsTrigger value="paste" className="flex-1 text-xs gap-1.5 data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400">
-                <ClipboardPaste className="w-3.5 h-3.5" />Paste
+              <TabsTrigger
+                value="paste"
+                className="flex-1 text-xs gap-1.5 data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400"
+              >
+                <ClipboardPaste className="w-3.5 h-3.5" />
+                Paste
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="feed" className="flex flex-col flex-1 mt-0 min-h-0">
+            <TabsContent
+              value="feed"
+              className="flex flex-col flex-1 mt-0 min-h-0"
+            >
               <div className="px-4 py-3 border-b border-gray-800 shrink-0">
                 <p className="text-xs text-gray-500">
-                  {sourceArticles.length === 0 ? "No articles selected." : `${sourceArticles.length} article${sourceArticles.length > 1 ? "s" : ""} selected`}
+                  {sourceArticles.length === 0
+                    ? "No articles selected."
+                    : `${sourceArticles.length} article${sourceArticles.length > 1 ? "s" : ""} selected`}
                 </p>
               </div>
               <ScrollArea className="flex-1">
                 <div className="px-3 py-3 space-y-2">
                   {sourceArticles.length === 0 && (
                     <div className="rounded-lg border border-dashed border-gray-700 p-4 text-center">
-                      <p className="text-xs text-gray-500">Go to <Link href="/admin/feed" className="text-emerald-400 hover:underline">Feed Reader</Link> and select 1–5 articles.</p>
+                      <p className="text-xs text-gray-500">
+                        Go to{" "}
+                        <Link
+                          href="/admin/feed"
+                          className="text-emerald-400 hover:underline"
+                        >
+                          Feed Reader
+                        </Link>{" "}
+                        and select 1–5 articles.
+                      </p>
                     </div>
                   )}
                   {sourceArticles.map((a) => (
-                    <div key={a.id} className="rounded-md bg-gray-800 border border-gray-700 p-3 text-xs">
+                    <div
+                      key={a.id}
+                      className="rounded-md bg-gray-800 border border-gray-700 p-3 text-xs"
+                    >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="text-white font-medium line-clamp-2 leading-snug">{a.title}</p>
+                          <p className="text-white font-medium line-clamp-2 leading-snug">
+                            {a.title}
+                          </p>
                           <div className="flex items-center gap-1.5 mt-1">
-                            <span className="text-gray-500">{a.sourceName}</span>
-                            <a href={a.url} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-emerald-400"><ExternalLink className="w-3 h-3" /></a>
+                            <span className="text-gray-500">
+                              {a.sourceName}
+                            </span>
+                            <a
+                              href={a.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-gray-600 hover:text-emerald-400"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
                           </div>
                         </div>
-                        <button onClick={() => removeSource(a.id)} className="flex-shrink-0 text-gray-600 hover:text-red-400 transition-colors"><X className="w-3.5 h-3.5" /></button>
+                        <button
+                          onClick={() => removeSource(a.id)}
+                          className="flex-shrink-0 text-gray-600 hover:text-red-400 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -366,30 +564,49 @@ export default function ComposePage() {
               <SettingsPanel mode="feed" />
             </TabsContent>
 
-            <TabsContent value="paste" className="flex flex-col flex-1 mt-0 min-h-0">
+            <TabsContent
+              value="paste"
+              className="flex flex-col flex-1 mt-0 min-h-0"
+            >
               <div className="px-4 py-3 border-b border-gray-800 shrink-0">
-                <p className="text-xs text-gray-500">Paste text from any source — AI rewrites into one article.</p>
+                <p className="text-xs text-gray-500">
+                  Paste text from any source — AI rewrites into one article.
+                </p>
               </div>
               <ScrollArea className="flex-1">
                 <div className="px-3 py-3 space-y-3">
                   {pasteBlocks.map((block, i) => (
-                    <div key={block.id} className="rounded-md bg-gray-800 border border-gray-700 p-3 space-y-2">
+                    <div
+                      key={block.id}
+                      className="rounded-md bg-gray-800 border border-gray-700 p-3 space-y-2"
+                    >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-gray-400">Source {i + 1}</span>
+                        <span className="text-xs font-medium text-gray-400">
+                          Source {i + 1}
+                        </span>
                         {pasteBlocks.length > 1 && (
-                          <button onClick={() => removePasteBlock(block.id)} className="text-gray-600 hover:text-red-400 transition-colors"><X className="w-3.5 h-3.5" /></button>
+                          <button
+                            onClick={() => removePasteBlock(block.id)}
+                            className="text-gray-600 hover:text-red-400 transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
                         )}
                       </div>
                       <Input
                         type="text"
                         value={block.label}
-                        onChange={(e) => updatePasteBlock(block.id, "label", e.target.value)}
+                        onChange={(e) =>
+                          updatePasteBlock(block.id, "label", e.target.value)
+                        }
                         placeholder="Source name (optional)"
                         className="w-full h-7 px-2 py-1 bg-gray-900 border-gray-700 text-xs text-white placeholder-gray-600 focus-visible:ring-emerald-500"
                       />
                       <Textarea
                         value={block.text}
-                        onChange={(e) => updatePasteBlock(block.id, "text", e.target.value)}
+                        onChange={(e) =>
+                          updatePasteBlock(block.id, "text", e.target.value)
+                        }
                         rows={5}
                         placeholder="Paste article text here…"
                         className="w-full bg-gray-900 border-gray-700 text-xs text-gray-200 placeholder-gray-600 focus-visible:ring-emerald-500 resize-y leading-relaxed font-mono"
@@ -397,9 +614,12 @@ export default function ComposePage() {
                     </div>
                   ))}
                   {pasteBlocks.length < 5 && (
-                    <button onClick={addPasteBlock}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md border border-dashed border-gray-700 text-xs text-gray-500 hover:border-emerald-700 hover:text-emerald-400 transition-colors">
-                      <Plus className="w-3.5 h-3.5" />Add another source ({pasteBlocks.length}/5)
+                    <button
+                      onClick={addPasteBlock}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md border border-dashed border-gray-700 text-xs text-gray-500 hover:border-emerald-700 hover:text-emerald-400 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Add another source ({pasteBlocks.length}/5)
                     </button>
                   )}
                 </div>
@@ -415,12 +635,15 @@ export default function ComposePage() {
           <div className="px-6 py-4 border-b border-gray-800 space-y-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-white">Article Editor</h2>
+                <h2 className="text-sm font-semibold text-white">
+                  Article Editor
+                </h2>
                 {/* Draft saved indicator */}
                 {draftSavedAt && (
                   <span className="flex items-center gap-1 text-xs text-gray-500">
                     <Save className="w-3 h-3" />
-                    Draft saved {Math.round((Date.now() - draftSavedAt) / 1000)}s ago
+                    Draft saved {Math.round((Date.now() - draftSavedAt) / 1000)}
+                    s ago
                   </span>
                 )}
               </div>
@@ -429,8 +652,12 @@ export default function ComposePage() {
                 {(content || title) && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button onClick={clearDraft} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-gray-500 hover:text-red-400 hover:bg-gray-800 transition-colors">
-                        <Trash2 className="w-3.5 h-3.5" />Clear
+                      <button
+                        onClick={clearDraft}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-gray-500 hover:text-red-400 hover:bg-gray-800 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Clear
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -439,16 +666,32 @@ export default function ComposePage() {
                   </Tooltip>
                 )}
                 {/* Publish EN only */}
-                <button onClick={handlePublish} disabled={publishing || publishingBoth || !content}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-xs font-medium text-white transition-colors">
-                  {publishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                <button
+                  onClick={handlePublish}
+                  disabled={publishing || publishingBoth || !content}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-xs font-medium text-white transition-colors"
+                >
+                  {publishing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Send className="w-3.5 h-3.5" />
+                  )}
                   {publishing ? "Publishing…" : "Publish EN"}
                 </button>
                 {/* Publish both EN+ZH */}
-                <button onClick={handlePublishBoth} disabled={publishing || publishingBoth || !content}
-                  className="flex items-center gap-2 px-4 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-xs font-medium text-white transition-colors">
-                  {publishingBoth ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Languages className="w-3.5 h-3.5" />}
-                  {publishingBoth ? "Translating & Publishing…" : "Publish EN + ZH"}
+                <button
+                  onClick={handlePublishBoth}
+                  disabled={publishing || publishingBoth || !content}
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-xs font-medium text-white transition-colors"
+                >
+                  {publishingBoth ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Languages className="w-3.5 h-3.5" />
+                  )}
+                  {publishingBoth
+                    ? "Translating & Publishing…"
+                    : "Publish EN + ZH"}
                 </button>
               </div>
             </div>
@@ -456,21 +699,47 @@ export default function ComposePage() {
             {/* Metadata fields */}
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2 space-y-1">
-                <Label htmlFor="article-title" className="text-xs text-gray-500">Title</Label>
+                <Label
+                  htmlFor="article-title"
+                  className="text-xs text-gray-500"
+                >
+                  Title
+                </Label>
                 <Input
                   id="article-title"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => {
+                    const newTitle = e.target.value;
+                    setTitle(newTitle);
+                    if (!slugManuallyEdited) {
+                      setSlug(titleToSlug(newTitle));
+                    }
+                  }}
                   className="w-full bg-gray-800 border-gray-700 text-sm text-white placeholder-gray-500 focus-visible:ring-emerald-500"
                   placeholder="Article title…"
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="article-slug" className="text-xs text-gray-500">Slug</Label>
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="article-slug"
+                    className="text-xs text-gray-500"
+                  >
+                    Slug
+                  </Label>
+                  {!slugManuallyEdited && slug && (
+                    <span className="text-xs text-emerald-600 font-mono">
+                      auto
+                    </span>
+                  )}
+                </div>
                 <Input
                   id="article-slug"
                   value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
+                  onChange={(e) => {
+                    setSlug(e.target.value);
+                    setSlugManuallyEdited(true);
+                  }}
                   className="w-full bg-gray-800 border-gray-700 text-xs text-white placeholder-gray-500 focus-visible:ring-emerald-500 font-mono"
                   placeholder="article-slug"
                 />
@@ -483,7 +752,13 @@ export default function ComposePage() {
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">
                     {CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c} className="text-sm text-white capitalize">{c}</SelectItem>
+                      <SelectItem
+                        key={c}
+                        value={c}
+                        className="text-sm text-white capitalize"
+                      >
+                        {c}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -492,15 +767,20 @@ export default function ComposePage() {
                 <Label className="text-xs text-gray-500">Article type</Label>
                 <div className="flex gap-2">
                   {(["posts", "threat-intel"] as const).map((t) => (
-                    <button key={t} onClick={() => setArticleType(t)}
-                      className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${articleType === t ? "bg-emerald-700 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                    <button
+                      key={t}
+                      onClick={() => setArticleType(t)}
+                      className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${articleType === t ? "bg-emerald-700 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}
+                    >
                       {t === "posts" ? "Article" : "Threat Intel"}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="article-tags" className="text-xs text-gray-500">Tags (comma separated)</Label>
+                <Label htmlFor="article-tags" className="text-xs text-gray-500">
+                  Tags (comma separated)
+                </Label>
                 <Input
                   id="article-tags"
                   value={tags}
@@ -510,7 +790,12 @@ export default function ComposePage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="article-excerpt" className="text-xs text-gray-500">Excerpt</Label>
+                <Label
+                  htmlFor="article-excerpt"
+                  className="text-xs text-gray-500"
+                >
+                  Excerpt
+                </Label>
                 <Textarea
                   id="article-excerpt"
                   value={excerpt}
@@ -529,18 +814,30 @@ export default function ComposePage() {
           <div className="flex-1 px-6 py-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <Label className="text-xs text-gray-500 font-medium uppercase tracking-wider">Content</Label>
-                {wordCount > 0 && <span className="text-xs text-gray-600">~{wordCount} words</span>}
+                <Label className="text-xs text-gray-500 font-medium uppercase tracking-wider">
+                  Content
+                </Label>
+                {wordCount > 0 && (
+                  <span className="text-xs text-gray-600">
+                    ~{wordCount} words
+                  </span>
+                )}
               </div>
               {/* Edit / Preview toggle */}
               <div className="flex rounded-md overflow-hidden border border-gray-700">
-                <button onClick={() => setPreviewMode("edit")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${previewMode === "edit" ? "bg-gray-700 text-white" : "bg-gray-900 text-gray-500 hover:text-gray-300"}`}>
-                  <Code2 className="w-3.5 h-3.5" />Edit
+                <button
+                  onClick={() => setPreviewMode("edit")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${previewMode === "edit" ? "bg-gray-700 text-white" : "bg-gray-900 text-gray-500 hover:text-gray-300"}`}
+                >
+                  <Code2 className="w-3.5 h-3.5" />
+                  Edit
                 </button>
-                <button onClick={() => setPreviewMode("preview")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${previewMode === "preview" ? "bg-gray-700 text-white" : "bg-gray-900 text-gray-500 hover:text-gray-300"}`}>
-                  <Eye className="w-3.5 h-3.5" />Preview
+                <button
+                  onClick={() => setPreviewMode("preview")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-colors ${previewMode === "preview" ? "bg-gray-700 text-white" : "bg-gray-900 text-gray-500 hover:text-gray-300"}`}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  Preview
                 </button>
               </div>
             </div>
@@ -556,10 +853,14 @@ export default function ComposePage() {
               <div className="w-full h-[calc(100vh-560px)] min-h-64 overflow-y-auto rounded-lg bg-gray-900 border border-gray-800 px-6 py-4">
                 {content ? (
                   <div className="prose prose-invert prose-sm max-w-none">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {content}
+                    </ReactMarkdown>
                   </div>
                 ) : (
-                  <p className="text-gray-600 text-sm font-mono">{"// Nothing to preview yet"}</p>
+                  <p className="text-gray-600 text-sm font-mono">
+                    {"// Nothing to preview yet"}
+                  </p>
                 )}
               </div>
             )}
