@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,10 +34,11 @@ type NVDVulnerability = {
   };
 };
 
-// ─── In-memory cache (24 h TTL) ──────────────────────────────────────────────
+// ─── In-memory cache (24 h TTL, max 1000 entries) ───────────────────────────
 
 const cache = new Map<string, { data: CVEData; ts: number }>();
 const CACHE_TTL = 24 * 60 * 60 * 1000;
+const CACHE_MAX_SIZE = 1000;
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
@@ -45,6 +47,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+
+  // Rate limit: 20 requests per minute per IP
+  const ip = getClientIp(_req.headers);
+  const rl = rateLimit(`cve:${ip}`, 20, 60_000);
+  if (!rl.allowed) return rateLimitResponse(rl);
 
   // Normalise and validate CVE ID format
   const cveId = id.toUpperCase().trim();
@@ -129,6 +136,11 @@ export async function GET(
       cvssVersion,
     };
 
+    // Evict oldest entries if cache is full
+    if (cache.size >= CACHE_MAX_SIZE) {
+      const oldest = cache.keys().next().value;
+      if (oldest) cache.delete(oldest);
+    }
     cache.set(cveId, { data, ts: Date.now() });
 
     return NextResponse.json(data, {

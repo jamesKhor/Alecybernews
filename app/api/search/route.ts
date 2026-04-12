@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllPosts } from "@/lib/content";
+import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  // Rate limit: 30 requests per minute per IP
+  const ip = getClientIp(req.headers);
+  const rl = rateLimit(`search:${ip}`, 30, 60_000);
+  if (!rl.allowed) return rateLimitResponse(rl);
+
   const { searchParams } = req.nextUrl;
   const q = (searchParams.get("q") ?? "").trim().toLowerCase();
   const locale = searchParams.get("locale") ?? "en";

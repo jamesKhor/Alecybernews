@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -8,18 +9,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         username: { label: "Username" },
         password: { label: "Password", type: "password" },
       },
-      authorize(credentials) {
+      async authorize(credentials) {
         const validUsername = process.env.ADMIN_USERNAME;
-        const validPassword = process.env.ADMIN_PASSWORD;
+        // Support both hashed (ADMIN_PASSWORD_HASH) and legacy plaintext (ADMIN_PASSWORD)
+        const passwordHash = process.env.ADMIN_PASSWORD_HASH;
+        const legacyPassword = process.env.ADMIN_PASSWORD;
 
-        if (!validUsername || !validPassword) return null;
-        if (
-          credentials.username === validUsername &&
-          credentials.password === validPassword
-        ) {
-          return { id: "1", name: "Admin" };
+        if (!validUsername || (!passwordHash && !legacyPassword)) return null;
+        if (credentials.username !== validUsername) return null;
+
+        const password = String(credentials.password);
+
+        if (passwordHash) {
+          const valid = await bcrypt.compare(password, passwordHash);
+          if (!valid) return null;
+        } else if (legacyPassword) {
+          if (password !== legacyPassword) return null;
+        } else {
+          return null;
         }
-        return null;
+
+        return { id: "1", name: "Admin" };
       },
     }),
   ],

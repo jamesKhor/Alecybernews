@@ -1,7 +1,7 @@
-import { auth } from "@/auth";
 import { NextRequest } from "next/server";
 import type { FeedArticle } from "@/lib/rss/fetch";
 import { generateWithFallback, getActiveProvider } from "@/lib/ai-provider";
+import { adminGuard } from "@/lib/admin-guard";
 
 type PastedText = { label?: string; text: string };
 
@@ -58,13 +58,8 @@ const WORD_COUNT_GUIDANCE = {
 };
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session) {
-    return new Response(
-      JSON.stringify({ type: "error", message: "Unauthorized" }),
-      { status: 401, headers: { "Content-Type": "application/json" } },
-    );
-  }
+  const guard = await adminGuard(req, "synthesize", 5, 60_000);
+  if (guard) return guard;
 
   if (getActiveProvider() === "none") {
     return new Response(

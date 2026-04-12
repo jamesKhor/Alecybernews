@@ -1,5 +1,5 @@
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { adminGuard, isValidLocale, isValidType } from "@/lib/admin-guard";
 
 type PublishRequest = {
   title: string;
@@ -99,9 +99,8 @@ async function commitToGitHub(
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const guard = await adminGuard(req, "publish", 10, 60_000);
+  if (guard) return guard;
 
   const body = (await req.json()) as PublishRequest;
   const { title, slug, content, locale = "en", type = "posts" } = body;
@@ -111,6 +110,20 @@ export async function POST(req: NextRequest) {
       { error: "title, slug and content are required" },
       { status: 400 },
     );
+  }
+
+  // Validate inputs
+  if (!isValidLocale(locale)) {
+    return NextResponse.json({ error: "Invalid locale" }, { status: 400 });
+  }
+  if (!isValidType(type)) {
+    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+  }
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+    return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
+  }
+  if (content.length > 500_000) {
+    return NextResponse.json({ error: "Content too large" }, { status: 400 });
   }
 
   const date = new Date().toISOString().split("T")[0];
