@@ -43,7 +43,7 @@ export default async function AdminLayout({
           <div className="flex items-center gap-2 px-4 py-4 border-b border-gray-800">
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
             <span className="font-semibold text-sm tracking-tight">
-              AleCyber<span className="text-emerald-400">Admin</span>
+              ZCyber<span className="text-emerald-400">Admin</span>
             </span>
           </div>
 

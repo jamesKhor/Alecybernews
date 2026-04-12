@@ -433,11 +433,53 @@ export async function translateWithFallback(
   options: {
     maxOutputTokens?: number;
     temperature?: number;
+    provider?: "auto" | "deepseek" | "kimi";
     onStatus?: (message: string, model?: string) => void;
   } = {},
 ): Promise<GenerateResult> {
-  const { maxOutputTokens = 4000, temperature = 0.3, onStatus } = options;
+  const {
+    maxOutputTokens = 4000,
+    temperature = 0.3,
+    provider = "auto",
+    onStatus,
+  } = options;
 
+  // ── Direct paid model (skip free queue) ────────────────────────────────────
+  if (provider === "deepseek") {
+    if (!process.env.DEEPSEEK_API_KEY)
+      throw new Error("DEEPSEEK_API_KEY not configured.");
+    const ds = makeDeepSeekClient();
+    const result = await generateText({
+      model: ds(DEEPSEEK_TRANSLATE_MODEL),
+      prompt,
+      maxOutputTokens,
+      temperature,
+    });
+    return {
+      text: result.text,
+      modelUsed: `deepseek/${DEEPSEEK_TRANSLATE_MODEL}`,
+      usedPaidFallback: true,
+    };
+  }
+
+  if (provider === "kimi") {
+    if (!process.env.KIMI_API_KEY)
+      throw new Error("KIMI_API_KEY not configured.");
+    const kimi = makeKimiClient();
+    const result = await generateText({
+      model: kimi(KIMI_TRANSLATE_MODEL),
+      prompt,
+      maxOutputTokens,
+      temperature,
+    });
+    return {
+      text: result.text,
+      modelUsed: `kimi/${KIMI_TRANSLATE_MODEL}`,
+      usedPaidFallback: true,
+    };
+  }
+
+  // ── Auto: free models first, then paid fallback ─────────────────────────────
   if (process.env.OPENROUTER_API_KEY) {
     const { translateModels } = await getLiveFreeModels();
 
@@ -445,7 +487,7 @@ export async function translateWithFallback(
       const result = await runWithFallback(translateModels, prompt, 50, {
         maxOutputTokens,
         temperature,
-        timeoutMs: 60_000, // 60 s per translate model
+        timeoutMs: 60_000,
         onStatus,
       });
       return { ...result, usedPaidFallback: false };

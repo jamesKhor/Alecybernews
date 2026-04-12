@@ -42,7 +42,7 @@ function LoginForm() {
         <div className="flex items-center justify-center gap-2 mb-8">
           <ShieldCheck className="w-7 h-7 text-emerald-400" />
           <span className="text-xl font-semibold tracking-tight text-white">
-            AleCyber<span className="text-emerald-400">Admin</span>
+            ZCyber<span className="text-emerald-400">Admin</span>
           </span>
         </div>
 

@@ -135,10 +135,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Translate title + excerpt
+  // Translate title + excerpt — use DeepSeek directly for speed (avoids free model queue + Kimi latency)
   const metaRes = await translateWithFallback(
     `Translate these to Simplified Chinese. Keep threat actor names, malware names, ALL-CAPS acronyms (EDR, VPN, APT, CVE, IOC, TTP etc), product names in English. Return ONLY valid JSON: {"title": "...", "excerpt": "..."}\n\nTitle: ${title}\nExcerpt: ${excerpt}`,
-    { maxOutputTokens: 300, temperature: 0.2 },
+    { maxOutputTokens: 300, temperature: 0.2, provider: "deepseek" },
   );
 
   let zhTitle = title;
@@ -161,7 +161,7 @@ Keep all Markdown formatting intact. Output ONLY the translated markdown, no exp
 Translate this article body to Simplified Chinese:
 
 ${content}`,
-    { maxOutputTokens: 4000, temperature: 0.3 },
+    { maxOutputTokens: 4000, temperature: 0.3, provider: "deepseek" },
   );
 
   const date = new Date().toISOString().split("T")[0];
