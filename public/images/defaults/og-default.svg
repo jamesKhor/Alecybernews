@@ -1,0 +1,36 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#0a1628"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#22d3ee" stroke-width="0.3" opacity="0.15"/>
+    </pattern>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#22d3ee"/>
+      <stop offset="100%" style="stop-color:#6366f1"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <!-- Subtle glow circles -->
+  <circle cx="200" cy="315" r="300" fill="#22d3ee" opacity="0.03"/>
+  <circle cx="1000" cy="315" r="250" fill="#6366f1" opacity="0.04"/>
+  <!-- Shield icon outline -->
+  <path d="M600 160 L660 190 L660 270 Q660 320 600 350 Q540 320 540 270 L540 190 Z" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.5"/>
+  <path d="M600 185 L645 208 L645 270 Q645 308 600 332 Q555 308 555 270 L555 208 Z" fill="#22d3ee" opacity="0.08"/>
+  <!-- Lock symbol inside shield -->
+  <rect x="583" y="272" width="34" height="28" rx="3" fill="#22d3ee" opacity="0.6"/>
+  <path d="M589 272 L589 260 Q589 248 600 248 Q611 248 611 260 L611 272" fill="none" stroke="#22d3ee" stroke-width="3" opacity="0.6" stroke-linecap="round"/>
+  <!-- Site name -->
+  <text x="600" y="420" font-size="64" font-weight="bold" fill="white" text-anchor="middle" font-family="'Courier New', monospace" letter-spacing="-1">ZCyberNews</text>
+  <!-- Tagline -->
+  <text x="600" y="468" font-size="22" fill="#94a3b8" text-anchor="middle" font-family="'Courier New', monospace" letter-spacing="2">CYBERSECURITY &amp; THREAT INTELLIGENCE</text>
+  <!-- Bottom accent bar -->
+  <rect x="0" y="610" width="1200" height="4" fill="url(#accent)" opacity="0.8"/>
+  <!-- Corner decorations -->
+  <path d="M0 0 L60 0 L0 60 Z" fill="#22d3ee" opacity="0.06"/>
+  <path d="M1200 630 L1140 630 L1200 570 Z" fill="#6366f1" opacity="0.06"/>
+</svg>

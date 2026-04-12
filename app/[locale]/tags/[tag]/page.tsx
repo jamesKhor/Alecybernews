@@ -34,6 +34,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "zh-Hans": `/zh/tags/${tag}`,
       },
     },
+    openGraph: {
+      title: `#${tag} — ZCyberNews`,
+      description: `Browse all articles tagged with "${tag}" on ZCyberNews.`,
+      url: `/${locale}/tags/${tag}`,
+      siteName: "ZCyberNews",
+      locale: locale === "zh" ? "zh_CN" : "en_US",
+      type: "website",
+    },
   };
 }
 
