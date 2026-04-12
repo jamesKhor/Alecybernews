@@ -404,15 +404,15 @@ export default function ComposePage() {
         };
       }
 
-      if (finalData.usedPaidFallback) {
+      if (finalData.usedPaidFallback && modelChoice === "auto") {
         toast.warning("⚠️ Paid API used", {
-          description: `All free OpenRouter models were unavailable. Paid API was used as fallback. Models: ${finalData.modelsUsed?.join(", ") ?? "unknown"}`,
+          description: `All free OpenRouter models failed. Paid API used as fallback. Models: ${finalData.modelsUsed?.join(", ") ?? "unknown"}`,
           duration: Infinity,
         });
       } else {
         toast.success("✅ Article ready!", {
           description: `Generated with ${modelLabel}. Review and publish when ready.`,
-          duration: Infinity, // keep visible until dismissed
+          duration: Infinity,
         });
       }
     } catch (err) {
@@ -523,7 +523,7 @@ export default function ComposePage() {
         toast.success("Published EN + ZH!", {
           description: "Both versions committed to GitHub",
         });
-        if (data.usedPaidFallback) {
+        if (false && data.usedPaidFallback) {
           toast.warning("⚠️ Paid API used for translation", {
             description:
               "All free OpenRouter translation models were unavailable. DeepSeek (paid) was used as fallback.",
