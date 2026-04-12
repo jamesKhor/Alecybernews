@@ -81,18 +81,8 @@ export default async function HomePage({ params }: Props) {
     postsByCat[cat].push(post);
   }
 
-  // Threat intel section (excluding already shown in latest)
-  const tiRemaining = tiPosts.filter(
-    (p) => !latestSlugs.has(p.frontmatter.slug),
-  );
-
   return (
-    <HomeContent
-      locale={locale}
-      latest={latest}
-      postsByCat={postsByCat}
-      tiPosts={tiRemaining.slice(0, 3)}
-    />
+    <HomeContent locale={locale} latest={latest} postsByCat={postsByCat} />
   );
 }
 
@@ -100,21 +90,17 @@ function HomeContent({
   locale,
   latest,
   postsByCat,
-  tiPosts,
 }: {
   locale: string;
   latest: ArticleWithSource[];
   postsByCat: Record<string, Awaited<ReturnType<typeof getAllPosts>>>;
-  tiPosts: Awaited<ReturnType<typeof getAllPosts>>;
 }) {
   const t = useTranslations("home");
   const tCats = useTranslations("categories");
   const isZh = locale === "zh";
 
   const hasContent =
-    latest.length > 0 ||
-    tiPosts.length > 0 ||
-    Object.values(postsByCat).some((p) => p.length > 0);
+    latest.length > 0 || Object.values(postsByCat).some((p) => p.length > 0);
 
   return (
     <main className="flex-1">
@@ -152,29 +138,6 @@ function HomeContent({
               viewAll={t("viewAll")}
             />
             <LatestGrid articles={latest} locale={locale} />
-          </section>
-        )}
-
-        {/* Threat Intel section */}
-        {tiPosts.length > 0 && (
-          <section>
-            <SectionHeader
-              label={isZh ? "威胁情报" : "Threat Intel"}
-              href="/threat-intel"
-              locale={locale}
-              viewAll={t("viewAll")}
-              accent="destructive"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {tiPosts.map((post) => (
-                <ArticleCard
-                  key={post.frontmatter.slug}
-                  article={post}
-                  locale={locale}
-                  type="threat-intel"
-                />
-              ))}
-            </div>
           </section>
         )}
 

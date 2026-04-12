@@ -142,12 +142,10 @@ export default function ComposePage() {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
-  const [category, setCategory] = useState("threat-intel");
+  const [category, setCategory] = useState("vulnerabilities");
   const [tags, setTags] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [articleType, setArticleType] = useState<"posts" | "threat-intel">(
-    "posts",
-  );
+  const articleType = "posts" as const;
 
   // UI state
   const [previewMode, setPreviewMode] = useState<"edit" | "preview">("edit");
@@ -170,11 +168,10 @@ export default function ComposePage() {
         if (d.content || d.title) {
           setTitle(d.title ?? "");
           setSlug(d.slug ?? "");
-          setCategory(d.category ?? "threat-intel");
+          setCategory(d.category ?? "vulnerabilities");
           setTags(d.tags ?? "");
           setExcerpt(d.excerpt ?? "");
           setContent(d.content ?? "");
-          setArticleType(d.articleType ?? "posts");
           setDraftSavedAt(d.savedAt ?? null);
         }
       } catch {}
@@ -207,7 +204,7 @@ export default function ComposePage() {
     localStorage.removeItem(DRAFT_KEY);
     setTitle("");
     setSlug("");
-    setCategory("threat-intel");
+    setCategory("vulnerabilities");
     setTags("");
     setExcerpt("");
     setContent("");
@@ -970,20 +967,6 @@ export default function ComposePage() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs text-gray-500">Article type</Label>
-                <div className="flex gap-2">
-                  {(["posts", "threat-intel"] as const).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setArticleType(t)}
-                      className={`flex-1 py-1.5 rounded-md text-xs font-medium transition-colors ${articleType === t ? "bg-emerald-700 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}
-                    >
-                      {t === "posts" ? "Article" : "Threat Intel"}
-                    </button>
-                  ))}
-                </div>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="article-tags" className="text-xs text-gray-500">
