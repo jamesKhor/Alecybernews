@@ -57,6 +57,7 @@ jobs:
           fi
           npx tsx scripts/pipeline/index.ts $ARGS
         env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           KIMI_API_KEY: ${{ secrets.KIMI_API_KEY }}
 

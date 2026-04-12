@@ -99,8 +99,17 @@ function assertEnv(key: string) {
 }
 
 if (!DRY_RUN) {
-  assertEnv("DEEPSEEK_API_KEY");
-  assertEnv("KIMI_API_KEY");
+  // Need at least one AI provider — OpenRouter (free) or DeepSeek/Kimi (paid)
+  if (
+    !process.env.OPENROUTER_API_KEY &&
+    !process.env.DEEPSEEK_API_KEY &&
+    !process.env.KIMI_API_KEY
+  ) {
+    console.error(
+      "[pipeline] ❌ No AI provider configured. Set OPENROUTER_API_KEY, DEEPSEEK_API_KEY, or KIMI_API_KEY.",
+    );
+    process.exit(1);
+  }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────

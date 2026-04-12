@@ -26,7 +26,16 @@ exec >> "$LOG_FILE" 2>&1
 # ── Load env vars (for API keys + Telegram config) ─────────────────────────
 if [ -f "$REPO_DIR/.env.local" ]; then
   set -a
-  source "$REPO_DIR/.env.local"
+  # Use env parsing that handles $ in values (e.g. bcrypt hashes like $2b$12$...)
+  while IFS='=' read -r key value; do
+    # Skip comments and blank lines
+    [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+    # Trim whitespace from key
+    key="${key//[[:space:]]/}"
+    # Only export valid variable names
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    export "$key=$value"
+  done < "$REPO_DIR/.env.local"
   set +a
 fi
 

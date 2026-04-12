@@ -1,5 +1,4 @@
-import { generateText } from "ai";
-import { translationModel } from "../ai/provider.js";
+import { translateText } from "../ai/provider.js";
 import {
   buildTranslationPrompt,
   buildZhMetaPrompt,
@@ -13,29 +12,39 @@ export type TranslatedMeta = {
   body: string;
 };
 
-/** Translate an English article to Chinese using Kimi K2. */
+/** Translate an English article to Chinese. */
 export async function translateArticle(
   article: GeneratedArticle,
 ): Promise<TranslatedMeta | null> {
   try {
     // Translate body
-    const { text: zhBody } = await withRetry(() =>
-      generateText({
-        model: translationModel,
-        prompt: buildTranslationPrompt(article.body, article.title),
+    const {
+      text: zhBody,
+      modelUsed: bodyModel,
+      paid: bodyPaid,
+    } = await withRetry(() =>
+      translateText(buildTranslationPrompt(article.body, article.title), {
         maxOutputTokens: 4000,
         temperature: 0.3,
       }),
     );
+    console.log(
+      `[translate] Body translated by ${bodyModel}${bodyPaid ? " (PAID)" : " (FREE)"}`,
+    );
 
     // Translate title + excerpt
-    const { text: metaRaw } = await withRetry(() =>
-      generateText({
-        model: translationModel,
-        prompt: buildZhMetaPrompt(article.excerpt, article.title),
+    const {
+      text: metaRaw,
+      modelUsed: metaModel,
+      paid: metaPaid,
+    } = await withRetry(() =>
+      translateText(buildZhMetaPrompt(article.excerpt, article.title), {
         maxOutputTokens: 300,
         temperature: 0.2,
       }),
+    );
+    console.log(
+      `[translate] Meta translated by ${metaModel}${metaPaid ? " (PAID)" : " (FREE)"}`,
     );
 
     let zhTitle = article.title;
