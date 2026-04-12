@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -77,6 +78,24 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
         <Toaster richColors position="top-right" closeButton duration={5000} />
+        {/* Google AdSense */}
+        {process.env.NEXT_PUBLIC_ADSENSE_ID && (
+          <Script
+            async
+            crossOrigin="anonymous"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_ID}`}
+            strategy="afterInteractive"
+          />
+        )}
+        {/* Plausible Analytics — privacy-friendly, no cookies */}
+        {process.env.PLAUSIBLE_DOMAIN && (
+          <Script
+            defer
+            data-domain={process.env.PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

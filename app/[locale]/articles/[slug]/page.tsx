@@ -11,6 +11,7 @@ import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { stripMarkdown } from "@/lib/utils";
 import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
+import { SidebarAd, InArticleAd } from "@/components/ads/AdSense";
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -191,6 +192,9 @@ function ArticlePageContent({
           {/* MDX body — CVEArticleBody hydrates plain-text CVE mentions */}
           <CVEArticleBody>{mdxContent}</CVEArticleBody>
 
+          {/* In-article ad */}
+          <InArticleAd className="my-8" />
+
           {/* Tags */}
           {frontmatter.tags.length > 0 && (
             <div className="mt-10 pt-6 border-t border-border">
@@ -212,29 +216,34 @@ function ArticlePageContent({
 
         {/* Sidebar */}
         <aside className="hidden lg:block">
-          {/* Table of Contents */}
-          {headings.length > 0 && (
-            <div className="sticky top-6 rounded-lg border border-border bg-card p-5">
-              <h3 className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">
-                {t("tableOfContents")}
-              </h3>
-              <nav className="space-y-1">
-                {headings.map((h) => (
-                  <a
-                    key={h.id}
-                    href={`#${h.id}`}
-                    className={`block text-sm hover:text-primary transition-colors ${
-                      h.level === 2
-                        ? "text-foreground"
-                        : "text-muted-foreground pl-3"
-                    }`}
-                  >
-                    {h.text}
-                  </a>
-                ))}
-              </nav>
-            </div>
-          )}
+          <div className="sticky top-6 space-y-6">
+            {/* Sidebar Ad */}
+            <SidebarAd className="rounded-lg border border-border bg-card p-3 overflow-hidden" />
+
+            {/* Table of Contents */}
+            {headings.length > 0 && (
+              <div className="rounded-lg border border-border bg-card p-5">
+                <h3 className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">
+                  {t("tableOfContents")}
+                </h3>
+                <nav className="space-y-1">
+                  {headings.map((h) => (
+                    <a
+                      key={h.id}
+                      href={`#${h.id}`}
+                      className={`block text-sm hover:text-primary transition-colors ${
+                        h.level === 2
+                          ? "text-foreground"
+                          : "text-muted-foreground pl-3"
+                      }`}
+                    >
+                      {h.text}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+            )}
+          </div>
         </aside>
       </div>
 

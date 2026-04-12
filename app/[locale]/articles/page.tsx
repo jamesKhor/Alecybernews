@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
+import { InFeedAd } from "@/components/ads/AdSense";
 import { useTranslations } from "next-intl";
 
 const PAGE_SIZE = 12;
@@ -104,12 +105,12 @@ function ArticlesContent({
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
-            <ArticleCard
-              key={post.frontmatter.slug}
-              article={post}
-              locale={locale}
-            />
+          {posts.map((post, i) => (
+            <div key={post.frontmatter.slug}>
+              <ArticleCard article={post} locale={locale} />
+              {/* In-feed ad after 3rd card */}
+              {i === 2 && <InFeedAd className="mt-6" />}
+            </div>
           ))}
         </div>
       )}
