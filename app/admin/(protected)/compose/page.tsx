@@ -40,7 +40,18 @@ import {
   Save,
   Trash2,
   Languages,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+type GenStatusEvent = {
+  step: "writing" | "metadata" | string;
+  message: string;
+  model?: string;
+  done?: boolean;
+  error?: boolean;
+};
 
 type SuggestedMeta = {
   title: string;
@@ -117,9 +128,13 @@ export default function ComposePage() {
   const [publishing, setPublishing] = useState(false);
   const [publishingBoth, setPublishingBoth] = useState(false);
   const [genError, setGenError] = useState("");
+  const [genStatusLog, setGenStatusLog] = useState<GenStatusEvent[]>([]);
   const [customPrompt, setCustomPrompt] = useState("");
   const [targetLength, setTargetLength] = useState<"short" | "medium" | "long">(
     "medium",
+  );
+  const [modelChoice, setModelChoice] = useState<"auto" | "deepseek" | "kimi">(
+    "deepseek",
   );
 
   // Generated content state
@@ -137,6 +152,7 @@ export default function ComposePage() {
   // UI state
   const [previewMode, setPreviewMode] = useState<"edit" | "preview">("edit");
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
+  const [genButtonLabel, setGenButtonLabel] = useState("Generate with AI");
 
   // Load from sessionStorage (feed articles) + localStorage (draft)
   useEffect(() => {
@@ -233,14 +249,26 @@ export default function ComposePage() {
 
     setGenerating(true);
     setGenError("");
+    setGenStatusLog([]);
+    setGenButtonLabel("Starting…");
+
+    // Request browser notification permission upfront so we can alert
+    // the user when generation finishes even if they switch tabs
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "default"
+    ) {
+      await Notification.requestPermission();
+    }
 
     try {
-      const body =
+      const requestBody =
         mode === "feed"
           ? {
               articles: sourceArticles,
               targetLength,
               customPrompt: customPrompt.trim() || undefined,
+              provider: modelChoice,
             }
           : {
               pastedTexts: pasteBlocks
@@ -251,57 +279,147 @@ export default function ComposePage() {
                 })),
               targetLength,
               customPrompt: customPrompt.trim() || undefined,
+              provider: modelChoice,
             };
 
       const res = await fetch("/api/admin/synthesize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(requestBody),
       });
-      const data = (await res.json()) as {
-        content?: string;
-        suggested?: SuggestedMeta;
-        error?: string;
-        usedPaidFallback?: boolean;
-        modelsUsed?: string[];
-      };
 
-      if (!res.ok || data.error) {
-        setGenError(data.error ?? "Generation failed");
+      if (!res.ok || !res.body) {
+        const errData = (await res.json()) as { message?: string };
+        setGenError(errData.message ?? "Generation failed");
         return;
       }
 
-      setContent(data.content ?? "");
-      if (data.suggested) {
-        setTitle(data.suggested.title);
-        setSlug(data.suggested.slug);
-        setSlugManuallyEdited(false); // AI provided the slug, re-enable auto-sync
-        // Clamp to valid enum — AI may return values like "cybersecurity" that
-        // Zod rejects at build time, causing the article to be silently skipped
-        const suggestedCat = data.suggested.category;
+      // Stream NDJSON events
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      let finalData: {
+        content?: string;
+        suggested?: SuggestedMeta;
+        usedPaidFallback?: boolean;
+        modelsUsed?: string[];
+      } | null = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const event = JSON.parse(line) as {
+              type: string;
+              step?: string;
+              message?: string;
+              model?: string;
+              content?: string;
+              suggested?: SuggestedMeta;
+              usedPaidFallback?: boolean;
+              modelsUsed?: string[];
+            };
+
+            if (event.type === "status") {
+              setGenStatusLog((prev) => [
+                ...prev,
+                {
+                  step: event.step ?? "writing",
+                  message: event.message ?? "",
+                  model: event.model,
+                },
+              ]);
+              // Update button label to reflect current step
+              if (event.step === "metadata") {
+                setGenButtonLabel("Generating metadata…");
+              } else if (
+                event.message?.startsWith("Trying") ||
+                event.message?.startsWith("Found")
+              ) {
+                setGenButtonLabel("Writing article…");
+              }
+            } else if (event.type === "done") {
+              finalData = {
+                content: event.content,
+                suggested: event.suggested,
+                usedPaidFallback: event.usedPaidFallback,
+                modelsUsed: event.modelsUsed,
+              };
+              setGenStatusLog((prev) => [
+                ...prev,
+                { step: "done", message: "Done!", done: true },
+              ]);
+            } else if (event.type === "error") {
+              setGenError(event.message ?? "Generation failed");
+              return;
+            }
+          } catch {
+            // malformed line — skip
+          }
+        }
+      }
+
+      if (!finalData) {
+        setGenError("No response received from AI");
+        return;
+      }
+
+      setContent(finalData.content ?? "");
+      if (finalData.suggested) {
+        setTitle(finalData.suggested.title);
+        setSlug(finalData.suggested.slug);
+        setSlugManuallyEdited(false);
+        const suggestedCat = finalData.suggested.category;
         setCategory(
           CATEGORIES.includes(suggestedCat) ? suggestedCat : "threat-intel",
         );
-        setTags(data.suggested.tags.join(", "));
-        setExcerpt(data.suggested.excerpt);
+        setTags(finalData.suggested.tags.join(", "));
+        setExcerpt(finalData.suggested.excerpt);
       }
 
-      // Notify admin if paid DeepSeek API was used as fallback
-      if (data.usedPaidFallback) {
+      const articleTitle = finalData.suggested?.title ?? "Article";
+      const modelLabel = finalData.modelsUsed?.[0] ?? "free model";
+
+      // Browser notification — fires even when the tab is in the background
+      if (
+        typeof Notification !== "undefined" &&
+        Notification.permission === "granted"
+      ) {
+        const notif = new Notification("✅ Article ready — AleCyberNews", {
+          body: `"${articleTitle}" is ready to review and publish.`,
+          icon: "/favicon.ico",
+          tag: "article-generation", // replaces previous notif if still showing
+        });
+        notif.onclick = () => {
+          window.focus();
+          notif.close();
+        };
+      }
+
+      if (finalData.usedPaidFallback) {
         toast.warning("⚠️ Paid API used", {
-          description: `All free OpenRouter models were unavailable. DeepSeek (paid) was used as fallback. Models attempted: ${data.modelsUsed?.join(", ") ?? "unknown"}`,
+          description: `All free OpenRouter models were unavailable. Paid API was used as fallback. Models: ${finalData.modelsUsed?.join(", ") ?? "unknown"}`,
           duration: Infinity,
         });
       } else {
-        toast.success("Generated!", {
-          description: `Model: ${data.modelsUsed?.[0] ?? "free"}`,
-          duration: 3000,
+        toast.success("✅ Article ready!", {
+          description: `Generated with ${modelLabel}. Review and publish when ready.`,
+          duration: Infinity, // keep visible until dismissed
         });
       }
     } catch (err) {
       setGenError(err instanceof Error ? err.message : "Network error");
     } finally {
       setGenerating(false);
+      setGenButtonLabel("Generate with AI");
     }
   };
 
@@ -453,7 +571,7 @@ export default function ComposePage() {
               Medium (700–900 words)
             </SelectItem>
             <SelectItem value="long" className="text-xs text-white">
-              Long (1000–1300 words)
+              Long (1000+ words)
             </SelectItem>
           </SelectContent>
         </Select>
@@ -474,6 +592,29 @@ export default function ComposePage() {
         />
       </div>
 
+      <div className="space-y-1">
+        <Label className="text-xs text-gray-500">Model</Label>
+        <Select
+          value={modelChoice}
+          onValueChange={(v) => setModelChoice(v as typeof modelChoice)}
+        >
+          <SelectTrigger className="bg-gray-800 border-gray-700 text-xs text-white h-8">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-gray-700">
+            <SelectItem value="deepseek" className="text-xs text-white">
+              DeepSeek — fast &amp; cheap
+            </SelectItem>
+            <SelectItem value="kimi" className="text-xs text-white">
+              Kimi (Moonshot) — good for ZH
+            </SelectItem>
+            <SelectItem value="auto" className="text-xs text-white">
+              Auto — free models → DeepSeek → Kimi
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <button
         onClick={() => handleGenerate(mode)}
         disabled={generating}
@@ -484,7 +625,7 @@ export default function ComposePage() {
         ) : (
           <Sparkles className="w-4 h-4" />
         )}
-        {generating ? "Generating…" : "Generate with AI"}
+        {generating ? genButtonLabel : "Generate with AI"}
       </button>
 
       {genError && (
@@ -498,6 +639,46 @@ export default function ComposePage() {
           >
             <X className="w-3.5 h-3.5" />
           </button>
+        </div>
+      )}
+
+      {/* Live generation status panel */}
+      {(generating || genStatusLog.length > 0) && !genError && (
+        <div className="rounded-md bg-gray-900 border border-gray-700 p-3 space-y-1.5">
+          {genStatusLog.length === 0 && generating && (
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Loader2 className="w-3 h-3 animate-spin text-emerald-400 flex-shrink-0" />
+              <span>Starting…</span>
+            </div>
+          )}
+          {genStatusLog.slice(-6).map((s, i, arr) => {
+            const isLast = i === arr.length - 1;
+            const isDone = s.done;
+            return (
+              <div key={i} className="flex items-start gap-2 text-xs min-w-0">
+                {isDone ? (
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0 mt-0.5" />
+                ) : isLast && generating ? (
+                  <Loader2 className="w-3 h-3 animate-spin text-emerald-400 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <Circle className="w-3 h-3 text-gray-600 flex-shrink-0 mt-0.5" />
+                )}
+                <span
+                  className={`flex-1 truncate ${isDone ? "text-emerald-400" : isLast && generating ? "text-gray-200" : "text-gray-500"}`}
+                >
+                  {s.message}
+                </span>
+                {s.model && (
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] leading-tight px-1 py-0 border-gray-700 text-gray-500 flex-shrink-0 max-w-[100px] truncate font-mono"
+                  >
+                    {s.model.split("/").pop()?.replace(":free", "") ?? s.model}
+                  </Badge>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

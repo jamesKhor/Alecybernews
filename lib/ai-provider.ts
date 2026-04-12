@@ -22,9 +22,11 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { generateText } from "ai";
 import type { LanguageModel } from "ai";
 
-// ─── DeepSeek model IDs ───────────────────────────────────────────────────────
+// ─── Paid model IDs ───────────────────────────────────────────────────────────
 export const DEEPSEEK_WRITE_MODEL = "deepseek-chat";
 export const DEEPSEEK_TRANSLATE_MODEL = "deepseek-chat";
+export const KIMI_WRITE_MODEL = "moonshot-v1-32k";
+export const KIMI_TRANSLATE_MODEL = "moonshot-v1-32k";
 
 // ─── Minimum thresholds for "usable" free models ─────────────────────────────
 const MIN_EFFECTIVE_PARAMS_B = 12; // anything under 12B is useless for articles
@@ -191,11 +193,12 @@ async function getLiveFreeModels(): Promise<CachedModelList> {
 }
 
 // ─── Provider detection ───────────────────────────────────────────────────────
-export type AIProvider = "openrouter" | "deepseek" | "none";
+export type AIProvider = "openrouter" | "deepseek" | "kimi" | "none";
 
 export function getActiveProvider(): AIProvider {
   if (process.env.OPENROUTER_API_KEY) return "openrouter";
   if (process.env.DEEPSEEK_API_KEY) return "deepseek";
+  if (process.env.KIMI_API_KEY) return "kimi";
   return "none";
 }
 
@@ -221,6 +224,14 @@ function makeDeepSeekClient() {
   });
 }
 
+function makeKimiClient() {
+  return createOpenAICompatible({
+    name: "kimi",
+    baseURL: "https://api.moonshot.cn/v1",
+    apiKey: process.env.KIMI_API_KEY!,
+  });
+}
+
 // ─── Core fallback runner ─────────────────────────────────────────────────────
 export type GenerateResult = {
   text: string;
@@ -232,12 +243,19 @@ async function runWithFallback(
   modelIds: string[],
   prompt: string,
   minResponseLength: number,
-  options: { maxOutputTokens: number; temperature: number },
+  options: {
+    maxOutputTokens: number;
+    temperature: number;
+    timeoutMs?: number; // per-model wall-clock timeout; skip model if exceeded
+    onStatus?: (message: string, model?: string) => void;
+  },
 ): Promise<Omit<GenerateResult, "usedPaidFallback"> & { errors: string[] }> {
   const errors: string[] = [];
   const or = makeOpenRouterClient();
+  const { timeoutMs = 60_000 } = options; // default 60 s per free model
 
   for (const modelId of modelIds) {
+    options.onStatus?.(`Trying ${modelId}…`, modelId);
     try {
       const model: LanguageModel = or(modelId);
       const result = await generateText({
@@ -245,6 +263,7 @@ async function runWithFallback(
         prompt,
         maxOutputTokens: options.maxOutputTokens,
         temperature: options.temperature,
+        abortSignal: AbortSignal.timeout(timeoutMs),
       });
 
       if (result.text && result.text.trim().length >= minResponseLength) {
@@ -255,7 +274,14 @@ async function runWithFallback(
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+
+      // Timeout — free model too slow, move on immediately
+      const isTimeout =
+        err instanceof Error &&
+        (err.name === "TimeoutError" || err.name === "AbortError");
+
       const isTransient =
+        isTimeout ||
         msg.includes("404") ||
         msg.includes("429") ||
         msg.includes("503") ||
@@ -264,13 +290,15 @@ async function runWithFallback(
         msg.includes("temporarily") ||
         msg.includes("Provider returned error");
 
-      errors.push(`${modelId}: ${msg.slice(0, 140)}`);
+      errors.push(
+        `${modelId}: ${isTimeout ? `timed out after ${timeoutMs / 1000}s` : msg.slice(0, 140)}`,
+      );
 
       if (!isTransient) {
         // Fatal error (bad API key, malformed request) — stop trying OpenRouter
         break;
       }
-      // Transient — try next model
+      // Transient or timeout — try next model
     }
   }
 
@@ -285,33 +313,28 @@ async function runWithFallback(
  */
 export async function generateWithFallback(
   prompt: string,
-  options: { maxOutputTokens?: number; temperature?: number } = {},
+  options: {
+    maxOutputTokens?: number;
+    temperature?: number;
+    provider?: "auto" | "deepseek" | "kimi";
+    onStatus?: (message: string, model?: string) => void;
+  } = {},
 ): Promise<GenerateResult> {
-  const { maxOutputTokens = 2000, temperature = 0.6 } = options;
+  const {
+    maxOutputTokens = 2000,
+    temperature = 0.6,
+    provider = "auto",
+    onStatus,
+  } = options;
 
-  if (process.env.OPENROUTER_API_KEY) {
-    const { writeModels } = await getLiveFreeModels();
-
-    try {
-      const result = await runWithFallback(writeModels, prompt, 100, {
-        maxOutputTokens,
-        temperature,
-      });
-      return { ...result, usedPaidFallback: false };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "";
-      if (!msg.startsWith("__all_models_failed__")) throw err; // unexpected error
-      console.warn(
-        `[ai-provider] All ${writeModels.length} free write models failed — falling back to DeepSeek (paid)`,
-      );
-    }
-  }
-
-  if (process.env.DEEPSEEK_API_KEY) {
+  // ── Direct paid model (no free queue) ──────────────────────────────────────
+  if (provider === "deepseek") {
+    if (!process.env.DEEPSEEK_API_KEY)
+      throw new Error("DEEPSEEK_API_KEY not configured.");
+    onStatus?.("Using DeepSeek…", "deepseek-chat");
     const ds = makeDeepSeekClient();
-    const model: LanguageModel = ds(DEEPSEEK_WRITE_MODEL);
     const result = await generateText({
-      model,
+      model: ds(DEEPSEEK_WRITE_MODEL),
       prompt,
       maxOutputTokens,
       temperature,
@@ -323,20 +346,97 @@ export async function generateWithFallback(
     };
   }
 
+  if (provider === "kimi") {
+    if (!process.env.KIMI_API_KEY)
+      throw new Error("KIMI_API_KEY not configured.");
+    onStatus?.("Using Kimi…", "moonshot-v1-32k");
+    const kimi = makeKimiClient();
+    const result = await generateText({
+      model: kimi(KIMI_WRITE_MODEL),
+      prompt,
+      maxOutputTokens,
+      temperature,
+    });
+    return {
+      text: result.text,
+      modelUsed: `kimi/${KIMI_WRITE_MODEL}`,
+      usedPaidFallback: true,
+    };
+  }
+
+  // ── Auto: free models first, then paid fallback ─────────────────────────────
+  if (process.env.OPENROUTER_API_KEY) {
+    onStatus?.("Fetching available free models…");
+    const { writeModels } = await getLiveFreeModels();
+    onStatus?.(`Found ${writeModels.length} usable free models`);
+
+    try {
+      const result = await runWithFallback(writeModels, prompt, 100, {
+        maxOutputTokens,
+        temperature,
+        timeoutMs: 90_000, // 90 s — long articles need time; skip if model stalls
+        onStatus,
+      });
+      return { ...result, usedPaidFallback: false };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (!msg.startsWith("__all_models_failed__")) throw err;
+      console.warn(
+        `[ai-provider] All ${writeModels.length} free write models failed — falling back to paid API`,
+      );
+    }
+  }
+
+  if (process.env.DEEPSEEK_API_KEY) {
+    onStatus?.("Trying DeepSeek (paid fallback)…", "deepseek-chat");
+    const ds = makeDeepSeekClient();
+    const result = await generateText({
+      model: ds(DEEPSEEK_WRITE_MODEL),
+      prompt,
+      maxOutputTokens,
+      temperature,
+    });
+    return {
+      text: result.text,
+      modelUsed: `deepseek/${DEEPSEEK_WRITE_MODEL}`,
+      usedPaidFallback: true,
+    };
+  }
+
+  if (process.env.KIMI_API_KEY) {
+    onStatus?.("Trying Kimi (paid fallback)…", "moonshot-v1-32k");
+    const kimi = makeKimiClient();
+    const result = await generateText({
+      model: kimi(KIMI_WRITE_MODEL),
+      prompt,
+      maxOutputTokens,
+      temperature,
+    });
+    return {
+      text: result.text,
+      modelUsed: `kimi/${KIMI_WRITE_MODEL}`,
+      usedPaidFallback: true,
+    };
+  }
+
   throw new Error(
-    "No AI provider configured. Set OPENROUTER_API_KEY or DEEPSEEK_API_KEY.",
+    "No AI provider configured. Set OPENROUTER_API_KEY, DEEPSEEK_API_KEY, or KIMI_API_KEY.",
   );
 }
 
 /**
- * Translate text (EN → ZH) using free OpenRouter models, falling back to DeepSeek.
+ * Translate text (EN → ZH) using free OpenRouter models, falling back to DeepSeek then Kimi.
  * Uses Qwen-first ordering for best Chinese quality.
  */
 export async function translateWithFallback(
   prompt: string,
-  options: { maxOutputTokens?: number; temperature?: number } = {},
+  options: {
+    maxOutputTokens?: number;
+    temperature?: number;
+    onStatus?: (message: string, model?: string) => void;
+  } = {},
 ): Promise<GenerateResult> {
-  const { maxOutputTokens = 4000, temperature = 0.3 } = options;
+  const { maxOutputTokens = 4000, temperature = 0.3, onStatus } = options;
 
   if (process.env.OPENROUTER_API_KEY) {
     const { translateModels } = await getLiveFreeModels();
@@ -345,15 +445,34 @@ export async function translateWithFallback(
       const result = await runWithFallback(translateModels, prompt, 50, {
         maxOutputTokens,
         temperature,
+        timeoutMs: 60_000, // 60 s per translate model
+        onStatus,
       });
       return { ...result, usedPaidFallback: false };
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       if (!msg.startsWith("__all_models_failed__")) throw err;
       console.warn(
-        `[ai-provider] All ${translateModels.length} free translate models failed — falling back to DeepSeek (paid)`,
+        `[ai-provider] All ${translateModels.length} free translate models failed — falling back to paid API`,
       );
     }
+  }
+
+  // Kimi first for translation — better Chinese quality than DeepSeek
+  if (process.env.KIMI_API_KEY) {
+    const kimi = makeKimiClient();
+    const model: LanguageModel = kimi(KIMI_TRANSLATE_MODEL);
+    const result = await generateText({
+      model,
+      prompt,
+      maxOutputTokens,
+      temperature,
+    });
+    return {
+      text: result.text,
+      modelUsed: `kimi/${KIMI_TRANSLATE_MODEL}`,
+      usedPaidFallback: true,
+    };
   }
 
   if (process.env.DEEPSEEK_API_KEY) {
@@ -373,7 +492,7 @@ export async function translateWithFallback(
   }
 
   throw new Error(
-    "No AI provider configured. Set OPENROUTER_API_KEY or DEEPSEEK_API_KEY.",
+    "No AI provider configured. Set OPENROUTER_API_KEY, DEEPSEEK_API_KEY, or KIMI_API_KEY.",
   );
 }
 
@@ -405,5 +524,6 @@ export function getProviderLabel(): string {
   if (process.env.OPENROUTER_API_KEY)
     return "OpenRouter (free models, live filtered)";
   if (process.env.DEEPSEEK_API_KEY) return "DeepSeek (deepseek-chat)";
+  if (process.env.KIMI_API_KEY) return "Kimi (moonshot-v1-32k)";
   return "none";
 }

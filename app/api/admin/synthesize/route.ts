@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import type { FeedArticle } from "@/lib/rss/fetch";
 import { generateWithFallback, getActiveProvider } from "@/lib/ai-provider";
 
@@ -11,12 +11,14 @@ type SynthesizeRequest =
       pastedTexts?: never;
       targetLength?: "short" | "medium" | "long";
       customPrompt?: string;
+      provider?: "auto" | "deepseek" | "kimi";
     }
   | {
       articles?: never;
       pastedTexts: PastedText[];
       targetLength?: "short" | "medium" | "long";
       customPrompt?: string;
+      provider?: "auto" | "deepseek" | "kimi";
     };
 
 // Valid categories — must match ArticleFrontmatterSchema exactly
@@ -44,26 +46,40 @@ function clampCategory(cat?: string): ValidCategory {
     : "threat-intel";
 }
 
+// Word count guidance — long has no upper cap
+const WORD_COUNT_GUIDANCE = {
+  short: { label: "400–600", instruction: "400–600 words" },
+  medium: { label: "700–900", instruction: "700–900 words" },
+  long: {
+    label: "1000+",
+    instruction:
+      "at least 1000 words — be thorough, cover all technical details, do not truncate",
+  },
+};
+
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) {
+    return new Response(
+      JSON.stringify({ type: "error", message: "Unauthorized" }),
+      { status: 401, headers: { "Content-Type": "application/json" } },
+    );
+  }
 
   if (getActiveProvider() === "none") {
-    return NextResponse.json(
-      {
-        error:
+    return new Response(
+      JSON.stringify({
+        type: "error",
+        message:
           "No AI provider configured. Set OPENROUTER_API_KEY or DEEPSEEK_API_KEY.",
-      },
-      { status: 503 },
+      }),
+      { status: 503, headers: { "Content-Type": "application/json" } },
     );
   }
 
   const body = (await req.json()) as SynthesizeRequest;
-  const { targetLength = "medium", customPrompt } = body;
-  const wordCount = { short: "400-600", medium: "700-900", long: "1000-1300" }[
-    targetLength
-  ];
+  const { targetLength = "medium", customPrompt, provider = "auto" } = body;
+  const wc = WORD_COUNT_GUIDANCE[targetLength];
 
   // Build source context
   let sourceContext: string;
@@ -73,9 +89,12 @@ export async function POST(req: NextRequest) {
 
   if (body.pastedTexts && body.pastedTexts.length > 0) {
     const validBlocks = body.pastedTexts.filter((b) => b.text.trim());
-    if (validBlocks.length === 0)
-      return NextResponse.json({ error: "No text provided" }, { status: 400 });
-
+    if (validBlocks.length === 0) {
+      return new Response(
+        JSON.stringify({ type: "error", message: "No text provided" }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
     sourceCount = validBlocks.length;
     sourceContext = validBlocks
       .map(
@@ -97,28 +116,52 @@ export async function POST(req: NextRequest) {
       )
       .join("\n\n---\n\n");
   } else {
-    return NextResponse.json({ error: "No sources provided" }, { status: 400 });
+    return new Response(
+      JSON.stringify({ type: "error", message: "No sources provided" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
+    );
   }
 
   const customInstruction = customPrompt?.trim()
     ? `\nADDITIONAL INSTRUCTIONS FROM EDITOR:\n${customPrompt.trim()}\n`
     : "";
 
-  try {
-    // Step 1: Generate article body — tries free models first, DeepSeek as last resort
-    const {
-      text: articleBody,
-      modelUsed: bodyModel,
-      usedPaidFallback: bodyWasPaid,
-    } = await generateWithFallback(
-      `You are a senior cybersecurity journalist and SEO writer for AleCyberNews, a professional threat intelligence news site.
+  // ── Streaming NDJSON response ───────────────────────────────────────────────
+  const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+
+  const send = (data: object) => {
+    try {
+      writer.write(encoder.encode(JSON.stringify(data) + "\n"));
+    } catch {
+      // writer already closed — ignore
+    }
+  };
+
+  // Run generation async; stream events back as they happen
+  (async () => {
+    try {
+      send({
+        type: "status",
+        step: "writing",
+        message: "Starting article generation…",
+      });
+
+      // Step 1: Generate article body — tries free models first, DeepSeek as last resort
+      const {
+        text: articleBody,
+        modelUsed: bodyModel,
+        usedPaidFallback: bodyWasPaid,
+      } = await generateWithFallback(
+        `You are a senior cybersecurity journalist and SEO writer for AleCyberNews, a professional threat intelligence news site.
 
 Synthesize the following ${sourceCount} source(s) into ONE original, SEO-optimised article that:
 
 CONTENT RULES:
 - Combines unique insights from ALL sources into a single coherent narrative
 - Does NOT copy sentences verbatim — rewrite entirely in your own words
-- Is ${wordCount} words long (strict target)
+- Is ${wc.instruction}
 - Is factual, technically precise, no marketing language — write like Krebs on Security
 - Attributes claims where possible ("according to researchers", "Mandiant reports", etc.)
 
@@ -142,17 +185,30 @@ SOURCES:
 ${sourceContext}
 
 Return ONLY the article body in markdown. Do not include a title or frontmatter.`,
-      { maxOutputTokens: 2000, temperature: 0.6 },
-    );
+        {
+          maxOutputTokens: 6000,
+          temperature: 0.6,
+          provider,
+          onStatus: (message, model) => {
+            send({ type: "status", step: "writing", message, model });
+          },
+        },
+      );
 
-    // Step 2: Generate SEO-optimised title + category + excerpt + tags
-    // Reuse same model family that succeeded for step 1 (no extra retries needed)
-    const {
-      text: metaRaw,
-      modelUsed: metaModel,
-      usedPaidFallback: metaWasPaid,
-    } = await generateWithFallback(
-      `You are an SEO specialist for a cybersecurity news site. Based on this article, return a JSON object:
+      send({
+        type: "status",
+        step: "metadata",
+        message: `Article written (${bodyModel.split("/").pop()}) — generating SEO metadata…`,
+        model: bodyModel,
+      });
+
+      // Step 2: Generate SEO-optimised title + category + excerpt + tags
+      const {
+        text: metaRaw,
+        modelUsed: metaModel,
+        usedPaidFallback: metaWasPaid,
+      } = await generateWithFallback(
+        `You are an SEO specialist for a cybersecurity news site. Based on this article, return a JSON object:
 
 {
   "title": "<SEO headline: put primary keyword near the start, 50-70 characters, no clickbait>",
@@ -182,81 +238,96 @@ Return ONLY the JSON object, no markdown fences, no explanation.
 
 ARTICLE:
 ${articleBody.slice(0, 1200)}`,
-      { maxOutputTokens: 400, temperature: 0.2 },
-    );
+        {
+          maxOutputTokens: 400,
+          temperature: 0.2,
+          provider,
+          onStatus: (message, model) => {
+            send({ type: "status", step: "metadata", message, model });
+          },
+        },
+      );
 
-    // Parse meta — fall back to safe defaults if AI returns garbage
-    let aiTitle = "";
-    let aiCategory: ValidCategory = primaryCategory;
-    let aiExcerpt = "";
-    let aiTags: string[] = autoTags;
+      // Parse meta — fall back to safe defaults if AI returns garbage
+      let aiTitle = "";
+      let aiCategory: ValidCategory = primaryCategory;
+      let aiExcerpt = "";
+      let aiTags: string[] = autoTags;
 
-    try {
-      const cleaned = metaRaw.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(cleaned) as {
-        title?: string;
-        category?: string;
-        excerpt?: string;
-        tags?: string[];
-      };
-      aiTitle = parsed.title?.trim() ?? "";
-      // Double-clamp: AI output + our guard
-      aiCategory = clampCategory(parsed.category?.trim());
-      aiExcerpt = parsed.excerpt?.trim() ?? "";
-      if (Array.isArray(parsed.tags) && parsed.tags.length > 0) {
-        aiTags = parsed.tags
-          .map((t) => String(t).toLowerCase().trim())
-          .filter(Boolean)
-          .slice(0, 8);
+      try {
+        const cleaned = metaRaw.replace(/```json|```/g, "").trim();
+        const parsed = JSON.parse(cleaned) as {
+          title?: string;
+          category?: string;
+          excerpt?: string;
+          tags?: string[];
+        };
+        aiTitle = parsed.title?.trim() ?? "";
+        aiCategory = clampCategory(parsed.category?.trim());
+        aiExcerpt = parsed.excerpt?.trim() ?? "";
+        if (Array.isArray(parsed.tags) && parsed.tags.length > 0) {
+          aiTags = parsed.tags
+            .map((t) => String(t).toLowerCase().trim())
+            .filter(Boolean)
+            .slice(0, 8);
+        }
+      } catch {
+        // Fallback: extract title from first non-empty line of body
+        aiTitle =
+          articleBody
+            .split("\n")
+            .find((l) => l.replace(/^#+\s*/, "").length > 10)
+            ?.replace(/^#+\s*/, "")
+            .slice(0, 80) ?? "Untitled";
       }
-    } catch {
-      // Fallback: extract title from first non-empty line of body
-      aiTitle =
-        articleBody
-          .split("\n")
-          .find((l) => l.replace(/^#+\s*/, "").length > 10)
-          ?.replace(/^#+\s*/, "")
-          .slice(0, 80) ?? "Untitled";
+
+      if (!aiExcerpt) {
+        aiExcerpt =
+          articleBody
+            .split("\n")
+            .find((l) => l.trim().length > 80)
+            ?.slice(0, 200) ?? "";
+      }
+
+      const slugBase = aiTitle
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-")
+        .slice(0, 60);
+
+      const today = new Date().toISOString().split("T")[0];
+      const usedPaidFallback = bodyWasPaid || metaWasPaid;
+      const modelsUsed = [...new Set([bodyModel, metaModel])];
+
+      send({
+        type: "done",
+        content: articleBody,
+        suggested: {
+          title: aiTitle,
+          slug: `${today}-${slugBase}`,
+          category: aiCategory,
+          tags: aiTags,
+          excerpt: aiExcerpt,
+        },
+        usedPaidFallback,
+        modelsUsed,
+      });
+    } catch (err) {
+      console.error("[api/admin/synthesize]", err);
+      const message =
+        err instanceof Error ? err.message : "AI generation failed";
+      send({ type: "error", message });
+    } finally {
+      writer.close();
     }
+  })();
 
-    // If excerpt still empty, derive from first long line
-    if (!aiExcerpt) {
-      aiExcerpt =
-        articleBody
-          .split("\n")
-          .find((l) => l.trim().length > 80)
-          ?.slice(0, 200) ?? "";
-    }
-
-    const slugBase = aiTitle
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .trim()
-      .replace(/\s+/g, "-")
-      .slice(0, 60);
-
-    const today = new Date().toISOString().split("T")[0];
-
-    // usedPaidFallback=true if either step used DeepSeek — admin gets notified
-    const usedPaidFallback = bodyWasPaid || metaWasPaid;
-    const modelsUsed = [...new Set([bodyModel, metaModel])];
-
-    return NextResponse.json({
-      content: articleBody,
-      suggested: {
-        title: aiTitle,
-        slug: `${today}-${slugBase}`,
-        category: aiCategory, // always a valid enum value
-        tags: aiTags,
-        excerpt: aiExcerpt,
-      },
-      // Admin notification fields
-      usedPaidFallback,
-      modelsUsed,
-    });
-  } catch (err) {
-    console.error("[api/admin/synthesize]", err);
-    const message = err instanceof Error ? err.message : "AI generation failed";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+  return new Response(readable, {
+    headers: {
+      "Content-Type": "application/x-ndjson",
+      "Cache-Control": "no-cache",
+      "X-Content-Type-Options": "nosniff",
+    },
+  });
 }
