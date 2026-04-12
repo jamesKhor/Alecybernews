@@ -21,6 +21,7 @@ export function CVEHydrate({
   articleRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const hydratedRef = useRef(false);
+  const rootsRef = useRef<ReturnType<typeof createRoot>[]>([]);
 
   useEffect(() => {
     if (hydratedRef.current || !articleRef.current) return;
@@ -37,7 +38,14 @@ export function CVEHydrate({
       span.replaceWith(container);
       const root = createRoot(container);
       root.render(<CVEBadge id={cveId} />);
+      rootsRef.current.push(root);
     });
+
+    // Cleanup on unmount
+    return () => {
+      rootsRef.current.forEach((root) => root.unmount());
+      rootsRef.current = [];
+    };
   }, [articleRef]);
 
   return null;

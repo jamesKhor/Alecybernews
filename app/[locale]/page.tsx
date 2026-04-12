@@ -4,6 +4,7 @@ import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
+import Image from "next/image";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { HomeJsonLd } from "@/components/seo/JsonLd";
 import { stripMarkdown } from "@/lib/utils";
@@ -219,13 +220,15 @@ function LatestGrid({
       >
         <div className="relative h-52 bg-secondary overflow-hidden">
           {leadImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={leadImage}
               alt={
                 lead.frontmatter.featured_image_alt ?? lead.frontmatter.title
               }
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/10 to-transparent" />

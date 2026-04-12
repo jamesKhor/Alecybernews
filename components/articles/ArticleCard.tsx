@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
+import Image from "next/image";
 import type { Article } from "@/lib/content";
 import {
   CATEGORY_DEFAULT_IMAGES,
@@ -34,11 +35,12 @@ export function ArticleCard({ article, locale, type = "posts" }: Props) {
       {/* Thumbnail */}
       <div className="relative h-44 bg-secondary overflow-hidden">
         {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={image}
             alt={frontmatter.featured_image_alt ?? frontmatter.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

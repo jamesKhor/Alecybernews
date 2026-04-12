@@ -38,7 +38,7 @@ export default async function ArticlesPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const { page: pageParam, category, tag } = await searchParams;
 
-  const page = Math.max(1, parseInt(pageParam ?? "1", 10));
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const allPosts = getAllPosts(locale, "posts");
 
   const filtered = allPosts.filter((a) => {
@@ -121,28 +121,60 @@ function ArticlesContent({
       )}
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 mt-12">
-          {page > 1 && (
-            <a
-              href={`/${locale}/articles?page=${page - 1}`}
-              className="rounded border border-border px-4 py-2 text-sm hover:bg-secondary transition-colors"
-            >
-              ← Prev
-            </a>
-          )}
-          <span className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
-          </span>
-          {page < totalPages && (
-            <a
-              href={`/${locale}/articles?page=${page + 1}`}
-              className="rounded border border-border px-4 py-2 text-sm hover:bg-secondary transition-colors"
-            >
-              Next →
-            </a>
-          )}
-        </div>
+        <PaginationNav
+          locale={locale}
+          page={page}
+          totalPages={totalPages}
+          category={activeCategory}
+          tag={activeTag}
+        />
       )}
     </main>
+  );
+}
+
+function PaginationNav({
+  locale,
+  page,
+  totalPages,
+  category,
+  tag,
+}: {
+  locale: string;
+  page: number;
+  totalPages: number;
+  category?: string;
+  tag?: string;
+}) {
+  function buildUrl(p: number) {
+    const params = new URLSearchParams();
+    if (category) params.set("category", category);
+    if (tag) params.set("tag", tag);
+    params.set("page", String(p));
+    return `/${locale}/articles?${params.toString()}`;
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-3 mt-12">
+      {page > 1 && (
+        <a
+          href={buildUrl(page - 1)}
+          className="rounded border border-border px-4 py-2 text-sm hover:bg-secondary transition-colors"
+        >
+          ← Prev
+        </a>
+      )}
+      <span className="text-sm text-muted-foreground">
+        Page {page} of {totalPages}
+      </span>
+      {page < totalPages && (
+        <a
+          href={buildUrl(page + 1)}
+          className="rounded border border-border px-4 py-2 text-sm hover:bg-secondary transition-colors"
+        >
+          Next →
+        </a>
+      )}
+    </div>
   );
 }

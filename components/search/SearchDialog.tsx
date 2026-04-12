@@ -132,7 +132,10 @@ export function SearchDialog({ locale }: Props) {
         <Search className="w-3.5 h-3.5" />
         <span className="text-xs">{isZh ? "搜索" : "Search"}</span>
         <kbd className="ml-1 text-xs border border-border rounded px-1 py-0.5 bg-background">
-          ⌘K
+          {typeof navigator !== "undefined" &&
+          /Mac|iPhone|iPad/.test(navigator.userAgent)
+            ? "⌘K"
+            : "Ctrl+K"}
         </kbd>
       </button>
 
@@ -147,10 +150,16 @@ export function SearchDialog({ locale }: Props) {
 
       {/* Modal */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={isZh ? "搜索文章" : "Search articles"}
+        >
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={handleClose}
+            aria-hidden="true"
           />
 
           <div className="relative w-full max-w-xl bg-background border border-border rounded-xl shadow-2xl overflow-hidden">

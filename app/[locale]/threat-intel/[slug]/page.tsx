@@ -10,6 +10,7 @@ import { NewsArticleJsonLd } from "@/components/seo/JsonLd";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
+import Image from "next/image";
 
 // Only serve pre-rendered slugs; unknown slugs return 404 cleanly (not 500)
 export const dynamicParams = false;
@@ -166,12 +167,14 @@ function TIPageContent({
           </header>
 
           {featuredImage && (
-            <div className="mb-8 rounded-lg overflow-hidden border border-border">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative mb-8 rounded-lg overflow-hidden border border-border h-64">
+              <Image
                 src={featuredImage}
                 alt={frontmatter.featured_image_alt ?? frontmatter.title}
-                className="w-full h-64 object-cover"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 720px"
+                className="object-cover"
               />
             </div>
           )}
