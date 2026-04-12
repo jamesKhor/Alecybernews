@@ -18,7 +18,7 @@ jobs:
           script: |
             cd /home/zcybernews/zcybernews
             git pull origin main
-            npm ci --production=false
+            HUSKY=0 npm ci --production=false
             npm run build
             pm2 restart zcybernews
             echo "✅ Deployed successfully at $(date)"

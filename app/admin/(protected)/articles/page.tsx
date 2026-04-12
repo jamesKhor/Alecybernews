@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ExternalLink,
   Pencil,
@@ -41,7 +40,6 @@ const CATEGORY_COLORS: Record<string, string> = {
 type FilterTab = "all" | "posts" | "threat-intel";
 
 export default function ArticlesPage() {
-  const router = useRouter();
   const [articles, setArticles] = useState<ArticleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

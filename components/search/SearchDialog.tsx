@@ -44,7 +44,8 @@ export function SearchDialog({ locale }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        open ? handleClose() : handleOpen();
+        if (open) handleClose();
+        else handleOpen();
       }
       if (e.key === "Escape" && open) handleClose();
     };
@@ -166,12 +167,20 @@ export function SearchDialog({ locale }: Props) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={isZh ? "搜索文章、威胁情报…" : "Search articles, threat intel…"}
+                placeholder={
+                  isZh
+                    ? "搜索文章、威胁情报…"
+                    : "Search articles, threat intel…"
+                }
                 className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none"
               />
               {query && (
                 <button
-                  onClick={() => { setQuery(""); setResults([]); inputRef.current?.focus(); }}
+                  onClick={() => {
+                    setQuery("");
+                    setResults([]);
+                    inputRef.current?.focus();
+                  }}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="w-4 h-4" />
@@ -195,7 +204,9 @@ export function SearchDialog({ locale }: Props) {
 
               {query.length >= 2 && !loading && results.length === 0 && (
                 <p className="text-xs text-muted-foreground text-center py-10">
-                  {isZh ? `未找到"${query}"相关结果` : `No results for "${query}"`}
+                  {isZh
+                    ? `未找到"${query}"相关结果`
+                    : `No results for "${query}"`}
                 </p>
               )}
 
@@ -205,9 +216,7 @@ export function SearchDialog({ locale }: Props) {
                   href={r.url}
                   onClick={handleClose}
                   className={`flex items-start gap-3 px-4 py-3 transition-colors border-b border-border last:border-0 ${
-                    i === activeIndex
-                      ? "bg-secondary"
-                      : "hover:bg-secondary/60"
+                    i === activeIndex ? "bg-secondary" : "hover:bg-secondary/60"
                   }`}
                 >
                   {r.type === "threat-intel" ? (
@@ -235,15 +244,21 @@ export function SearchDialog({ locale }: Props) {
             {/* Footer hints */}
             <div className="px-4 py-2 border-t border-border flex items-center gap-3 text-xs text-muted-foreground">
               <span>
-                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">↑↓</kbd>{" "}
+                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">
+                  ↑↓
+                </kbd>{" "}
                 {isZh ? "导航" : "navigate"}
               </span>
               <span>
-                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">↵</kbd>{" "}
+                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">
+                  ↵
+                </kbd>{" "}
                 {isZh ? "打开" : "open"}
               </span>
               <span>
-                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">esc</kbd>{" "}
+                <kbd className="border border-border rounded px-1 py-0.5 bg-secondary">
+                  esc
+                </kbd>{" "}
                 {isZh ? "关闭" : "close"}
               </span>
               {results.length > 0 && (

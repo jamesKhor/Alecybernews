@@ -46,6 +46,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          HUSKY: 0
 
       - name: Run AI Pipeline
         run: |
