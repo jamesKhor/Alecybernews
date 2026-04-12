@@ -1,23 +1,5 @@
 [
   {
-    "id": "hackernews",
-    "name": "Hacker News",
-    "url": "https://news.ycombinator.com/rss",
-    "category": "tech",
-    "type": "rss",
-    "enabled": true,
-    "description": "Tech news from Hacker News community"
-  },
-  {
-    "id": "cybersecuritynews",
-    "name": "CyberSecurity News",
-    "url": "https://cybersecuritynews.com/feed/",
-    "category": "cybersecurity",
-    "type": "rss",
-    "enabled": true,
-    "description": "Latest cybersecurity news and analysis"
-  },
-  {
     "id": "bleepingcomputer",
     "name": "BleepingComputer",
     "url": "https://www.bleepingcomputer.com/feed/",
@@ -54,6 +36,60 @@
     "description": "Cybersecurity news and analysis for security professionals"
   },
   {
+    "id": "cybersecuritynews",
+    "name": "CyberSecurity News",
+    "url": "https://cybersecuritynews.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Latest cybersecurity news and analysis"
+  },
+  {
+    "id": "securityweek",
+    "name": "SecurityWeek",
+    "url": "https://feeds.feedburner.com/securityweek",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Major cybersecurity news outlet covering breaches, vulnerabilities, and threat intel"
+  },
+  {
+    "id": "helpnetsecurity",
+    "name": "Help Net Security",
+    "url": "https://www.helpnetsecurity.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Enterprise-focused cybersecurity news covering products, research, and vulnerabilities"
+  },
+  {
+    "id": "schneier",
+    "name": "Schneier on Security",
+    "url": "https://www.schneier.com/feed/atom/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Bruce Schneier's influential blog on security policy, cryptography, and privacy"
+  },
+  {
+    "id": "blackhillsinfosec",
+    "name": "Black Hills Information Security",
+    "url": "https://www.blackhillsinfosec.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Penetration testing, threat hunting, and active defense techniques from BHIS team"
+  },
+  {
+    "id": "hackernews",
+    "name": "Hacker News",
+    "url": "https://news.ycombinator.com/rss",
+    "category": "tech",
+    "type": "rss",
+    "enabled": true,
+    "description": "Tech news from Hacker News community"
+  },
+  {
     "id": "cisa-alerts",
     "name": "CISA Alerts",
     "url": "https://www.cisa.gov/uscert/ncas/alerts.xml",
@@ -63,6 +99,15 @@
     "description": "Official CISA cybersecurity alerts and advisories"
   },
   {
+    "id": "cisa-kev",
+    "name": "CISA Known Exploited Vulnerabilities",
+    "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+    "category": "vulnerabilities",
+    "type": "cisa-kev",
+    "enabled": true,
+    "description": "CISA KEV catalog — actively exploited vulnerabilities requiring immediate action"
+  },
+  {
     "id": "sans-isc",
     "name": "SANS Internet Storm Center",
     "url": "https://isc.sans.edu/rssfeed_full.xml",
@@ -70,6 +115,15 @@
     "type": "rss",
     "enabled": true,
     "description": "Daily threat analysis and security diaries from SANS ISC handlers"
+  },
+  {
+    "id": "ncsc-uk",
+    "name": "NCSC UK",
+    "url": "https://www.ncsc.gov.uk/api/1/services/v1/report-rss-feed.xml",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "UK National Cyber Security Centre advisories and threat reports"
   },
   {
     "id": "talos",
@@ -90,12 +144,174 @@
     "description": "Threat intelligence and security research from Check Point"
   },
   {
-    "id": "cisa-kev",
-    "name": "CISA Known Exploited Vulnerabilities",
-    "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
-    "category": "vulnerabilities",
-    "type": "cisa-kev",
+    "id": "mandiant",
+    "name": "Mandiant Blog (Google Cloud)",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/rss/",
+    "category": "cybersecurity",
+    "type": "rss",
     "enabled": true,
-    "description": "CISA KEV catalog — actively exploited vulnerabilities requiring immediate action"
+    "description": "World-class threat intelligence from Mandiant covering APT groups and campaign analysis"
+  },
+  {
+    "id": "google-tag",
+    "name": "Google Threat Analysis Group",
+    "url": "https://blog.google/threat-analysis-group/rss/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Google's threat analysis team tracking government-backed hacking and zero-days"
+  },
+  {
+    "id": "project-zero",
+    "name": "Google Project Zero",
+    "url": "https://googleprojectzero.blogspot.com/feeds/posts/default",
+    "category": "vulnerabilities",
+    "type": "rss",
+    "enabled": true,
+    "description": "Elite vulnerability research team publishing deep technical zero-day write-ups"
+  },
+  {
+    "id": "msrc",
+    "name": "Microsoft Security Response Center",
+    "url": "https://msrc.microsoft.com/blog/feed",
+    "category": "vulnerabilities",
+    "type": "rss",
+    "enabled": true,
+    "description": "Microsoft's official security response blog — Patch Tuesday, zero-days, vulnerability disclosures"
+  },
+  {
+    "id": "microsoft-security",
+    "name": "Microsoft Security Blog",
+    "url": "https://www.microsoft.com/en-us/security/blog/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Microsoft Defender, Sentinel, threat analytics, and security best practices"
+  },
+  {
+    "id": "crowdstrike",
+    "name": "CrowdStrike Blog",
+    "url": "https://www.crowdstrike.com/en-us/blog/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Threat research on eCrime, nation-state adversaries, and endpoint detection"
+  },
+  {
+    "id": "sentinelone",
+    "name": "SentinelOne Labs",
+    "url": "https://www.sentinelone.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "SentinelLabs research on malware families, threat actors, and vulnerability exploitation"
+  },
+  {
+    "id": "unit42",
+    "name": "Palo Alto Unit 42",
+    "url": "https://unit42.paloaltonetworks.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Detailed reports on ransomware, APTs, cloud threats, and IoT vulnerabilities"
+  },
+  {
+    "id": "sophos",
+    "name": "Sophos News",
+    "url": "https://news.sophos.com/en-us/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Sophos X-Ops research on ransomware, malware campaigns, and attacker behavior"
+  },
+  {
+    "id": "kaspersky-securelist",
+    "name": "Kaspersky Securelist",
+    "url": "https://securelist.com/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Kaspersky GReAT team's threat research — APTs, malware campaigns, crimeware"
+  },
+  {
+    "id": "malwarebytes",
+    "name": "Malwarebytes Labs",
+    "url": "https://www.malwarebytes.com/blog/feed/index.xml",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Threat intelligence on malware, ransomware, scams, and enterprise threats"
+  },
+  {
+    "id": "welivesecurity",
+    "name": "WeLiveSecurity (ESET)",
+    "url": "https://www.welivesecurity.com/en/rss/feed/",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "ESET research on APT campaigns, malware analysis, and Eastern European threats"
+  },
+  {
+    "id": "rapid7",
+    "name": "Rapid7 Blog",
+    "url": "https://blog.rapid7.com/rss/",
+    "category": "vulnerabilities",
+    "type": "rss",
+    "enabled": true,
+    "description": "Emergent threats, vulnerability analysis, and Metasploit research"
+  },
+  {
+    "id": "qualys",
+    "name": "Qualys Threat Research",
+    "url": "https://blog.qualys.com/feed",
+    "category": "vulnerabilities",
+    "type": "rss",
+    "enabled": true,
+    "description": "Vulnerability research, Patch Tuesday analysis, and cloud security findings"
+  },
+  {
+    "id": "zdi",
+    "name": "Zero Day Initiative (ZDI)",
+    "url": "https://www.zerodayinitiative.com/rss/published/",
+    "category": "vulnerabilities",
+    "type": "rss",
+    "enabled": true,
+    "description": "Trend Micro's ZDI vulnerability advisories from their bug bounty program"
+  },
+  {
+    "id": "fortinet",
+    "name": "Fortinet FortiGuard Labs",
+    "url": "https://feeds.fortinet.com/fortinet/blog/threat-research",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Malware analysis, botnet tracking, and vulnerability discoveries"
+  },
+  {
+    "id": "proofpoint",
+    "name": "Proofpoint Threat Insight",
+    "url": "https://www.proofpoint.com/us/rss.xml",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Email-borne threats, BEC campaigns, phishing, and social engineering research"
+  },
+  {
+    "id": "elastic-security",
+    "name": "Elastic Security Labs",
+    "url": "https://www.elastic.co/security-labs/rss/feed.xml",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Malware analysis, detection rules, and threat hunting techniques"
+  },
+  {
+    "id": "recorded-future",
+    "name": "Recorded Future (Insikt Group)",
+    "url": "https://www.recordedfuture.com/feed",
+    "category": "cybersecurity",
+    "type": "rss",
+    "enabled": true,
+    "description": "Nation-state threats, cybercrime ecosystems, and geopolitical cyber risk"
   }
 ]
