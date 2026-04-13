@@ -1,0 +1,62 @@
+---
+title: Chrome 146 在 Windows 上部署 DBSC 以阻止会话 Cookie 被盗
+slug: 2026-04-13-chrome-146-dbsc-session-cookie-theft-protection
+date: '2026-04-13'
+excerpt: >-
+  Google 已在 Windows 系统上的 Chrome 146 中默认启用了设备绑定会话凭证（Device Bound Session
+  Credentials），这是一种旨在阻止被盗会话 Cookie 重放的加密防御措施。
+category: vulnerabilities
+tags:
+  - chrome
+  - authentication
+  - session-hijacking
+  - google
+  - windows
+language: zh
+source_urls:
+  - >-
+    https://thehackernews.com/2026/04/google-rolls-out-dbsc-in-chrome-146-to.html
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-chrome-146-dbsc-session-cookie-theft-protection
+severity: medium
+---
+## 执行摘要
+谷歌在Windows系统的Chrome 146版本中默认启用了**设备绑定会话凭证（DBSC）**，标志着在防御会话Cookie盗窃方面发生了重大转变。这项加密特性将认证会话绑定到原始设备的硬件上，使得在任何其他机器上被盗的Cookie变得无用。谷歌确认的这一推广目前仅限于Windows系统，计划在未来的版本中扩展到macOS。
+
+## 技术分析
+**设备绑定会话凭证（DBSC）**是一种浏览器级的安全机制，旨在减轻会话Cookie数据泄露的影响，这是信息窃取恶意软件活动和网络钓鱼攻击中的常见目标。传统上，当攻击者通过恶意扩展、恶意软件或中间人攻击等手段窃取会话Cookie时，他们可以从任何位置重放该Cookie以冒充受害者。DBSC通过将会话加密绑定到设备**可信平台模块（TPM）**中的密钥，或者在不可用的情况下绑定到安全的系统软件中，打破了这种攻击链。
+
+当用户在Windows系统上的Chrome 146+版本中登录Google账户（或未来可能支持的其他服务）时，浏览器会生成一个独特的、硬件支持的密钥。然后，会话凭证与此密钥进行加密链接。随后对Google服务器的认证请求必须证明拥有这个设备绑定的密钥。因此，从磁盘或内存中被盗的Cookie无法在不同的设备上成功重放，因为攻击者缺乏必要的加密证明。据The Hacker News报道，这个项目代表了谷歌在打击猖獗的会话Cookie盗窃方面迈出的重要一步。
+
+## 入侵指标
+目前没有识别出任何入侵指标。
+
+## 战术、技术与程序
+这次更新旨在破坏的主要技术是**会话Cookie盗窃（T1550.004）**。攻击者通常通过以下方式获取这些令牌：
+*   **恶意软件/窃取者：** 信息窃取恶意软件（例如Lumma、Rhadamanthys）刮取浏览器数据目录和进程内存。
+*   **网络钓鱼：** 旨在收集凭证和活动会话令牌的假登录页面。
+*   **中间人攻击：** 拦截未加密或加密不强的网络流量。
+*   **恶意扩展：** 权限过多的被破坏或欺诈性浏览器扩展。
+
+DBSC不能阻止Cookie数据的初始盗窃，但使攻击者无法利用其效用，有效地中和了使用被盗会话进行**横向移动**或**初始访问**的最后一步。
+
+## 威胁行为者背景
+会话Cookie盗窃是一系列威胁行为者的基础技术，从以财务为动机的网络犯罪分子到高级持续性威胁（APTs）。运营信息窃取恶意软件即服务（MaaS）的犯罪集团已经将这些Cookie的盗窃和转售商品化，通常与受害者档案捆绑在一起。APT组织也利用被盗的会话令牌来维持对目标电子邮件和云协作平台的持久、认证访问，绕过仅在初始登录时检查的多因素认证（MFA）。DBSC通过要求攻击者破坏特定的端点硬件，而不仅仅是其数据，提高了这些操作的成本和复杂性。
+
+## 检测与溯源查询
+虽然DBSC是一种保护控制，但防御者应继续监控导致Cookie盗窃的初始入侵向量。相关的溯源查询包括：
+*   **进程创建：** 检测已知信息窃取二进制文件或脚本的执行。
+*   **网络流量：** 用户工作站向已知与窃取者相关的C2基础设施的出站连接。
+*   **浏览器工件访问：** 可疑进程（非浏览器）读取浏览器`Local State`、`Cookies`或`Login Data` SQLite数据库文件。
+*   **认证日志（云）：** 监控不可能的旅行场景或从不熟悉的设备登录，这可能表明重放被盗的非DBSC Cookie的尝试失败。
+
+## 缓解措施与建议
+1.  **更新Chrome：** 确保所有Windows端点的Chrome更新到146版本或更高版本。该功能默认启用；不需要行政配置。
+2.  **启用TPM：** 为了最大安全，确保设备有TPM（1.2或2.0）可用，并在系统BIOS/UEFI中启用。Chrome将使用TPM存储设备绑定的密钥。
+3.  **维护端点安全：** DBSC减轻盗窃后的滥用，但并不能阻止恶意软件感染。保持强大的端点检测和响应（EDR）、反恶意软件和扩展允许列表政策。
+4.  **准备macOS推广：** 监控将DBSC带到macOS的Chrome发布，并计划其部署。
+5.  **用户教育：** 继续培训用户识别网络钓鱼企图，并避免安装不受信任的浏览器扩展或软件，这些仍然是初始Cookie盗窃的主要向量。
+
+## 参考资料
+*   [https://thehackernews.com/2026/04/google-rolls-out-dbsc-in-chrome-146-to.html](https://thehackernews.com/2026/04/google-rolls-out-dbsc-in-chrome-146-to.html)
