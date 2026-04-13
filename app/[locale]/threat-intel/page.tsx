@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
+import { InFeedAd } from "@/components/ads/AdSense";
 import { useTranslations } from "next-intl";
 
 interface Props {
@@ -72,6 +73,7 @@ function ThreatIntelContent({
               type="threat-intel"
             />
           ))}
+          {posts.length > 2 && <InFeedAd className="mt-6" />}
         </div>
       )}
     </main>

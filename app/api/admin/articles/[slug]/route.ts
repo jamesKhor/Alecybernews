@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import matter from "gray-matter";
-import { adminGuard, isValidLocale, isValidType } from "@/lib/admin-guard";
+import {
+  adminGuard,
+  isValidLocale,
+  isValidType,
+  sanitizeSlug,
+} from "@/lib/admin-guard";
 
 const GH_HEADERS = {
   Accept: "application/vnd.github+json",
@@ -32,7 +37,12 @@ export async function GET(
   const guard = await adminGuard(req, "articles-read", 30, 60_000);
   if (guard) return guard;
 
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = sanitizeSlug(rawSlug);
+  if (!slug) {
+    return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
+
   const sp = req.nextUrl.searchParams;
   const locale = sp.get("locale") ?? "en";
   const type = sp.get("type") ?? "posts";
@@ -87,7 +97,11 @@ export async function PATCH(
   const guard = await adminGuard(req, "articles-update", 10, 60_000);
   if (guard) return guard;
 
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = sanitizeSlug(rawSlug);
+  if (!slug) {
+    return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
 
   try {
     const { token, repo } = getToken();
@@ -174,7 +188,11 @@ export async function DELETE(
   const guard = await adminGuard(req, "articles-delete", 5, 60_000);
   if (guard) return guard;
 
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = sanitizeSlug(rawSlug);
+  if (!slug) {
+    return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
 
   try {
     const { token, repo } = getToken();

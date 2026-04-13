@@ -25,15 +25,12 @@ export async function adminGuard(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // CSRF protection: require custom header that CORS preflight blocks cross-origin
+  // CSRF protection: mutating requests MUST include x-requested-with header.
+  // Browser form submissions and cross-origin requests won't include this header,
+  // and CORS preflight will block cross-origin requests that try to add it.
   if (req.method !== "GET") {
     const hasCustomHeader = req.headers.get("x-requested-with");
-    // Allow requests from same-origin (Next.js fetch) and Telegram bot
-    // Check referer/origin as additional signal
-    const origin = req.headers.get("origin");
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ?? "https://zcybernews.com";
-    if (!hasCustomHeader && origin && !origin.startsWith(siteUrl)) {
+    if (!hasCustomHeader) {
       return Response.json(
         { error: "CSRF validation failed" },
         { status: 403 },

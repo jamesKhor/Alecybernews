@@ -125,7 +125,7 @@ function HomeContent({
             </span>
             <Link
               href={
-                `/articles/${latest[0].frontmatter.slug}` as Parameters<
+                `/${latest[0]._sourceType === "threat-intel" ? "threat-intel" : "articles"}/${latest[0].frontmatter.slug}` as Parameters<
                   typeof Link
                 >[0]["href"]
               }

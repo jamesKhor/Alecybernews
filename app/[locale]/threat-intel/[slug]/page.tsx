@@ -10,6 +10,7 @@ import { NewsArticleJsonLd } from "@/components/seo/JsonLd";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
+import { SidebarAd, InArticleAd } from "@/components/ads/AdSense";
 import Image from "next/image";
 
 // Only serve pre-rendered slugs; unknown slugs return 404 cleanly (not 500)
@@ -195,9 +196,13 @@ function TIPageContent({
           )}
 
           <CVEArticleBody>{mdxContent}</CVEArticleBody>
+
+          <InArticleAd className="my-8" />
         </article>
 
         <aside className="hidden lg:block">
+          <SidebarAd className="rounded-lg border border-border bg-card p-3 overflow-hidden mb-4" />
+
           {headings.length > 0 && (
             <div className="sticky top-6 rounded-lg border border-border bg-card p-5">
               <h3 className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">

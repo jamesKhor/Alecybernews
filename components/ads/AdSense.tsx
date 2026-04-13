@@ -12,7 +12,8 @@ interface AdSenseProps {
   className?: string;
 }
 
-const publisherId = process.env.NEXT_PUBLIC_ADSENSE_ID;
+const publisherId =
+  process.env.NEXT_PUBLIC_ADSENSE_ID ?? "ca-pub-6168266894987797";
 
 /**
  * Google AdSense ad unit.

@@ -17,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "daily",
         priority: 1.0,
         alternates: {
-          languages: { en: `${BASE_URL}/en`, zh: `${BASE_URL}/zh` },
+          languages: { en: `${BASE_URL}/en`, "zh-Hans": `${BASE_URL}/zh` },
         },
       },
       {
@@ -28,7 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: {
           languages: {
             en: `${BASE_URL}/en/articles`,
-            zh: `${BASE_URL}/zh/articles`,
+            "zh-Hans": `${BASE_URL}/zh/articles`,
           },
         },
       },
@@ -40,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: {
           languages: {
             en: `${BASE_URL}/en/threat-intel`,
-            zh: `${BASE_URL}/zh/threat-intel`,
+            "zh-Hans": `${BASE_URL}/zh/threat-intel`,
           },
         },
       },
@@ -56,7 +56,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: {
           languages: {
             en: `${BASE_URL}/en/categories/${category}`,
-            zh: `${BASE_URL}/zh/categories/${category}`,
+            "zh-Hans": `${BASE_URL}/zh/categories/${category}`,
           },
         },
       });
@@ -82,7 +82,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: {
           languages: {
             en: `${BASE_URL}/en/tags/${tag}`,
-            zh: `${BASE_URL}/zh/tags/${tag}`,
+            "zh-Hans": `${BASE_URL}/zh/tags/${tag}`,
           },
         },
       });
@@ -101,7 +101,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: {
           languages: {
             en: `${BASE_URL}/en/articles/${post.frontmatter.locale_pair ?? post.frontmatter.slug}`,
-            zh: `${BASE_URL}/zh/articles/${post.frontmatter.locale_pair ?? post.frontmatter.slug}`,
+            "zh-Hans": `${BASE_URL}/zh/articles/${post.frontmatter.locale_pair ?? post.frontmatter.slug}`,
           },
         },
       });
@@ -120,7 +120,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: {
           languages: {
             en: `${BASE_URL}/en/threat-intel/${post.frontmatter.locale_pair ?? post.frontmatter.slug}`,
-            zh: `${BASE_URL}/zh/threat-intel/${post.frontmatter.locale_pair ?? post.frontmatter.slug}`,
+            "zh-Hans": `${BASE_URL}/zh/threat-intel/${post.frontmatter.locale_pair ?? post.frontmatter.slug}`,
           },
         },
       });

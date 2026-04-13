@@ -1,27 +1,57 @@
 @import "tailwindcss";
 
 @layer base {
+  /* ─── Light mode (default) — clean white ─── */
   :root {
-    --background: 222 47% 7%;
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
+    --card: 0 0% 99%;
+    --card-foreground: 224 71% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+    --primary: 210 100% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 224 71% 4%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 210 100% 35%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 210 100% 35%;
+    --radius: 0.5rem;
+    /* severity colors */
+    --severity-critical: 0 84% 50%;
+    --severity-high: 25 95% 45%;
+    --severity-medium: 45 93% 40%;
+    --severity-low: 142 71% 35%;
+    --severity-info: 210 100% 35%;
+  }
+
+  /* ─── Dark mode — true OLED black ─── */
+  .dark {
+    --background: 0 0% 0%;
     --foreground: 210 40% 96%;
-    --card: 222 47% 10%;
+    --card: 0 0% 4%;
     --card-foreground: 210 40% 96%;
-    --popover: 222 47% 10%;
+    --popover: 0 0% 4%;
     --popover-foreground: 210 40% 96%;
     --primary: 199 89% 48%;
-    --primary-foreground: 222 47% 7%;
-    --secondary: 222 47% 15%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 8%;
     --secondary-foreground: 210 40% 96%;
-    --muted: 222 47% 15%;
+    --muted: 0 0% 8%;
     --muted-foreground: 215 20% 55%;
     --accent: 199 89% 48%;
-    --accent-foreground: 222 47% 7%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 96%;
-    --border: 222 47% 18%;
-    --input: 222 47% 18%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
     --ring: 199 89% 48%;
-    --radius: 0.5rem;
     /* severity colors */
     --severity-critical: 0 84% 60%;
     --severity-high: 25 95% 53%;
@@ -44,6 +74,14 @@
   --color-border: hsl(var(--border));
   --color-accent: hsl(var(--accent));
   --color-destructive: hsl(var(--destructive));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card-foreground: hsl(var(--card-foreground));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -87,7 +125,7 @@ body {
 .prose p {
   line-height: 1.8;
   margin-bottom: 1.25rem;
-  color: hsl(210 30% 85%);
+  color: hsl(var(--muted-foreground));
 }
 
 .prose a {
@@ -106,7 +144,7 @@ body {
 }
 
 .prose pre {
-  background: hsl(222 47% 5%);
+  background: hsl(var(--secondary));
   border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
   padding: 1.25rem;
@@ -124,7 +162,7 @@ body {
 .prose ol {
   padding-left: 1.5rem;
   margin-bottom: 1.25rem;
-  color: hsl(210 30% 85%);
+  color: hsl(var(--muted-foreground));
 }
 
 .prose li {
@@ -151,41 +189,72 @@ body {
 .prose td {
   padding: 0.6rem 0.9rem;
   border: 1px solid hsl(var(--border));
-  color: hsl(210 30% 85%);
+  color: hsl(var(--muted-foreground));
   vertical-align: top;
 }
 
 .prose tr:nth-child(even) td {
-  background: hsl(222 47% 8%);
+  background: hsl(var(--card));
 }
 
-/* Syntax highlighting (highlight.js) */
-.hljs {
+/* Syntax highlighting (highlight.js) — dark mode */
+.dark .hljs {
   background: transparent !important;
   color: hsl(210 40% 90%) !important;
 }
-.hljs-keyword {
+.dark .hljs-keyword {
   color: hsl(199 89% 60%) !important;
 }
-.hljs-string {
+.dark .hljs-string {
   color: hsl(142 71% 55%) !important;
 }
-.hljs-comment {
+.dark .hljs-comment {
   color: hsl(215 20% 45%) !important;
   font-style: italic;
 }
-.hljs-number {
+.dark .hljs-number {
   color: hsl(25 95% 65%) !important;
 }
-.hljs-function {
+.dark .hljs-function {
   color: hsl(280 65% 75%) !important;
 }
-.hljs-title {
+.dark .hljs-title {
   color: hsl(45 93% 65%) !important;
 }
-.hljs-attr {
+.dark .hljs-attr {
   color: hsl(199 89% 60%) !important;
 }
-.hljs-variable {
+.dark .hljs-variable {
   color: hsl(0 72% 70%) !important;
+}
+
+/* Syntax highlighting — light mode */
+.hljs {
+  background: transparent !important;
+  color: hsl(224 71% 15%) !important;
+}
+.hljs-keyword {
+  color: hsl(270 75% 45%) !important;
+}
+.hljs-string {
+  color: hsl(142 60% 30%) !important;
+}
+.hljs-comment {
+  color: hsl(215 15% 55%) !important;
+  font-style: italic;
+}
+.hljs-number {
+  color: hsl(25 90% 40%) !important;
+}
+.hljs-function {
+  color: hsl(210 100% 35%) !important;
+}
+.hljs-title {
+  color: hsl(30 80% 40%) !important;
+}
+.hljs-attr {
+  color: hsl(210 100% 35%) !important;
+}
+.hljs-variable {
+  color: hsl(0 60% 45%) !important;
 }

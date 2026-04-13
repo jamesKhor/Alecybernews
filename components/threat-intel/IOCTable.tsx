@@ -17,9 +17,9 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const CONFIDENCE_COLORS: Record<string, string> = {
-  high: "text-green-400",
-  medium: "text-yellow-400",
-  low: "text-red-400",
+  high: "text-green-600 dark:text-green-400",
+  medium: "text-yellow-600 dark:text-yellow-400",
+  low: "text-red-600 dark:text-red-400",
 };
 
 interface Props {

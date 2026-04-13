@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { SearchDialog } from "@/components/search/SearchDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface Props {
   locale: string;
@@ -35,10 +36,7 @@ export function Header({ locale }: Props) {
           href={`/${locale}`}
           className="flex items-center gap-2 font-bold text-foreground"
         >
-          <span
-            style={{ color: "#003781" }}
-            className="text-2xl font-black tracking-tight"
-          >
+          <span className="text-2xl font-black tracking-tight text-primary">
             Z
           </span>
           <span className="font-bold tracking-tight">CyberNews</span>
@@ -61,6 +59,9 @@ export function Header({ locale }: Props) {
         <div className="flex items-center gap-3">
           {/* Search */}
           <SearchDialog locale={locale} />
+
+          {/* Theme toggle */}
+          <ThemeToggle />
 
           {/* Locale switcher */}
           <Link
