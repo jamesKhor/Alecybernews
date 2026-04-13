@@ -25,5 +25,6 @@ jobs:
             echo "🔨 Building..."
             npm run build
             echo "♻️  Restarting PM2..."
-            pm2 restart zcybernews
+            pm2 restart zcybernews || pm2 start npm --name zcybernews -- start
+            pm2 save
             echo "✅ Deployed successfully at $(date)"
