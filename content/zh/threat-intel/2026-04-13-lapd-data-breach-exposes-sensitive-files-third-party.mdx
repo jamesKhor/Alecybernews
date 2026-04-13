@@ -1,0 +1,51 @@
+---
+title: LAPD 数据泄露通过第三方系统暴露 7.7 TB 敏感文件
+slug: 2026-04-13-lapd-data-breach-exposes-sensitive-files-third-party
+date: '2026-04-13'
+excerpt: >-
+  洛杉矶市检察官办公室使用的数字存储系统发生数据泄露，暴露了 7.7 TB 和超过 337,000 个文件，包括敏感的 LAPD
+  记录。该事件源于第三方供应商的配置错误。
+category: threat-intel
+tags:
+  - data-breach
+  - law-enforcement
+  - misconfiguration
+  - third-party-risk
+language: zh
+source_urls:
+  - 'https://research.checkpoint.com/2026/13th-april-threat-intelligence-report/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-lapd-data-breach-exposes-sensitive-files-third-party
+severity: high
+affected_sectors:
+  - government
+  - law-enforcement
+affected_regions:
+  - North America
+---
+## 执行摘要
+涉及洛杉矶市检察官办公室使用的第三方数字存储系统的一次重大数据泄露事件，暴露了7.7TB的数据，包括来自洛杉矶警察局（LAPD）的敏感记录。这次泄露包括超过337,000个文件，归因于存储系统的配置错误，而不是LAPD网络的直接被入侵。目前尚不清楚被访问数据的全部范围和任何潜在威胁行为者的身份。
+
+## 技术分析
+根据Check Point Research的报告，此次泄露集中在洛杉矶市检察官办公室使用的基于云的存储库上。由于配置错误，数据被暴露，可能是访问控制错误，如不当的存储桶权限或云存储实例上缺少认证。这种故障允许未经授权的一方通过公共互联网搜索或专门的扫描工具发现和访问数据。暴露的数据集总计7.7TB，包含大量文件，其中许多被识别为包含敏感的LAPD信息。配置错误的具体技术细节和涉及的确切供应商尚未由当局公开详细说明。
+
+## 入侵指标
+目前没有识别出任何入侵指标。该事件是由配置错误引起的数据暴露，而不是恶意软件部署。基于网络的IOC不适用。
+
+## 战术、技术与程序
+在此次事件中观察到的主要技术是**T1530 - Data from Cloud Storage Object**。如果有任何活跃的威胁行为者利用了这个漏洞，他们可能使用了**T1595 - Active Scanning**来发现配置错误的存储端点。根本原因与**T1552.006 - Unsecured Credentials: Cloud Object Storage**一致，这是一个常见的错误，其中云存储权限被设置为允许公共或过于广泛的访问。在可用的源材料中没有证据表明随后的数据加密、数据泄露工具或横向移动，这表明该事件可能是对暴露资产的机会性发现。
+
+## 威胁行为者背景
+源报告没有将这次数据暴露归因于已知的威胁行为者或团体。事件的性质——一个公开可访问的存储桶——使其成为寻找此类错误的个人和有组织的网络犯罪实体的目标。从执法机构窃取的数据可以被用于勒索、在犯罪论坛上出售，或被对手用于情报收集。没有明确的归因，动机仍然不确定，但与一般财务或破坏目的一致。
+
+## 缓解措施与建议
+组织，特别是那些处理敏感政府或执法数据的组织，必须对云服务实施严格的配置管理。关键行动包括：
+*   使用CSPM（Cloud Security Posture Management）等工具，实施对公开可访问的云存储桶和服务的自动化扫描。
+*   对所有云存储对象强制执行最小权限原则，应用细粒度的访问控制，并默认要求认证。
+*   定期进行审计和渗透测试，重点关注云资产配置，特别关注第三方供应商和共享平台。
+*   确保所有处理敏感数据的第三方供应商符合同等的安全标准，并被纳入安全评估。
+*   部署数据丢失预防（DLP）策略，对敏感数据进行分类和监控，防止其存储在未经批准或不安全的位置。
+
+## 参考资料
+*   Check Point Research. (2026, April 13). *13th April – Threat Intelligence Report*. Retrieved from https://research.checkpoint.com/2026/13th-april-threat-intelligence-report/

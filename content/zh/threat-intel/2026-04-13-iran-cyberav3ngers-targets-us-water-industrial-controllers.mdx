@@ -1,0 +1,50 @@
+---
+title: 伊朗 CyberAv3ngers 加剧对美国水、工业基础设施的攻击
+slug: 2026-04-13-iran-cyberav3ngers-targets-us-water-industrial-controllers
+date: '2026-04-13'
+excerpt: >-
+  得到伊朗支持的威胁行动者
+  CyberAv3ngers，与伊朗革命卫队（IRGC）有关，已经从黑客行动主义演变为针对美国水务设施和可编程逻辑控制器（PLCs）进行破坏性网络行动。
+category: threat-intel
+tags:
+  - apt
+  - critical-infrastructure
+  - iran
+  - ics-scada
+  - geopolitical
+language: zh
+source_urls:
+  - 'https://cybersecuritynews.com/iran-linked-cyberav3ngers-sets-sights/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-iran-cyberav3ngers-targets-us-water-industrial-controllers
+severity: high
+threat_actor: CyberAv3ngers
+threat_actor_origin: Iran
+affected_sectors:
+  - water
+  - utilities
+  - industrial
+affected_regions:
+  - United States
+---
+## 执行摘要
+与伊朗有关的威胁组织**CyberAv3ngers**已从一个主要的黑客活动实体转变为一个更有能力的威胁行为者，对美国关键基础设施进行破坏性行动，特别是针对水和废水系统以及工业控制系统（ICS）。根据CyberSecurity News引用的分析，该组织正式与伊朗的**伊斯兰革命卫队网络电子司令部（IRGC-CEC）**有联系，并且一直在积极针对可编程逻辑控制器（PLCs）以破坏运营技术（OT）环境。
+
+## 技术分析
+自2020年左右出现以来，CyberAv3ngers的行动重点已经变得更加明确。该组织最近的活动表明，他们有意识地转向针对暴露在互联网上的**工业控制系统**，特别关注**Unitronics Vision Series** PLCs。这些设备通常用于水处理、能源和制造业。攻击者利用这些系统上的弱或默认凭据来获得初始访问权限。一旦进入，他们就用反以色列和亲伊朗的信息篡改人机界面（HMI），这也有助于掩盖进一步的恶意活动。直接与PLCs交互和操纵的技术能力表明，他们已经超越了简单的网站篡改，对物理过程构成了切实的风险。源材料没有指定使用任何新颖的零日漏洞；相反，攻击似乎依赖于**糟糕的安全卫生**，例如未更改的默认密码和直接连接到互联网的系统。
+
+## 入侵指标
+目前没有识别出任何指标。
+
+## 战术、技术与程序
+该组织的**TTPs**与针对关键基础设施中的低挂果实的不断发展的入侵集相一致。初始访问通常是通过**有效账户**（T1078）实现的，特别是利用面向互联网的OT设备上的默认凭据。在破坏之后，行为者参与**篡改**（T1491）HMI，这是一种既服务于意识形态信息也作为潜在干扰的策略。一个关键技术涉及**利用远程服务**（T1210）以保持持久性，并可能向PLCs发出命令。针对特定PLC型号的攻击表明**收集受害者主机信息**（T1592）和**收集受害者身份信息**（T1589）以定制攻击。该组织的运营安全性似乎适中，因为他们利用现有的基础设施和常见漏洞，而不是复杂的定制恶意软件。
+
+## 威胁行为者背景
+CyberAv3ngers被评估为**伊斯兰革命卫队网络电子司令部（IRGC-CEC）**的作战臂膀，这是伊朗的主要军事网络力量。这种联系将该组织从一个无结构的黑客活动集体提升为与国家对齐的威胁行为者，具有战略目标。他们的公开言论强烈反以色列，并与伊朗的地缘政治利益一致，但他们针对美国水设施的攻击表明了一个更广泛目标，即展示能力和在一个竞争对手国家的关键基础设施内制造混乱。他们的能力在几年内的演变表明了持续的投资和发展，很可能得到了直接或间接的国家支持。他们的活动符合伊朗网络行动的模式，即测试阈值并进行有限的、破坏性的攻击，而不是造成广泛的破坏。
+
+## 缓解措施与建议
+组织，特别是在水和工业部门，应立即实施防御措施。首先，**将ICS/SCADA网络与公共互联网隔离**。所有远程访问应通过安全的、经过多因素认证的VPN路由。其次，**更改所有OT设备上的默认凭据**，包括PLCs和HMIs，改为强大、独特的密码。第三，实施**网络分段**以防止从IT到OT网络的横向移动。第四，确保为OT环境**建立强大的日志记录和监控**，以检测未经授权的访问尝试和异常命令执行。最后，组织应迅速应用**供应商推荐的安全补丁**，并定期对OT资产进行漏洞评估。还建议主动寻找与该组织相关的威胁指标。
+
+## 参考资料
+- https://cybersecuritynews.com/iran-linked-cyberav3ngers-sets-sights/

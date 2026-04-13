@@ -1,0 +1,52 @@
+---
+title: LAPD Data Breach Exposes 7.7 TB of Sensitive Files via Third-Party System
+slug: 2026-04-13-lapd-data-breach-exposes-sensitive-files-third-party
+date: '2026-04-13'
+excerpt: >-
+  A data breach at a digital storage system used by the L.A. City Attorney's
+  Office exposed 7.7 TB and over 337,000 files, including sensitive LAPD
+  records. The incident stemmed from a third-party vendor's misconfiguration.
+category: threat-intel
+tags:
+  - data-breach
+  - law-enforcement
+  - misconfiguration
+  - third-party-risk
+language: en
+source_urls:
+  - 'https://research.checkpoint.com/2026/13th-april-threat-intelligence-report/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-lapd-data-breach-exposes-sensitive-files-third-party
+severity: high
+affected_sectors:
+  - government
+  - law-enforcement
+affected_regions:
+  - North America
+---
+## Executive Summary
+A significant data breach involving a third-party digital storage system used by the Los Angeles City Attorney's Office has exposed 7.7 terabytes of data, including sensitive records from the Los Angeles Police Department (LAPD). The exposure, which comprised over 337,000 files, was attributed to a misconfiguration of the storage system, not a direct compromise of LAPD networks. The full scope of accessed data and the identity of any potential threat actors remain unclear at this time.
+
+## Technical Analysis
+According to a report from Check Point Research, the breach centered on a cloud-based storage repository utilized by the L.A. City Attorney's Office. The data was exposed due to a misconfiguration, likely an access control error such as improper bucket permissions or a lack of authentication on a cloud storage instance. This type of failure allows unauthorized parties to discover and access data via public internet searches or specialized scanning tools. The exposed data set, totaling 7.7 TB, contained a wide array of files, many of which were identified as containing sensitive LAPD information. The technical specifics of the misconfiguration and the exact vendor involved have not been publicly detailed by authorities.
+
+## Indicators of Compromise
+None identified at this time. The incident was a data exposure caused by misconfiguration rather than malware deployment. Network-based IOCs are not applicable.
+
+## Tactics, Techniques & Procedures
+The primary technique observed in this incident is **T1530 - Data from Cloud Storage Object**. The threat actors, if any actively exploited the flaw, likely employed **T1595 - Active Scanning** to discover the misconfigured storage endpoint. The root cause aligns with **T1552.006 - Unsecured Credentials: Cloud Object Storage**, a common misstep where cloud storage permissions are set to allow public or overly broad access. There is no evidence in the available source material of subsequent data encryption, exfiltration tools, or lateral movement, suggesting the incident may have been an opportunistic discovery of an exposed asset.
+
+## Threat Actor Context
+The source report does not attribute this data exposure to a known threat actor or group. The nature of the incident—a publicly accessible storage bucket—makes it a target for both opportunistic individuals and organized cybercriminal entities scanning for such errors. Data stolen from law enforcement agencies can be leveraged for extortion, sold on criminal forums, or used for intelligence gathering by adversaries. Without explicit attribution, the motive remains uncertain but aligns with general financial or disruptive aims.
+
+## Mitigations & Recommendations
+Organizations, particularly those handling sensitive government or law enforcement data, must enforce strict configuration management for cloud services. Key actions include:
+*   Implement automated scanning for publicly accessible cloud storage buckets and services using tools like CSPM (Cloud Security Posture Management).
+*   Enforce the principle of least privilege for all cloud storage objects, applying granular access controls and requiring authentication by default.
+*   Conduct regular audits and penetration tests focusing on cloud asset configurations, with special attention given to third-party vendors and shared platforms.
+*   Ensure all third-party vendors handling sensitive data comply with equivalent security standards and are included in security assessments.
+*   Deploy data loss prevention (DLP) policies to classify and monitor sensitive data, preventing its storage in unapproved or insecure locations.
+
+## References
+*   Check Point Research. (2026, April 13). *13th April – Threat Intelligence Report*. Retrieved from https://research.checkpoint.com/2026/13th-april-threat-intelligence-report/
