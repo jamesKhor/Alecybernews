@@ -45,10 +45,10 @@ export const metadata: Metadata = {
       "Professional cybersecurity and tech intelligence — threat analysis, vulnerability research, and security news for defenders.",
     images: [
       {
-        url: "/opengraph-image",
+        url: "/og-default.png",
         width: 1200,
         height: 630,
-        alt: "ZCyberNews",
+        alt: "ZCyberNews — Cybersecurity & Tech Intelligence",
       },
     ],
   },
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     title: "ZCyberNews",
     description:
       "Professional cybersecurity and tech intelligence — threat analysis, vulnerability research, and security news for defenders.",
-    images: ["/opengraph-image"],
+    images: ["/og-default.png"],
   },
   alternates: {
     types: {

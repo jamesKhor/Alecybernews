@@ -99,12 +99,12 @@ export type Category = z.infer<typeof CategoryEnum>;
 export type Severity = z.infer<typeof SeverityEnum>;
 
 export const CATEGORY_DEFAULT_IMAGES: Record<Category, string> = {
-  "threat-intel": "/images/defaults/threat-intel.svg",
-  vulnerabilities: "/images/defaults/vulnerabilities.svg",
-  malware: "/images/defaults/malware.svg",
-  industry: "/images/defaults/industry.svg",
-  tools: "/images/defaults/tools.svg",
-  ai: "/images/defaults/ai.svg",
+  "threat-intel": "/images/defaults/threat-intel.png",
+  vulnerabilities: "/images/defaults/vulnerabilities.png",
+  malware: "/images/defaults/malware.png",
+  industry: "/images/defaults/industry.png",
+  tools: "/images/defaults/tools.png",
+  ai: "/images/defaults/ai.png",
 };
 
 export const SEVERITY_COLORS: Record<Severity, string> = {

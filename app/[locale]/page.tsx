@@ -38,11 +38,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `/${locale}`,
       locale: isZh ? "zh_CN" : "en_US",
       alternateLocale: isZh ? "en_US" : "zh_CN",
+      images: [
+        {
+          url: "/og-default.png",
+          width: 1200,
+          height: 630,
+          alt: "ZCyberNews — Cybersecurity & Tech Intelligence",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: ["/og-default.png"],
     },
   };
 }
@@ -234,7 +243,6 @@ function LatestGrid({
               priority
               sizes="(max-width: 1024px) 100vw, 60vw"
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              {...(leadImage.endsWith(".svg") ? { unoptimized: true } : {})}
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/10 to-transparent" />

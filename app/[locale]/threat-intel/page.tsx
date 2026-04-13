@@ -27,7 +27,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "x-default": "/en/threat-intel",
       },
     },
-    openGraph: { title, description, url: `/${locale}/threat-intel` },
+    openGraph: {
+      title,
+      description,
+      url: `/${locale}/threat-intel`,
+      images: [
+        {
+          url: "/images/defaults/threat-intel.png",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
     twitter: { card: "summary_large_image", title, description },
   };
 }

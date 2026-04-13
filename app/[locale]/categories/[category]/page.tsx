@@ -3,7 +3,11 @@ import { ArticleCard } from "@/components/articles/ArticleCard";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { CategoryEnum } from "@/lib/types";
+import {
+  CategoryEnum,
+  CATEGORY_DEFAULT_IMAGES,
+  type Category,
+} from "@/lib/types";
 import { Link } from "@/i18n/navigation";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { ArrowLeft, Shield } from "lucide-react";
@@ -60,6 +64,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: "ZCyberNews",
       locale: locale === "zh" ? "zh_CN" : "en_US",
       type: "website",
+      images: [
+        {
+          url:
+            CATEGORY_DEFAULT_IMAGES[category as Category] ?? "/og-default.png",
+          width: 1200,
+          height: 630,
+          alt: label,
+        },
+      ],
     },
   };
 }
