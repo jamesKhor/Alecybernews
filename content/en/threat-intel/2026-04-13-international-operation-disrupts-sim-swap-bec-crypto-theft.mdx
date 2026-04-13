@@ -1,0 +1,65 @@
+---
+title: 'International Operation Disrupts SIM Swap & BEC Schemes, Recovers $45M'
+slug: 2026-04-13-international-operation-disrupts-sim-swap-bec-crypto-theft
+date: '2026-04-13'
+excerpt: >-
+  A joint US, UK, and Canadian law enforcement operation disrupted multi-million
+  dollar crypto theft schemes using SIM swapping and BEC, identifying over $45M
+  in stolen assets and freezing $12M.
+category: threat-intel
+tags:
+  - law-enforcement
+  - cryptocurrency
+  - sim-swapping
+  - bec
+  - fraud
+language: en
+source_urls:
+  - >-
+    https://www.securityweek.com/international-operation-targets-multimillion-dollar-crypto-theft-schemes/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-international-operation-disrupts-sim-swap-bec-crypto-theft
+severity: high
+affected_sectors:
+  - cryptocurrency
+  - financial-services
+  - telecommunications
+affected_regions:
+  - North America
+  - Europe
+---
+## Executive Summary
+A coordinated international law enforcement operation has disrupted a series of high-value cryptocurrency theft schemes, identifying more than $45 million in stolen assets and securing the freeze of approximately $12 million. The operation, involving agencies from the United States, United Kingdom, and Canada, targeted criminals employing **SIM swapping** and **business email compromise (BEC)** to hijack victim accounts and drain cryptocurrency wallets. While specific threat actor groups were not named in the public announcement, the scale of identified losses points to organized, financially motivated cybercriminal operations.
+
+## Technical Analysis
+The thefts relied on two primary, low-tech but highly effective social engineering techniques to bypass account security. **SIM swapping** involves fraudulently convincing a mobile carrier to port a victim's phone number to a device controlled by the attacker. This grants the attacker the ability to intercept SMS-based two-factor authentication (2FA) codes and password reset links, providing direct access to email, financial, and cryptocurrency exchange accounts. In parallel, attackers used **business email compromise (BEC)**, where they impersonate executives or trusted partners via compromised or spoofed email accounts to authorize fraudulent cryptocurrency transfers. The technical barrier to entry for these schemes is relatively low, but their success hinges on the manipulation of human operators at telecommunications companies and within victim organizations, rather than exploiting software vulnerabilities.
+
+## Indicators of Compromise
+None identified at this time. Law enforcement disclosures from this operation did not publicly release specific indicators such as wallet addresses, domain names, or malware hashes. Such data is typically held for ongoing investigative and prosecutorial purposes.
+
+## Tactics, Techniques & Procedures
+The threat actors' **TTPs** align with techniques documented in the MITRE ATT&CK framework under initial access and credential access. The primary techniques observed are:
+- **Tactic: Initial Access (TA0001)**
+  - **Technique T1586.001: Compromise Accounts – Email Accounts**: Attackers gained initial footholds through credential phishing or purchase of previously breached credentials to access corporate email systems for BEC.
+- **Tactic: Credential Access (TA0006)**
+  - **Technique T1566.002: Phishing – Spearphishing Link**: Likely used to harvest initial credentials from targeted individuals.
+  - **Technique T0872: SIM Card Swap (MITRE PRE-ATT&CK)**: The core technique to subvert 2FA and maintain persistence on victim accounts by controlling the associated phone number.
+- **Tactic: Impact (TA0040)**
+  - **Technique T1657: Financial Theft**: The ultimate objective, executed via unauthorized cryptocurrency transfers from compromised wallets or exchange accounts.
+
+The operational workflow typically involved researching high-value targets in the cryptocurrency space, acquiring their personal data (doxxing), using that information to socially engineer mobile carrier support staff, and then leveraging the hijacked phone number to systematically take over all linked online accounts.
+
+## Threat Actor Context
+While the joint announcement did not attribute the activity to a named threat group or nation-state, the operational profile is consistent with financially motivated cybercriminal gangs. These groups often operate in loose, affiliate-based networks where specialists in SIM swapping, phishing, and cryptocurrency laundering collaborate. The international dimension of the thefts and recovery efforts suggests a transnational criminal enterprise. The focus on cryptocurrency theft, as opposed to ransomware or data theft, indicates a specialization in navigating blockchain transactions and cryptocurrency mixing services to obfuscate fund flows.
+
+## Mitigations & Recommendations
+Organizations and individuals, particularly those holding significant cryptocurrency assets, should implement defenses beyond SMS-based 2FA. Critical recommendations include:
+1.  **Eliminate SMS for 2FA**: Replace SMS-based two-factor authentication with more secure methods such as **FIDO2/WebAuthn security keys** (e.g., YubiKey) or **time-based one-time password (TOTP)** applications like Google Authenticator or Authy. These are not vulnerable to SIM swapping.
+2.  **Implement Carrier Protections**: Contact your mobile provider to establish a port-freeze or a unique account PIN that must be provided before any account changes are made. Use this in conjunction with a strong, unique password for the carrier account itself.
+3.  **Enforce Strict Email and Transfer Protocols**: For organizations, mandate multi-person approval for all cryptocurrency transactions and use out-of-band verification (e.g., a confirmed phone call via a known number) for any email request involving fund transfers.
+4.  **Segregate Communications and Assets**: Use a dedicated, low-profile mobile phone number and email account exclusively for cryptocurrency exchange and wallet accounts. This number should not be publicly listed or used for social media or other services.
+5.  **Monitor for Account Takeover Signals**: Be alert for unexpected loss of cell service, notifications of account password changes you did not initiate, or unexpected denial of access to email accounts.
+
+## References
+- https://www.securityweek.com/international-operation-targets-multimillion-dollar-crypto-theft-schemes/

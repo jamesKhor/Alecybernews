@@ -1,0 +1,47 @@
+---
+title: ShinyHunters 通过第三方 SaaS 平台入侵 Rockstar Games
+slug: 2026-04-13-rockstar-games-breach-shinyhunters-snowflake
+date: '2026-04-13'
+excerpt: >-
+  ShinyHunters 利用 Anodot SaaS 平台入侵 Rockstar Games，访问了公司的 Snowflake
+  数据环境，并威胁如果不支付赎金就泄露被盗数据。
+category: threat-intel
+tags:
+  - data-breach
+  - ransomware
+  - snowflake
+  - shinyhunters
+  - saas-security
+language: zh
+source_urls:
+  - >-
+    https://www.helpnetsecurity.com/2026/04/13/rockstar-games-data-breach-shinyhunters/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-rockstar-games-breach-shinyhunters-snowflake
+severity: high
+threat_actor: ShinyHunters
+affected_sectors:
+  - gaming
+  - entertainment
+---
+## 执行摘要
+黑客组织ShinyHunters已经入侵了Rockstar Games，获得了该公司Snowflake云数据环境的访问权限。攻击者声称已经窃取了敏感数据，并威胁说如果不支付赎金就泄露这些数据。最初的入侵并非通过直接攻击Rockstar的基础设施实现，而是利用了第三方SaaS分析和监控平台Anodot，该平台可以访问Snowflake实例。
+
+## 技术分析
+根据Rockstar Games的确认和ShinyHunters的声明，攻击途径是利用Anodot，这是一个云成本管理和分析服务。Anodot与Rockstar的Snowflake环境的集成为威胁行为者提供了必要的访问凭证或权限。Anodot被入侵的确切机制仍然不清楚；可能涉及被盗的凭证、Anodot平台的漏洞，或者是其访问控制的配置错误。一旦攻击者通过Anodot获得了立足点，他们就转向了连接的Snowflake实例，Rockstar用于数据分析和存储。Rockstar尚未公开详细说明Snowflake内部访问的数据范围和性质，尽管ShinyHunters声称拥有重要的内部数据。
+
+## 入侵指标
+目前没有识别出任何入侵指标。Rockstar Games和相关第三方提供商尚未发布与此事件相关的具体技术指标，如恶意IP、文件哈希或异常查询模式。
+
+## 战术、技术与程序
+这次攻击清楚地表明了对**软件供应链**和**受信任的第三方关系**作为初始访问向量（战术TA0001）的关注。通过入侵Anodot，ShinyHunters采用了**利用外部远程服务**（T1584）的技术来达到他们的主要目标。这绕过了Rockstar的直接边界防御。随后访问Snowflake与**云存储对象操作**（T1530）的技术一致，攻击者与基于云的仓库中的数据进行交互。最后阶段涉及**数据勒索**（T1657），威胁是公开泄露被盗信息，而不是（或除了）加密信息，这是ShinyHunters的常见做法。
+
+## 威胁行为者背景
+ShinyHunters是一个以财务为动机的威胁组织，以大规模数据泄露和随后拍卖或泄露被盗数据而闻名。该组织有针对各个行业的组织的历史，通常利用被盗的凭证或第三方应用程序漏洞来访问受害者网络和数据存储库。他们的行动通常涉及窃取数据库和个人身份信息（PII），然后用于勒索。该组织与其他团体的隶属关系或潜在联系仍然不确定。
+
+## 缓解措施与建议
+使用Snowflake等云数据平台的组织必须严格审计并最小化第三方SaaS的访问权限。为所有集成实施**零信任原则**，确保第三方工具仅通过细粒度访问控制拥有必要的最小权限。强制所有服务账户和行政界面，包括第三方服务使用的界面，进行多因素认证（MFA）。持续监控数据仓库内的查询活动，寻找异常模式，如不寻常的数据访问量或来自不熟悉地理位置的查询。最后，制定一个专门针对通过受信任的第三方供应商入侵的事件响应计划，包括通信协议和技术遏制步骤。
+
+## 参考资料
+- https://www.helpnetsecurity.com/2026/04/13/rockstar-games-data-breach-shinyhunters/
