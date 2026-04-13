@@ -1,7 +1,7 @@
 name: AI Content Pipeline
 
 on:
-  # Manual trigger only — no automatic schedule
+  # Manual trigger only — auto schedule handled by local VPS cron
   workflow_dispatch:
     inputs:
       max_articles:
@@ -66,7 +66,7 @@ jobs:
           git config user.name "zcybernews-bot"
           git config user.email "bot@zcybernews.com"
           git add content/ public/images/articles/ .pipeline-cache/ || true
-          git diff --staged --quiet || git commit -m "chore: ai pipeline $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+          git diff --staged --quiet || git commit -m "chore: ai pipeline $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push
 
       # Deploy is triggered automatically by the push to main above
