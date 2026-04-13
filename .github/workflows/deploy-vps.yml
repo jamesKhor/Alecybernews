@@ -22,6 +22,8 @@ jobs:
             git pull origin main
             echo "📦 Installing dependencies..."
             HUSKY=0 npm ci --production=false
+            echo "🧹 Cleaning old build cache..."
+            rm -rf .next
             echo "🔨 Building..."
             npm run build
             echo "♻️  Restarting PM2..."
