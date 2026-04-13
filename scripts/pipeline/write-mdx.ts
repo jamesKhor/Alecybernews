@@ -6,6 +6,30 @@ import type { TranslatedMeta } from "./translate-article.js";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
+/** Detect CJK characters (Chinese/Japanese/Korean) in text */
+const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/;
+
+/**
+ * Validate that EN content doesn't contain Chinese characters
+ * and ZH content has Chinese in the body (not just English).
+ * Logs a warning and strips CJK from EN articles to prevent contamination.
+ */
+function validateLanguage(locale: "en" | "zh", body: string): string {
+  if (locale === "en" && CJK_RE.test(body)) {
+    console.warn(
+      `[write] WARNING: Chinese characters detected in EN article — stripping CJK characters`,
+    );
+    // Replace runs of CJK characters (and adjacent Chinese punctuation) with empty string
+    return body
+      .replace(
+        /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff\u3000-\u303f\uff00-\uffef]+/g,
+        " ",
+      )
+      .replace(/ {2,}/g, " ");
+  }
+  return body;
+}
+
 function buildFrontmatter(
   article: GeneratedArticle,
   locale: "en" | "zh",
@@ -55,7 +79,8 @@ function writeMdx(
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
   const filePath = path.join(dir, `${datedSlug}.mdx`);
-  const file = matter.stringify(body, frontmatter);
+  const cleanBody = validateLanguage(locale, body);
+  const file = matter.stringify(cleanBody, frontmatter);
   fs.writeFileSync(filePath, file, "utf-8");
   console.log(`[write] ${filePath}`);
   return filePath;
