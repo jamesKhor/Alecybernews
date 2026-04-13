@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { CategoryEnum } from "@/lib/types";
 import { Link } from "@/i18n/navigation";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { ArrowLeft, Shield } from "lucide-react";
 
 interface Props {
@@ -100,16 +101,14 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-12">
-      {/* Breadcrumb */}
+      <Breadcrumbs
+        items={[
+          { label: locale === "zh" ? "首页" : "Home", href: `/${locale}` },
+          { label: tNav("categories"), href: `/${locale}/categories` },
+          { label },
+        ]}
+      />
       <div className="mb-8">
-        <Link
-          href="/articles"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          {tNav("articles")}
-        </Link>
-
         <div className="flex items-center gap-3">
           <span className="text-4xl">{icon}</span>
           <div>

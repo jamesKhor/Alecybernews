@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { ArrowLeft, Tag } from "lucide-react";
 
 interface Props {
@@ -81,16 +82,14 @@ export default async function TagPage({ params }: Props) {
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-12">
-      {/* Breadcrumb */}
+      <Breadcrumbs
+        items={[
+          { label: locale === "zh" ? "首页" : "Home", href: `/${locale}` },
+          { label: tNav("tags"), href: `/${locale}/articles` },
+          { label: `#${tag}` },
+        ]}
+      />
       <div className="mb-8">
-        <Link
-          href="/articles"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          {tNav("articles")}
-        </Link>
-
         <div className="flex items-center gap-3">
           <Tag className="w-8 h-8 text-primary" />
           <div>

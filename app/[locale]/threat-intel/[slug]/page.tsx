@@ -11,6 +11,7 @@ import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
 import { SidebarAd, InArticleAd } from "@/components/ads/AdSense";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import Image from "next/image";
 
 // Allow dynamic params so new articles work before a full rebuild on VPS
@@ -166,6 +167,16 @@ function TIPageContent({
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-10">
+      <Breadcrumbs
+        items={[
+          { label: locale === "zh" ? "首页" : "Home", href: `/${locale}` },
+          {
+            label: locale === "zh" ? "威胁情报" : "Threat Intel",
+            href: `/${locale}/threat-intel`,
+          },
+          { label: frontmatter.title },
+        ]}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
         <article>
           <header className="mb-8">

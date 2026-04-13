@@ -14,6 +14,7 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
 import { SidebarAd, InArticleAd } from "@/components/ads/AdSense";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -162,6 +163,16 @@ function ArticlePageContent({
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-10">
+      <Breadcrumbs
+        items={[
+          { label: locale === "zh" ? "首页" : "Home", href: `/${locale}` },
+          {
+            label: locale === "zh" ? "文章" : "Articles",
+            href: `/${locale}/articles`,
+          },
+          { label: frontmatter.title },
+        ]}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
         {/* Main article column */}
         <article>

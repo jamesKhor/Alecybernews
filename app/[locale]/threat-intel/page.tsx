@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { InFeedAd } from "@/components/ads/AdSense";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { useTranslations } from "next-intl";
 
 interface Props {
@@ -49,6 +50,12 @@ function ThreatIntelContent({
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-12">
+      <Breadcrumbs
+        items={[
+          { label: t("home"), href: `/${locale}` },
+          { label: t("threatIntel") },
+        ]}
+      />
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-2">
           <span className="h-3 w-3 rounded-full bg-destructive" />

@@ -3,6 +3,7 @@ import { getAllPosts } from "@/lib/content";
 import { CategoryEnum } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -56,6 +57,12 @@ function CategoriesContent({
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-12">
+      <Breadcrumbs
+        items={[
+          { label: isZh ? "首页" : "Home", href: `/${locale}` },
+          { label: isZh ? "分类" : "Categories" },
+        ]}
+      />
       <h1 className="text-3xl font-bold mb-8">
         {isZh ? "分类" : "Categories"}
       </h1>
