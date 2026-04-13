@@ -6,7 +6,7 @@ import { ArticleMeta } from "@/components/articles/ArticleMeta";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { IOCTable } from "@/components/threat-intel/IOCTable";
 import { MitreMatrix } from "@/components/threat-intel/MitreMatrix";
-import { NewsArticleJsonLd } from "@/components/seo/JsonLd";
+import { NewsArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
@@ -115,6 +115,22 @@ export default async function ThreatIntelArticlePage({ params }: Props) {
         url={`${siteUrl}/${locale}/threat-intel/${slug}`}
         image={image ? `${siteUrl}${image}` : undefined}
         keywords={frontmatter.tags}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          {
+            name: locale === "zh" ? "首页" : "Home",
+            url: `${siteUrl}/${locale}`,
+          },
+          {
+            name: locale === "zh" ? "威胁情报" : "Threat Intelligence",
+            url: `${siteUrl}/${locale}/threat-intel`,
+          },
+          {
+            name: frontmatter.title,
+            url: `${siteUrl}/${locale}/threat-intel/${slug}`,
+          },
+        ]}
       />
       <TIPageContent
         frontmatter={frontmatter}

@@ -51,6 +51,7 @@ export function NewsArticleJsonLd({
       logo: { "@type": "ImageObject", url: PUBLISHER_LOGO },
     },
     url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
     ...(image && {
       image: { "@type": "ImageObject", url: image, width: 1200, height: 630 },
     }),

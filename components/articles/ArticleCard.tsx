@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import Image from "next/image";
+import Link from "next/link";
 import type { Article } from "@/lib/content";
 import {
   CATEGORY_DEFAULT_IMAGES,
@@ -28,7 +29,7 @@ export function ArticleCard({ article, locale, type = "posts" }: Props) {
   const href = `/${locale}/${type === "threat-intel" ? "threat-intel" : "articles"}/${frontmatter.slug}`;
 
   return (
-    <a
+    <Link
       href={href}
       className="group flex flex-col rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-card/80 transition-all duration-200 overflow-hidden"
     >
@@ -105,6 +106,6 @@ export function ArticleCard({ article, locale, type = "posts" }: Props) {
           )}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

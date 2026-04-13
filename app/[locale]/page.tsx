@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { getAllPosts } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { Link } from "@/i18n/navigation";
+import NextLink from "next/link";
 import { format } from "date-fns";
 import Image from "next/image";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
@@ -214,7 +215,7 @@ function LatestGrid({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
       {/* Lead story */}
-      <a
+      <NextLink
         href={leadHref}
         className="lg:col-span-3 group flex flex-col rounded-xl border border-border bg-card hover:border-primary/40 transition-all duration-200 overflow-hidden"
       >
@@ -257,14 +258,14 @@ function LatestGrid({
             {tArt("readingTime", { minutes: lead.readingTime })}
           </span>
         </div>
-      </a>
+      </NextLink>
 
       {/* 3 compact stories */}
       <div className="lg:col-span-2 flex flex-col gap-4">
         {rest.slice(0, 3).map((article) => {
           const href = `/${locale}/${article._sourceType === "threat-intel" ? "threat-intel" : "articles"}/${article.frontmatter.slug}`;
           return (
-            <a
+            <NextLink
               key={article.frontmatter.slug}
               href={href}
               className="group flex gap-3 p-4 rounded-xl border border-border bg-card hover:border-primary/40 transition-all duration-200"
@@ -282,7 +283,7 @@ function LatestGrid({
                   {article.frontmatter.title}
                 </h3>
               </div>
-            </a>
+            </NextLink>
           );
         })}
       </div>

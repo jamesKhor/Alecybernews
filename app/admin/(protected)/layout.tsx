@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 import {
   LayoutDashboard,
   Rss,

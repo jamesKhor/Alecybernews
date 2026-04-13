@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { Shield, Rss } from "lucide-react";
 
 interface Props {
@@ -31,20 +32,20 @@ export function Footer({ locale }: Props) {
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <a
+                <Link
                   href={`/${locale}/articles`}
                   className="hover:text-primary transition-colors"
                 >
                   {t("articles")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   href={`/${locale}/threat-intel`}
                   className="hover:text-primary transition-colors"
                 >
                   {t("threatIntel")}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

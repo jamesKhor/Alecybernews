@@ -11,18 +11,26 @@ interface Props {
   searchParams: Promise<{ page?: string; category?: string; tag?: string }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: Props): Promise<Metadata> {
   const { locale } = await params;
+  const { page: pageParam } = await searchParams;
+  const page = parseInt(pageParam ?? "1", 10) || 1;
   const isZh = locale === "zh";
   const title = isZh ? "文章" : "Articles";
   const description = isZh
     ? "浏览所有网络安全文章、分析与研究报告。"
     : "Browse all cybersecurity articles, analysis, and research.";
+  // Pages beyond 1 get self-referencing canonical to avoid duplicate content
+  const canonical =
+    page > 1 ? `/${locale}/articles?page=${page}` : `/${locale}/articles`;
   return {
-    title,
+    title: page > 1 ? `${title} — ${isZh ? "第" : "Page "}${page}` : title,
     description,
     alternates: {
-      canonical: `/${locale}/articles`,
+      canonical,
       languages: {
         en: "/en/articles",
         "zh-Hans": "/zh/articles",
@@ -31,6 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: { title, description, url: `/${locale}/articles` },
     twitter: { card: "summary_large_image", title, description },
+    ...(page > 1 && { robots: { index: false } }),
   };
 }
 

@@ -11,6 +11,7 @@ import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { stripMarkdown } from "@/lib/utils";
 import Image from "next/image";
+import NextLink from "next/link";
 import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
 import { SidebarAd, InArticleAd } from "@/components/ads/AdSense";
 
@@ -222,13 +223,13 @@ function ArticlePageContent({
                 {t("tags")}:
               </span>
               {frontmatter.tags.map((tag) => (
-                <a
+                <NextLink
                   key={tag}
                   href={`/${locale}/tags/${encodeURIComponent(tag)}`}
                   className="inline-block mr-2 mb-1 text-sm rounded-full bg-secondary hover:bg-secondary/80 px-3 py-1 transition-colors"
                 >
                   #{tag}
-                </a>
+                </NextLink>
               ))}
             </div>
           )}
