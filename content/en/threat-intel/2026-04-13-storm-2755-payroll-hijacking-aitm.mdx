@@ -1,0 +1,84 @@
+---
+title: Storm-2755 Hijacks Payroll via AiTM Attacks
+slug: 2026-04-13-storm-2755-payroll-hijacking-aitm
+date: '2026-04-13'
+excerpt: >-
+  Financially motivated group Storm-2755 targets Canadian employees using AiTM
+  session hijacking to redirect salary payments.
+category: threat-intel
+tags:
+  - aitm
+  - session-hijacking
+  - payroll-theft
+  - storm-2755
+  - mfa-bypass
+language: en
+source_urls:
+  - 'https://cybersecuritynews.com/hackers-use-aitm-session-hijacking/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-storm-2755-payroll-hijacking-aitm
+severity: high
+threat_actor: Storm-2755
+affected_sectors:
+  - finance
+  - hr
+  - payroll
+affected_regions:
+  - Canada
+ttp_matrix:
+  - tactic: Credential Access
+    technique_id: T1071
+    technique_name: Application Layer Protocol
+  - tactic: Credential Access
+    technique_id: T1566
+    technique_name: Phishing
+  - tactic: Defense Evasion
+    technique_id: T1562
+    technique_name: Impair Defenses
+  - tactic: Lateral Movement
+    technique_id: T1550
+    technique_name: Use Alternate Authentication Material
+---
+## Executive Summary
+A financially driven threat actor tracked as **Storm-2755** has been conducting targeted payroll redirection attacks against Canadian organizations. Leveraging adversary-in-the-middle (AiTM) proxies, the group hijacks authenticated sessions to bypass MFA and manipulate payroll systems.
+
+## Technical Analysis
+The Storm-2755 campaign relies on **AiTM infrastructure** to intercept real-time communication between users and targeted web applications—particularly HR and payroll portals. Unlike traditional phishing kits that harvest credentials post-login, AiTM setups allow attackers to maintain active sessions, enabling actions like modifying direct deposit information without user awareness. According to CyberSecurity News [^1], the group leverages legitimate browser automation tools such as Puppeteer or Selenium to simulate user behavior, making detection more challenging. Once inside, they alter payment details to route salaries to external accounts under their control.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+Storm-2755 initiates campaigns with credential harvesting via phishing emails tailored to HR personnel. These messages often contain malicious links directing victims to AiTM proxy servers designed to mimic official login pages. Upon successful authentication by the victim, the server relays session tokens back to the attacker while maintaining an active connection to the target service. This allows modification of sensitive fields within payroll interfaces, including bank account routing numbers and recipient names. The use of headless browsers suggests attempts to evade behavioral analysis mechanisms implemented in modern authentication platforms.
+
+## Threat Actor Context
+Storm-2755 is described as a financially motivated cybercriminal collective primarily focused on payroll manipulation targeting Canadian businesses [^1]. While attribution remains uncertain, operational security practices suggest moderate sophistication and possible prior experience with credential-based fraud. No confirmed nation-state ties have been reported.
+
+## Detection & Hunting Queries
+Organizations can search logs for anomalies indicating potential AiTM activity:
+- Unusual geolocation shifts during authentication flows
+- Unexpected increases in outbound traffic from internal IP addresses to known suspicious domains
+- Repeated failed modifications followed by one successful change to payroll records
+
+Example Splunk query:
+```
+tag=authentication action=success earliest=-7d@d 
+| iplocation src_ip 
+| stats count by Country, user, _raw
+```
+
+SIEM rules should also flag repeated POST requests to `/login` endpoints originating from single IPs but associated with multiple usernames over short intervals.
+
+## Mitigations & Recommendations
+To defend against AiTM-enabled payroll theft:
+- Implement **step-up authentication** for financial transactions, especially those altering banking details.
+- Monitor and restrict access to HR/payroll systems based on job role and necessity.
+- Deploy network monitoring solutions capable of identifying TLS interception patterns indicative of proxy usage.
+- Enforce **FIDO2/WebAuthn** wherever possible, as hardware-backed keys resist AiTM interception.
+- Conduct regular training for HR staff regarding social engineering red flags.
+
+Additionally, organizations should review recent changes to employee banking information and validate them manually if executed outside standard procedures.
+
+## References
+[^1]: [https://cybersecuritynews.com/hackers-use-aitm-session-hijacking/](https://cybersecuritynews.com/hackers-use-aitm-session-hijacking/)

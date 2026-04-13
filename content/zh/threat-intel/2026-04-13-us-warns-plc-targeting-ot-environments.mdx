@@ -1,0 +1,66 @@
+---
+title: 美国警告OT环境中PLC遭到活跃攻击
+slug: 2026-04-13-us-warns-plc-targeting-ot-environments
+date: '2026-04-13'
+excerpt: 政府机构警告称，可编程逻辑控制器仍然是工业环境中网络对手的首要目标。
+category: threat-intel
+tags:
+  - ics
+  - ot
+  - plc
+  - government-warning
+language: zh
+source_urls:
+  - >-
+    https://www.darkreading.com/ics-ot-security/industrial-controllers-vulnerable-conflicts-cyber
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-us-warns-plc-targeting-ot-environments
+severity: high
+affected_sectors:
+  - energy
+  - manufacturing
+  - utilities
+affected_regions:
+  - north-america
+---
+## 执行摘要
+根据美国政府机构最近发出的警告，运营技术（OT）环境中使用的可编程逻辑控制器（PLC）正持续受到网络攻击者的积极针对。Dark Reading 报道中引用的研究发现，有 179 台 OT 设备存在可被利用的漏洞，其中许多设备广泛部署在关键基础设施领域。
+
+## 技术分析
+PLC 是工业控制系统（ICS）中的基础组件，在能源、制造和公用事业等行业中用于自动化机械流程。这些设备通常缺乏现代安全功能，例如安全启动、加密通信以及常规补丁更新机制。据 Dark Reading 引用的研究结果显示，由于固件过时和默认配置问题，多个主要厂商的 PLC 型号仍暴露于已知漏洞之中。尽管报告未列出具体的 CVE 编号，但以往研究经常发现诸如弱认证、使用如 Modbus 等未加密协议、以及面向互联网接口的暴露等问题。这些弱点的存在使攻击者可能远程操控物理过程。
+
+## 入侵指标
+目前尚未识别出任何入侵指标。
+
+## 战术、技术与程序
+针对 PLC 的攻击者通常通过已被攻破的 IT 网络或直接互联网暴露获得初始访问权限。常见手段包括凭证暴力破解、利用未修复的漏洞，以及滥用不安全的协议如 Modbus TCP 或 DNP3。一旦进入环境内部，攻击者可能会借助错误配置的网络信任关系或共享管理工具横向移动至 OT 区段。攻陷系统后的操作可能涉及修改控制器逻辑、禁用安全机制，或者收集遥测数据以供未来行动之用。虽然现有报道并未详细说明当前活动中具体使用的战术、技术和程序（TTP），但从 Sandworm 和 Dragonfly 等组织的历史案例来看，其对操纵工业流程表现出持久的兴趣。
+
+## 威胁行为者背景
+所引用的报告中没有点名特定威胁行为者。然而，国家支持的黑客组织及犯罪实体均已展现出针对 ICS 环境的能力。由国家资助的团体如 APT28（Fancy Bear）、APT29（Cozy Bear）和 Sandworm（隶属于俄罗斯军事情报局 GRU）此前曾对 OT 网络实施渗透活动。在缺乏将观测到的行为与特定行为者关联起来的取证证据的情况下，归因仍然属于推测性质。
+
+## 检测与溯源查询
+组织应监控 IT 与 OT 网络区段之间的异常流量模式，特别是涉及传统协议的情况：
+```sql
+SELECT * FROM network_traffic WHERE protocol IN ('Modbus', 'DNP3') AND src_zone = 'IT' AND dst_zone = 'OT'
+```
+此外，还应对已知 PLC IP 地址重复出现的身份验证失败日志进行查询：
+```sql
+SELECT count(*) AS login_attempts, src_ip FROM auth_logs WHERE device_type LIKE '%PLC%' GROUP BY src_ip HAVING login_attempts > 10
+```
+控制器上发生的异常二进制更改或意外上传的逻辑也应当引起怀疑。
+
+## 缓解措施与建议
+为降低被攻破的风险，资产所有者应采取以下措施：
+
+- **网络分段**：采用物理隔离或强大的防火墙隔离 OT 环境；限制区域间不必要的通信。
+- **更新固件**：定期应用补丁并升级所有工业控制器上的固件，即使它们已经超出支持周期。
+- **关闭无用协议**：除非业务需要，否则应关闭 FTP、Telnet 和 Web 接口等服务。
+- **强化访问控制**：实施强身份验证、基于角色的访问控制，并尽可能启用多因素认证。
+- **日志监控**：在 PLC 及相关人机界面（HMI）上启用日志记录；集中收集并分析事件数据以检测异常情况。
+- **开展资产清查**：维护一份包含所有联网设备的最新清单，注明品牌、型号、固件版本及网络位置。
+
+鉴于许多 PLC 难以轻易打补丁或更换，因此定制化适用于 ICS 环境的入侵检测系统等补偿性控制措施至关重要。
+
+## 参考资料
+- [随着冲突转向网络空间 工业控制器仍存风险 – Dark Reading](https://www.darkreading.com/ics-ot-security/industrial-controllers-vulnerable-conflicts-cyber)

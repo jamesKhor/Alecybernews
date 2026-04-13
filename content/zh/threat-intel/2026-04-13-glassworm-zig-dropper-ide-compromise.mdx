@@ -1,0 +1,69 @@
+---
+title: GlassWorm 使用新的 Zig 投放器通过伪造的 VS Code 扩展针对开发者 IDE
+slug: 2026-04-13-glassworm-zig-dropper-ide-compromise
+date: '2026-04-13'
+excerpt: 研究人员发现 GlassWorm 最新的 Zig 投放器隐藏在恶意 VS Code 扩展中，允许在开发者工作站上静默感染多个 IDE。
+category: threat-intel
+tags:
+  - glassworm
+  - zig
+  - ide
+  - vs-code
+  - supply-chain
+language: zh
+source_urls:
+  - >-
+    https://thehackernews.com/2026/04/glassworm-campaign-uses-zig-dropper-to.html
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-glassworm-zig-dropper-ide-compromise
+severity: high
+affected_sectors:
+  - software development
+  - technology
+---
+## 执行摘要
+观察到的 **GlassWorm** 活动的新变种利用了一个基于自定义 **Zig** 的投放器，该投放器嵌入在名为 `specstudio.code-wakatime-activity-tracker` 的恶意 Open VSX 扩展中。该扩展伪装成 Visual Studio Code 及其他 IDE 的合法 WakaTime 活动跟踪器。安装后，投放器会悄悄向主机上的多个开发环境注入负载，赋予攻击者在开发者工作站上的持久代码执行能力。
+
+## 技术分析
+恶意扩展通过公开的 Open VSX 市场分发，模仿了真实 WakaTime 插件的命名和图标。对该包的静态分析发现了一个编译后的 Zig 二进制文件（`dropper.zig`），在扩展的激活事件期间被执行。投放器执行以下步骤：
+
+1. **环境枚举** – 通过扫描常见的安装路径和注册表键，检测已安装的 IDE（VS Code、JetBrains IDE、Sublime Text）。
+2. **特权提升** – 尝试获取对 IDE 扩展目录的写入权限，如未获得提升权限则回退到用户级执行。
+3. **负载投递** – 使用 TLS 1.2 从硬编码的 C2 域名 (`dlz9x[.]cloudfront.net`) 下载加密负载。负载使用从主机 MAC 地址派生的 XOR 密钥解密。
+4. **持久化** – 将负载写入隐藏脚本 (`.vscode/extension.js`) 并在 IDE 的启动配置中注册。
+5. **指挥控制** – 建立到 C2 的反向 HTTPS 连接，允许攻击者执行任意命令、外泄源代码或部署额外模块。
+
+使用 Zig 值得注意；该语言编译后生成单一静态二进制文件，运行时依赖极少，使传统 AV 启发式检测更为困难。研究人员观察到投放器在首次运行后会禁用自身的文件哈希校验，以降低痕迹。
+
+## 入侵指标
+目前未发现具体指标。该活动使用动态生成的 URL 和加密负载，限制了静态 IOC 的提取。建议分析人员监控扩展标识符 `specstudio.code-wakatime-activity-tracker` 以及对观察到的 C2 域名的异常网络连接。
+
+## 战术、技术与程序
+| ATT&CK ID | Technique | Description |
+|-----------|-----------|-------------|
+| T1195.001 | Supply Chain Compromise: Compromise Software Dependencies | Malicious extension published to a legitimate marketplace. |
+| T1027.004 | Obfuscated/Encrypted Network Traffic: Encrypted Channel | Payload delivered over TLS with custom encryption. |
+| T1059.001 | Command and Scripting Interpreter: PowerShell | Reverse shell delivered as PowerShell script on Windows hosts. |
+| T1547.001 | Boot or Logon Autostart Execution: Registry Run Keys/Startup Folder | Persistence via IDE startup scripts. |
+| T1086 | PowerShell | Used for post‑exploitation command execution. |
+| T1105 | Ingress Tool Transfer | Download of encrypted payload from C2. |
+
+## 威胁行为者背景
+GlassWorm 自 2024 年初活跃，主要针对软件开发者，以获取源码和知识产权的早期访问权。该组织之前的活动使用基于 Go 的投放器，并利用被入侵的 GitHub 账户。转向 Zig 表明其在规避基于签名的检测并生成更小二进制文件方面的意图。归因仍不确定；然而其作案模式与先前观察到的一个位于东欧的松散组织的网络犯罪论坛活动相符。
+
+## 检测与溯源查询
+- **Windows Sysmon**: `EventID=1 AND ImageLoaded LIKE "%extension.js%"`
+- **Endpoint logs**: `process_name: "code.exe" AND command_line:*"specstudio.code-wakatime-activity-tracker*"`
+- **Network**: `dst.domain: "dlz9x.cloudfront.net" AND dst.port:443`
+- **File integrity**: Alert on newly created hidden files under `%USERPROFILE%\.vscode\` or JetBrains config directories.
+
+## 缓解措施与建议
+1. **验证扩展** – 要求开发者仅从已验证来源安装扩展；在 IDE 策略设置中实施白名单。
+2. **供应链扫描** – 集成能够检测扩展包内编译二进制的 SAST/SCA 工具。
+3. **网络控制** – 阻止对未知 CDN 的出站 TLS 连接，除非明确需要；监控开发工作站对 `*.cloudfront.net` 的异常 DNS 查询。
+4. **终端加固** – 启用应用程序控制（如 Windows Defender Application Control），阻止用户配置文件目录中的未签名可执行文件。
+5. **事件响应** – 如怀疑被侵入，移除恶意扩展，删除隐藏脚本，并轮换可能已在源码仓库中泄露的凭证。
+
+## 参考资料
+- GlassWorm Campaign Uses Zig Dropper to Infect Multiple Developer IDEs, The Hacker News. https://thehackernews.com/2026/04/glassworm-campaign-uses-zig-dropper-to.html

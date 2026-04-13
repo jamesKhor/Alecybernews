@@ -1,0 +1,60 @@
+---
+title: 数千美国工业PLC暴露于伊朗国家支持的威胁行为者
+slug: 2026-04-12-us-industrial-plcs-exposed-iranian-cyberattacks
+date: '2026-04-12'
+excerpt: 美国近4000台罗克韦尔自动化PLC直接暴露在线上，为伊朗国家支持的黑客攻击关键基础设施创造了一个显著的攻击面。
+category: threat-intel
+tags:
+  - ics
+  - critical-infrastructure
+  - state-sponsored
+  - plc
+  - ot
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/nearly-4-000-us-industrial-devices-exposed-to-iranian-cyberattacks/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-12-us-industrial-plcs-exposed-iranian-cyberattacks
+severity: high
+threat_actor: Iranian state-sponsored actors
+threat_actor_origin: Iran
+affected_sectors:
+  - critical-infrastructure
+  - industrial
+affected_regions:
+  - United States
+---
+## 执行摘要
+美国近4000台工业控制设备可以直接从公共互联网访问，为伊朗国家资助的威胁行为者提供了一个重大且迫在眉睫的攻击面。根据网络安全公司BitSight的分析，这些暴露的设备——主要是罗克韦尔自动化的可编程逻辑控制器（PLC）——是伊朗高级持续性威胁（APT）团体针对美国关键基础设施的有记录活动的一部分。这些运营技术（OT）资产的暴露绕过了网络分段防御，允许直接操纵物理工业流程。
+
+## 技术分析
+暴露的设备是**罗克韦尔自动化ControlLogix和CompactLogix**系列PLC。这些是工业环境中的关键组件，控制着制造业、水处理和能源等行业的机械。BitSight的研究，如BleepingComputer报道的那样，通过扫描TCP端口44818上的特定服务横幅来识别这些设备，这是罗克韦尔的**EtherNet/IP**工业协议的标准端口。直接的互联网暴露意味着这些PLC没有防火墙的保护，也不在非军事区（DMZ）后面，违反了核心OT安全原则。拥有此端口网络访问权限的攻击者可以发出直接命令，读取设备状态，修改控制逻辑，或迫使PLC停止运行，可能造成运营中断或物理损坏。由于这些设备通常使用默认或弱凭据，并且缺乏编程命令的原生认证，因此利用的技术障碍降低了。
+
+## 入侵指标
+目前没有识别出任何入侵指标。
+
+## 战术、技术与程序
+报告的活动与伊朗APT的已知战术、技术与程序（TTP）一致，特别是CISA、FBI、NSA和国际伙伴在2024年2月披露的**“点击这里”**活动。这一阶段的主要技术是**发现（TA0043）**和**初始访问（TA0001）**，通过面向互联网的OT资产。威胁行为者正在扫描和识别暴露的PLC和人机界面（HMIs）。随后的TTP可能涉及对弱凭据的**暴力破解（T1110）**尝试和使用原生工程协议对PLC进行**命令行界面（T1059）**操纵。最终目标被假定为**抑制控制系统功能（T0805）**或**控制操纵（T0831）**。PLC的直接暴露简化了攻击链，可能消除了早期步骤如鱼叉式网络钓鱼或VPN利用的需求。
+
+## 威胁行为者背景
+该活动被归因于伊朗国家资助的网络行为者，特别是被追踪为**CyberAv3ngers**和**Soldier of Fortune**的团体。这些团体有针对关键基础设施的记录历史，特别关注以色列及其盟友，包括美国。他们的活动通常将网络效果与地缘政治信息混合。2023年底针对美国水和废水系统的攻击是这一更广泛暴露发现的直接前兆。这些行为者表现出造成中断和展示能力的意图，而不仅仅是间谍活动。目前尚不清楚所有暴露的设备是否已被积极探测或破坏，但它们的可访问性与行为者声明的目标模式完全一致。
+
+## 检测与溯源查询
+组织，特别是在关键基础设施领域，应该寻找以下活动：
+*   网络流量日志显示从意外的外部IP地址（特别是那些地理位置与伊朗基础设施相关的地区）尝试连接到OT资产（特别是TCP/44818上的罗克韦尔PLC）。
+*   **Zeek/Suricata签名：** 对`ET SCAN Rockwell EtherNet/IP Scanner`或类似的签名发出警报，检测对端口44818的扫描。
+*   **内部网络狩猎：** 查找从工程工作站或服务器到PLC的连接，这些工作站或服务器通常不与它们通信，表明可能的横向移动。
+*   **防火墙/代理日志：** 查询从OT网络到已知威胁情报源或不熟悉的外部IP的出站连接，这可能表明来自被破坏的HMI的信标。
+
+## 缓解措施与建议
+需要立即采取行动以减少这一攻击面。
+1.  **网络分段：** 将所有OT设备，包括PLC、HMIs和工程工作站，从直接互联网访问中移除。实施一个正确配置的防火墙，并使用**非军事区（DMZ）**架构进行任何必要的远程访问。
+2.  **访问控制：** 在所有OT设备和网络组件上强制执行强大、独特的密码。为所有远程访问解决方案（如VPN和跳转箱）实施多因素认证（MFA）。
+3.  **资产清单：** 对所有OT/ICS资产进行全面清单，以识别未知或未经授权的设备，特别是那些具有外部网络接口的设备。
+4.  **监控：** 部署能够解析工业协议的网络监控解决方案，以检测OT环境中的异常命令或未经授权的访问尝试。
+5.  **供应商指南：** 咨询并实施罗克韦尔自动化的安全咨询和最佳实践，以加强ControlLogix和CompactLogix系统的安全。
+
+## 参考资料
+*   [https://www.bleepingcomputer.com/news/security/nearly-4-000-us-industrial-devices-exposed-to-iranian-cyberattacks/](https://www.bleepingcomputer.com/news/security/nearly-4-000-us-industrial-devices-exposed-to-iranian-cyberattacks/)

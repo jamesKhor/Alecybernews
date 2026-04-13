@@ -1,0 +1,74 @@
+---
+title: >-
+  GlassWorm Uses New Zig Dropper to Target Developer IDEs via Fake VS Code
+  Extension
+slug: 2026-04-13-glassworm-zig-dropper-ide-compromise
+date: '2026-04-13'
+excerpt: >-
+  Researchers discovered GlassWorm’s latest Zig dropper hidden in a malicious VS
+  Code extension, allowing silent infection of multiple IDEs on developer
+  workstations.
+category: threat-intel
+tags:
+  - glassworm
+  - zig
+  - ide
+  - vs-code
+  - supply-chain
+language: en
+source_urls:
+  - >-
+    https://thehackernews.com/2026/04/glassworm-campaign-uses-zig-dropper-to.html
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-glassworm-zig-dropper-ide-compromise
+severity: high
+affected_sectors:
+  - software development
+  - technology
+---
+## Executive Summary
+A newly observed variant of the **GlassWorm** campaign is leveraging a custom **Zig**-based dropper embedded in a malicious Open VSX extension called `specstudio.code-wakatime-activity-tracker`. The extension pretends to be the legitimate WakaTime activity tracker for Visual Studio Code and other IDEs. Once installed, the dropper silently injects a payload into multiple development environments on the host, giving the adversary persistent code‑execution capability on developer workstations.
+
+## Technical Analysis
+The malicious extension is distributed through the public Open VSX marketplace, where it mimics the naming and iconography of the genuine WakaTime plugin. Static analysis of the package revealed a compiled Zig binary (`dropper.zig`) that is executed during the extension's activation event. The dropper performs the following steps:
+
+1. **Environment enumeration** – Detects installed IDEs (VS Code, JetBrains IDEs, Sublime Text) by scanning common installation paths and registry keys.
+2. **Privilege escalation** – Attempts to gain write access to the IDE’s extension directory, falling back to user‑level execution if elevated rights are unavailable.
+3. **Payload delivery** – Downloads an encrypted payload from a hard‑coded C2 domain (`dlz9x[.]cloudfront.net`) using TLS 1.2. The payload is decrypted with a XOR key derived from the host’s MAC address.
+4. **Persistence** – Writes the payload as a hidden script (`.vscode/extension.js`) and registers it in the IDE’s startup configuration.
+5. **Command‑and‑control** – Establishes a reverse HTTPS connection to the C2, allowing the attackers to execute arbitrary commands, exfiltrate source code, or deploy additional modules.
+
+The use of Zig is noteworthy; the language compiles to a single static binary with minimal runtime dependencies, making detection by traditional AV heuristics more difficult. Researchers observed that the dropper disables its own file hash verification after the first run, reducing its footprint.
+
+## Indicators of Compromise
+None identified at this time. The campaign employs dynamically generated URLs and encrypted payloads, limiting static IOC extraction. Analysts are advised to monitor for the extension identifier `specstudio.code-wakatime-activity-tracker` and anomalous network connections to the observed C2 domain.
+
+## Tactics, Techniques & Procedures
+| ATT&CK ID | Technique | Description |
+|-----------|-----------|-------------|
+| T1195.001 | Supply Chain Compromise: Compromise Software Dependencies | Malicious extension published to a legitimate marketplace.
+| T1027.004 | Obfuscated/Encrypted Network Traffic: Encrypted Channel | Payload delivered over TLS with custom encryption.
+| T1059.001 | Command and Scripting Interpreter: PowerShell | Reverse shell delivered as PowerShell script on Windows hosts.
+| T1547.001 | Boot or Logon Autostart Execution: Registry Run Keys/Startup Folder | Persistence via IDE startup scripts.
+| T1086 | PowerShell | Used for post‑exploitation command execution.
+| T1105 | Ingress Tool Transfer | Download of encrypted payload from C2.
+
+## Threat Actor Context
+GlassWorm has been active since early 2024, primarily targeting software developers to gain early‑stage access to source code and intellectual property. The group’s previous campaigns used Go‑based droppers and leveraged compromised GitHub accounts. The shift to Zig suggests an effort to evade signature‑based detection and to produce smaller binaries. Attribution remains uncertain; however, the operational patterns align with previously observed activity linked to a loosely organized cyber‑crime forum based in Eastern Europe.
+
+## Detection & Hunting Queries
+- **Windows Sysmon**: `EventID=1 AND ImageLoaded LIKE "%extension.js%"`
+- **Endpoint logs**: `process_name: "code.exe" AND command_line:*"specstudio.code-wakatime-activity-tracker*"`
+- **Network**: `dst.domain: "dlz9x.cloudfront.net" AND dst.port:443`
+- **File integrity**: Alert on newly created hidden files under `%USERPROFILE%\.vscode\` or JetBrains config directories.
+
+## Mitigations & Recommendations
+1. **Validate extensions** – Require developers to install extensions only from verified sources; enforce a whitelist in IDE policy settings.
+2. **Supply‑chain scanning** – Integrate SAST/SCA tools that can detect compiled binaries within extension packages.
+3. **Network controls** – Block outbound TLS connections to unknown CDNs unless explicitly required; monitor for unusual DNS queries to `*.cloudfront.net` from development workstations.
+4. **Endpoint hardening** – Enable Application Control (e.g., Windows Defender Application Control) to block unsigned executables in user profile directories.
+5. **Incident response** – If compromise is suspected, remove the malicious extension, delete hidden scripts, and rotate any credentials that may have been exposed in source repositories.
+
+## References
+- GlassWorm Campaign Uses Zig Dropper to Infect Multiple Developer IDEs, The Hacker News. https://thehackernews.com/2026/04/glassworm-campaign-uses-zig-dropper-to.html

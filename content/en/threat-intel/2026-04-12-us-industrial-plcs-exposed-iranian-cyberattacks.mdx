@@ -1,0 +1,65 @@
+---
+title: >-
+  Thousands of US Industrial PLCs Exposed to Iranian State-Sponsored Threat
+  Actors
+slug: 2026-04-12-us-industrial-plcs-exposed-iranian-cyberattacks
+date: '2026-04-12'
+excerpt: >-
+  Nearly 4,000 Rockwell Automation PLCs in the US are directly exposed online,
+  creating a significant attack surface for Iranian state-sponsored hackers
+  targeting critical infrastructure.
+category: threat-intel
+tags:
+  - ics
+  - critical-infrastructure
+  - state-sponsored
+  - plc
+  - ot
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/nearly-4-000-us-industrial-devices-exposed-to-iranian-cyberattacks/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-12-us-industrial-plcs-exposed-iranian-cyberattacks
+severity: high
+threat_actor: Iranian state-sponsored actors
+threat_actor_origin: Iran
+affected_sectors:
+  - critical-infrastructure
+  - industrial
+affected_regions:
+  - United States
+---
+## Executive Summary
+Nearly 4,000 industrial control devices in the United States are directly accessible from the public internet, creating a significant and immediate attack surface for Iranian state-sponsored threat actors. According to analysis by cybersecurity firm BitSight, these exposed devices—primarily Rockwell Automation programmable logic controllers (PLCs)—are part of a documented campaign by Iranian Advanced Persistent Threat (APT) groups targeting U.S. critical infrastructure. The exposure of these operational technology (OT) assets bypasses network segmentation defenses and allows for direct manipulation of physical industrial processes.
+
+## Technical Analysis
+The exposed devices are **Rockwell Automation ControlLogix and CompactLogix** series PLCs. These are critical components in industrial environments, governing machinery in sectors like manufacturing, water treatment, and energy. BitSight's research, as reported by BleepingComputer, identified these devices by scanning for specific service banners on TCP port 44818, the standard port for Rockwell's **EtherNet/IP** industrial protocol. Direct internet exposure means these PLCs are not protected by firewalls or behind demilitarized zones (DMZs), violating core OT security principles. An attacker with network access to this port could issue direct commands to read device status, modify control logic, or force the PLC into a halted state, potentially causing operational disruption or physical damage. The technical barrier to exploitation is lowered because these devices often use default or weak credentials and lack native authentication for programming commands.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+The reported activity aligns with known TTPs of Iranian APTs, particularly the **"Click Here"** campaign disclosed by CISA, FBI, NSA, and international partners in February 2024. The primary technique in this phase is **Discovery (TA0043)** and **Initial Access (TA0001)** via internet-facing OT assets. Threat actors are scanning for and identifying exposed PLCs and human-machine interfaces (HMIs). Subsequent TTPs likely involve **Brute Force (T1110)** attempts against weak credentials and **Command-Line Interface (T1059)** manipulation of the PLCs using native engineering protocols. The end goal is presumed to be **Inhibit Control System Function (T0805)** or **Manipulation of Control (T0831)**. The direct exposure of the PLCs simplifies the attack chain, potentially eliminating the need for earlier steps like spear-phishing or VPN exploitation.
+
+## Threat Actor Context
+The activity is attributed to Iranian state-sponsored cyber actors, specifically groups tracked as **CyberAv3ngers** and **Soldier of Fortune**. These groups have a documented history of targeting critical infrastructure, with a pronounced focus on Israel and its allies, including the United States. Their campaigns often blend cyber effects with geopolitical messaging. The targeting of U.S. water and wastewater systems in late 2023 is a direct precursor to this wider exposure finding. The actors demonstrate intent to cause disruption and demonstrate capability, rather than purely espionage. It is unclear if all exposed devices have been actively probed or compromised, but their accessibility aligns perfectly with the actor's stated targeting patterns.
+
+## Detection & Hunting Queries
+Organizations, especially in critical infrastructure, should hunt for the following activity:
+*   Network traffic logs showing connection attempts to OT assets (particularly Rockwell PLCs on TCP/44818) from unexpected external IP addresses, especially those geolocated to regions associated with Iranian infrastructure.
+*   **Zeek/Suricata Signature:** Alert for `ET SCAN Rockwell EtherNet/IP Scanner` or similar signatures detecting scans for port 44818.
+*   **Internal Network Hunting:** Look for connections to PLCs from engineering workstations or servers that do not normally communicate with them, indicating potential lateral movement.
+*   **Firewall/Proxy Logs:** Query for outbound connections from the OT network to known threat intelligence feeds or unfamiliar external IPs, which may indicate beaconing from a compromised HMI.
+
+## Mitigations & Recommendations
+Immediate action is required to reduce this attack surface.
+1.  **Network Segmentation:** Remove all OT devices, including PLCs, HMIs, and engineering workstations, from direct internet access. Implement a properly configured firewall and use a **demilitarized zone (DMZ)** architecture for any necessary remote access.
+2.  **Access Control:** Enforce strong, unique passwords on all OT devices and network components. Implement multi-factor authentication (MFA) for all remote access solutions, such as VPNs and jump boxes.
+3.  **Asset Inventory:** Conduct a thorough inventory of all OT/ICS assets to identify unknown or unauthorized devices, particularly those with external network interfaces.
+4.  **Monitoring:** Deploy network monitoring solutions capable of parsing industrial protocols to detect anomalous commands or unauthorized access attempts within the OT environment.
+5.  **Vendor Guidance:** Consult and implement Rockwell Automation's security advisories and best practices for hardening ControlLogix and CompactLogix systems.
+
+## References
+*   https://www.bleepingcomputer.com/news/security/nearly-4-000-us-industrial-devices-exposed-to-iranian-cyberattacks/

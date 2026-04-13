@@ -1,0 +1,60 @@
+---
+title: Juniper 修补 Junos OS 中的关键 RCE 漏洞，以及其他数十个漏洞
+slug: 2026-04-12-juniper-patches-critical-rce-junos-os-vulnerabilities
+date: '2026-04-12'
+excerpt: Juniper Networks 发布了针对 Junos OS 中关键的、无需认证的远程代码执行漏洞的补丁，以及数十个其他安全修复。
+category: vulnerabilities
+tags:
+  - juniper
+  - rce
+  - network-security
+  - patch-management
+language: zh
+source_urls:
+  - >-
+    https://www.securityweek.com/juniper-networks-patches-dozens-of-junos-os-vulnerabilities/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-12-juniper-patches-critical-rce-junos-os-vulnerabilities
+severity: critical
+---
+## 执行摘要
+
+Juniper Networks 发布了一项关键安全公告，涉及其 Junos OS 中的多个漏洞，其中最严重的漏洞允许未经身份验证的远程攻击者在受影响的设备上执行任意代码。这个漏洞，被追踪为 **CVE-2024-2973**，影响 **J-Web** 界面，对网络基础设施完整性构成重大风险。该公告于 2024 年 4 月 10 日发布，包括针对超过两打其他安全问题的补丁，这些安全问题的严重程度从中等到关键不等。组织被敦促立即应用相关更新。
+
+## 技术分析
+
+关键漏洞 CVE-2024-2973 存在于 SRX 系列防火墙和 EX 系列交换机上的 Junos OS 的 J-Web 界面中。根据 Juniper 的公告，这个漏洞是一个 **Out-of-Bounds Write** 问题。攻击者可以通过向 J-Web 服务器发送特别制作的 HTTP 请求来利用此漏洞。成功利用后，攻击者将获得在底层 FreeBSD 操作系统上以 **root 权限** 执行代码的能力，导致设备完全被接管。攻击向量基于网络，不需要用户交互，关键的是，不需要身份验证，使其极易被利用。公共公告中没有详细说明越界写入的确切机制。其他修补的漏洞包括 **Junos OS 内核** 和 **路由协议守护进程 (RPD)** 中的多个高严重性漏洞，这些漏洞可能导致拒绝服务 (DoS) 条件。
+
+## 入侵指标
+
+目前尚未识别出任何入侵指标。Juniper Networks 的公告和 SecurityWeek 的报告没有提供与活跃利用相关的具体取证工件、网络签名或恶意有效载荷哈希值。检测应集中于应用补丁和监控针对端口 `80` 和 `443` 上 J-Web 界面的异常 HTTP 流量。
+
+## 战术、技术与程序
+
+根据 CVE-2024-2973 的性质，可能的利用链将涉及以下 TTPs：
+*   **侦察 (TA0043)：** 扫描 Juniper SRX 或 EX 系列设备，这些设备将 J-Web 界面暴露给不受信任的网络。
+*   **初始访问 (TA0001)：** 利用 **面向公众的应用** (T1190) 通过恶意 HTTP 请求到易受攻击的 J-Web 端点，绕过身份验证要求。
+*   **执行 (TA0002)：** 利用越界写入实现 **命令和脚本解释器：Unix Shell** (T1059.004) 执行，以 root 权限运行。
+这个漏洞提供了从外部网络访问到完整系统控制的直接路径，与 **利用面向公众的应用** 技术相一致。
+
+## 威胁行为者背景
+
+没有公开证据表明在补丁发布之前 CVE-2024-2973 被活跃利用。然而，漏洞的技术细节——远程、未经身份验证，导致 root 级别代码执行——使其成为快速整合到机会主义威胁行为者和国家赞助团体武器库的首选。像防火墙和交换机这样的网络基础设施设备是间谍活动、网络持久性和流量操纵的高价值目标。不需要身份验证显著降低了利用的门槛。
+
+## 检测与溯源查询
+
+组织应优先修补。对于无法立即修补的环境中的检测，可以考虑以下狩猎策略：
+*   监控网络日志，查找针对 SRX 和 EX 系列设备 IP 上 `/juniper/` 路径或其他 J-Web 特定 URI 的 HTTP 请求，特别是来自意外的源 IP 或地理位置。
+*   部署专注于针对 Juniper 网络界面的异常 HTTP 数据包大小或结构的入侵检测签名，尽管这些可能被复杂的攻击规避。
+*   使用 FreeBSD 主机上的端点检测来查找 J-Web 服务生成的意外子进程或系统文件的未经授权的更改。
+*   查询失败的登录尝试，紧接着是成功的利用尝试，尽管这个漏洞不需要身份验证。
+
+## 缓解措施与建议
+
+主要且最有效的缓解措施是应用 Juniper Networks 提供的 Junos OS 软件更新。公司已发布多个支持分支的固定版本，包括 21.4R3-S8、22.2R3-S4、22.3R3-S3 等。组织应咨询官方 Juniper 安全公告 (JSA75700) 以获取修补版本的完整列表。如果无法立即进行修补，一个关键的变通方法是完全 **禁用 J-Web 界面**，并使用带外 (OOB) 管理或 Junos OS CLI 进行设备管理。作为标准安全实践，关键网络基础设施的管理界面永远不应直接暴露在互联网上。
+
+## 参考资料
+
+*   Juniper Networks 安全公告 JSA75700（漏洞详情和补丁来源）：[https://supportportal.juniper.net/s/article/2024-04-Out-of-Cycle-Security-Bulletin-Junos-OS-SRX-Series-and-EX-Series-Multiple-vulnerabilities-in-J-Web-can-be-combined-to-allow-a-pre-auth-RCE](https://supportportal.juniper.net/s/article/2024-04-Out-of-Cycle-Security-Bulletin-Junos-OS-SRX-Series-and-EX-Series-Multiple-vulnerabilities-in-J-Web-can-be-combined-to-allow-a-pre-auth-RCE)
+*   SecurityWeek 文章摘要：[https://www.securityweek.com/juniper-networks-patches-dozens-of-junos-os-vulnerabilities/](https://www.securityweek.com/juniper-networks-patches-dozens-of-junos-os-vulnerabilities/)

@@ -1,0 +1,82 @@
+---
+title: Storm-2755 通过 AiTM 攻击劫持工资单
+slug: 2026-04-13-storm-2755-payroll-hijacking-aitm
+date: '2026-04-13'
+excerpt: 以经济利益为目的的组织 Storm-2755 利用 AiTM 会话劫持攻击加拿大员工，以重定向薪资支付。
+category: threat-intel
+tags:
+  - aitm
+  - session-hijacking
+  - payroll-theft
+  - storm-2755
+  - mfa-bypass
+language: zh
+source_urls:
+  - 'https://cybersecuritynews.com/hackers-use-aitm-session-hijacking/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-storm-2755-payroll-hijacking-aitm
+severity: high
+threat_actor: Storm-2755
+affected_sectors:
+  - finance
+  - hr
+  - payroll
+affected_regions:
+  - Canada
+ttp_matrix:
+  - tactic: Credential Access
+    technique_id: T1071
+    technique_name: Application Layer Protocol
+  - tactic: Credential Access
+    technique_id: T1566
+    technique_name: Phishing
+  - tactic: Defense Evasion
+    technique_id: T1562
+    technique_name: Impair Defenses
+  - tactic: Lateral Movement
+    technique_id: T1550
+    technique_name: Use Alternate Authentication Material
+---
+## 执行摘要
+一个以经济利益为目的的威胁行为者 **Storm-2755** 一直在针对加拿大组织发动有针对性的薪资重定向攻击。该组织利用中间人（AiTM）代理劫持已验证会话，绕过多重身份验证（MFA），并操控薪资系统。
+
+## 技术分析
+Storm-2755 攻击活动依赖于 **AiTM 基础设施** 来拦截用户与目标 Web 应用程序（特别是人力资源和薪资门户）之间的实时通信。不同于传统的钓鱼工具包在登录后窃取凭证的方式，AiTM 设置使攻击者能够维持活跃会话，从而在用户不知情的情况下执行诸如修改直接存款信息等操作。据 CyberSecurity News [^1] 报道，该组织使用合法的浏览器自动化工具（如 Puppeteer 或 Selenium）模拟用户行为，增加了检测难度。一旦进入系统，他们会更改支付详情，将工资转至其控制的外部账户。
+
+## 入侵指标
+目前尚未识别到任何入侵指标。
+
+## 战术、技术与程序
+Storm-2755 通过发送专门针对人力资源人员的钓鱼邮件来启动攻击活动，进行凭证收集。这些邮件通常包含恶意链接，引导受害者访问用于模仿官方登录页面的 AiTM 代理服务器。当受害者成功完成身份验证后，服务器会将会话令牌转发给攻击者，同时保持与目标服务的连接。这使得攻击者可以在薪资界面中修改敏感字段，包括银行账户路由号码和收款人姓名。使用无头浏览器的做法表明他们试图规避现代认证平台中的行为分析机制。
+
+## 威胁行为者背景
+Storm-2755 被描述为一个专注于操纵薪资系统的、以经济利益为目的的网络犯罪团伙，主要针对加拿大的企业 [^1]。虽然归因尚不确定，但从运营安全实践来看，该组织具备中等程度的技术水平，并可能曾参与过基于凭证的欺诈活动。目前未发现与其相关的国家支持背景。
+
+## 检测与溯源查询
+组织可以搜索日志中显示潜在 AiTM 活动异常的记录：
+- 认证流程期间出现不寻常的地理位置变化  
+- 内部 IP 地址向已知可疑域名发出的出站流量突然增加  
+- 对薪资记录多次失败的修改尝试后有一次成功的变更  
+
+示例 Splunk 查询语句：
+```
+tag=authentication action=success earliest=-7d@d 
+| iplocation src_ip 
+| stats count by Country, user, _raw
+```
+
+SIEM 规则还应标记来自单一 IP 的重复 POST 请求至 `/login` 端点，并且短时间内关联多个用户名的情况。
+
+## 缓解措施与建议
+为了防范由 AiTM 导致的薪资盗窃：
+- 在金融交易过程中实施 **增强型身份验证（step-up authentication）**，尤其是涉及银行信息更改的操作。
+- 根据岗位职责监控并限制对 HR/薪资系统的访问权限。
+- 部署可识别 TLS 拦截模式的网络监控解决方案，此类模式常表明存在代理使用行为。
+- 尽可能强制启用 **FIDO2/WebAuthn**，因为硬件密钥能有效抵御 AiTM 拦截。
+- 定期为 HR 员工提供关于社会工程学警示信号的相关培训。
+
+此外，组织应审查最近员工银行信息的变化情况，若非按标准流程执行，则需手动核实确认。
+
+## 参考资料
+[^1]: [https://cybersecuritynews.com/hackers-use-aitm-session-hijacking/](https://cybersecuritynews.com/hackers-use-aitm-session-hijacking/)
