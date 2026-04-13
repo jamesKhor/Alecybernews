@@ -20,13 +20,12 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: zcybernews
           key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 10m
           script: |
             set -e
             cd /home/zcybernews/zcybernews
 
             echo "⬇️  Syncing to latest remote main..."
-            # Use fetch + reset instead of pull to handle diverged local branches
-            # (pipeline commits locally before push; git pull fails on diverge)
             git fetch origin main
             git reset --hard origin/main
 
@@ -34,13 +33,22 @@ jobs:
             HUSKY=0 npm ci --production=false
 
             echo "🧹 Cleaning old build cache..."
-            rm -rf .next
+            sudo rm -rf .next 2>/dev/null || rm -rf .next
 
             echo "🔨 Building (commit: $(git rev-parse --short HEAD))..."
+            export NODE_OPTIONS="--max-old-space-size=1536"
             npm run build
 
             echo "♻️  Restarting PM2..."
             pm2 restart zcybernews || pm2 start npm --name zcybernews -- start
             pm2 save
+
+            echo "🏥 Health check..."
+            sleep 5
+            curl -sf http://localhost:3000 > /dev/null || {
+              echo "❌ Health check failed — recent logs:"
+              pm2 logs zcybernews --lines 20 --nostream
+              exit 1
+            }
 
             echo "✅ Deployed $(git rev-parse --short HEAD) at $(TZ='Asia/Singapore' date '+%Y-%m-%d %H:%M:%S SGT')"

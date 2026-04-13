@@ -7,7 +7,6 @@
 A professional cybersecurity and tech intelligence site serving bilingual (EN/ZH) threat analysis, vulnerability research, and security news — with an AI content pipeline that ingests RSS feeds, generates analyst-grade articles, and publishes automatically.
 
 [![Deploy to VPS](https://github.com/jamesKhor/Zcybernews/actions/workflows/deploy-vps.yml/badge.svg)](https://github.com/jamesKhor/Zcybernews/actions/workflows/deploy-vps.yml)
-[![AI Pipeline](https://github.com/jamesKhor/Zcybernews/actions/workflows/ai-content-pipeline.yml/badge.svg)](https://github.com/jamesKhor/Zcybernews/actions/workflows/ai-content-pipeline.yml)
 
 [Live Site](https://zcybernews.com) | [English](https://zcybernews.com/en) | [Chinese](https://zcybernews.com/zh)
 
