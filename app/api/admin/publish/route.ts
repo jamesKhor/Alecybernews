@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import matter from "gray-matter";
 import { adminGuard, isValidLocale, isValidType } from "@/lib/admin-guard";
 
 type PublishRequest = {
@@ -15,20 +16,19 @@ type PublishRequest = {
 
 function buildFrontmatter(req: PublishRequest): string {
   const date = new Date().toISOString().split("T")[0];
-  const tags = req.tags.length ? `\n  - ${req.tags.join("\n  - ")}` : " []";
-  return `---
-title: "${req.title.replace(/"/g, '\\"')}"
-slug: "${req.slug}"
-date: "${date}"
-excerpt: "${req.excerpt.replace(/"/g, '\\"').slice(0, 200)}"
-category: "${req.category}"
-tags:${tags}
-language: "${req.locale ?? "en"}"
-author: "${req.author ?? "ZCyberNews"}"
-draft: false
----
-
-`;
+  const fm: Record<string, unknown> = {
+    title: req.title.replace(/\n/g, " "),
+    slug: req.slug,
+    date,
+    excerpt: req.excerpt.replace(/\n/g, " ").slice(0, 200),
+    category: req.category,
+    tags: req.tags,
+    language: req.locale ?? "en",
+    author: req.author ?? "ZCyberNews",
+    draft: false,
+  };
+  // gray-matter.stringify handles YAML escaping properly
+  return matter.stringify("", fm);
 }
 
 const GH_HEADERS = {
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
   }
 
   const date = new Date().toISOString().split("T")[0];
-  const filename = `${date}-${slug.replace(/^[\d-]+-/, "")}.mdx`;
+  const filename = `${date}-${slug.replace(/^\d{4}-\d{2}-\d{2}-/, "")}.mdx`;
   const filePath = `content/${locale}/${type}/${filename}`;
   const fullContent = buildFrontmatter(body) + content;
   const commitMessage = `content: add "${title}" [${locale}]`;

@@ -34,6 +34,35 @@ export async function POST(req: Request) {
 
   // Test mode — just validate the feed URL
   if (body.action === "test") {
+    // SSRF protection: only allow https URLs to external hosts
+    try {
+      const testUrl = new URL(body.url);
+      if (testUrl.protocol !== "https:") {
+        return NextResponse.json(
+          { ok: false, error: "Only HTTPS URLs are allowed" },
+          { status: 400 },
+        );
+      }
+      if (
+        testUrl.hostname === "localhost" ||
+        testUrl.hostname === "127.0.0.1" ||
+        testUrl.hostname.startsWith("169.254.") ||
+        testUrl.hostname.startsWith("10.") ||
+        testUrl.hostname.startsWith("192.168.") ||
+        testUrl.hostname.endsWith(".internal")
+      ) {
+        return NextResponse.json(
+          { ok: false, error: "Internal URLs are not allowed" },
+          { status: 400 },
+        );
+      }
+    } catch {
+      return NextResponse.json(
+        { ok: false, error: "Invalid URL" },
+        { status: 400 },
+      );
+    }
+
     try {
       const parser = new Parser({
         timeout: 10000,

@@ -224,7 +224,7 @@ function ArticlePageContent({
               {frontmatter.tags.map((tag) => (
                 <a
                   key={tag}
-                  href={`/${locale}/articles?tag=${tag}`}
+                  href={`/${locale}/tags/${encodeURIComponent(tag)}`}
                   className="inline-block mr-2 mb-1 text-sm rounded-full bg-secondary hover:bg-secondary/80 px-3 py-1 transition-colors"
                 >
                   #{tag}

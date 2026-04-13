@@ -50,6 +50,10 @@
     "description": "Professional cybersecurity intelligence for enterprise defenders.",
     "rights": "All rights reserved.",
     "rss": "RSS Feed",
-    "wechat": "WeChat Feed"
+    "wechat": "WeChat Feed",
+    "quickLinks": "Quick Links",
+    "articles": "Articles",
+    "threatIntel": "Threat Intel",
+    "feeds": "Feeds"
   }
 }

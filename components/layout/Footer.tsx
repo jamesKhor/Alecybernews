@@ -27,7 +27,7 @@ export function Footer({ locale }: Props) {
           {/* Quick links */}
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
-              Quick Links
+              {t("quickLinks")}
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
@@ -35,7 +35,7 @@ export function Footer({ locale }: Props) {
                   href={`/${locale}/articles`}
                   className="hover:text-primary transition-colors"
                 >
-                  Articles
+                  {t("articles")}
                 </a>
               </li>
               <li>
@@ -43,7 +43,7 @@ export function Footer({ locale }: Props) {
                   href={`/${locale}/threat-intel`}
                   className="hover:text-primary transition-colors"
                 >
-                  Threat Intel
+                  {t("threatIntel")}
                 </a>
               </li>
             </ul>
@@ -52,7 +52,7 @@ export function Footer({ locale }: Props) {
           {/* Feeds */}
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
-              Feeds
+              {t("feeds")}
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>

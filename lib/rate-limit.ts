@@ -11,7 +11,8 @@ interface RateLimitEntry {
 const store = new Map<string, RateLimitEntry>();
 
 // Cleanup expired entries every 5 minutes
-setInterval(
+// unref() allows Node.js to exit cleanly (PM2 graceful shutdown)
+const cleanup = setInterval(
   () => {
     const now = Date.now();
     for (const [key, entry] of store) {
@@ -20,6 +21,7 @@ setInterval(
   },
   5 * 60 * 1000,
 );
+cleanup.unref();
 
 export type RateLimitResult = {
   allowed: boolean;

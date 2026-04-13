@@ -77,9 +77,9 @@ export default async function HomePage({ params }: Props) {
   const latest = combined.slice(0, 4);
   const latestSlugs = new Set(latest.map((a) => a.frontmatter.slug));
 
-  // Group remaining posts by category
+  // Group remaining posts + threat-intel by category
   const postsByCat: Record<string, typeof allPosts> = {};
-  for (const post of allPosts.filter(
+  for (const post of combined.filter(
     (p) => !latestSlugs.has(p.frontmatter.slug),
   )) {
     const cat = post.frontmatter.category;

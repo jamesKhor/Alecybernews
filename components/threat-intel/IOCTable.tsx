@@ -66,11 +66,17 @@ export function IOCTable({ iocs }: Props) {
     setTimeout(() => setCopied(null), 1500);
   }
 
+  function sanitizeCsvCell(val: string): string {
+    // Prevent CSV injection: prefix formula-triggering characters with a single quote
+    if (/^[=+\-@\t\r]/.test(val)) return `'${val}`;
+    return val;
+  }
+
   function exportCSV() {
     const header = "type,value,description,confidence,first_seen";
     const rows = filtered.map(
       (i) =>
-        `${i.type},"${i.value}","${i.description ?? ""}",${i.confidence ?? ""},${i.first_seen ?? ""}`,
+        `${sanitizeCsvCell(i.type)},"${sanitizeCsvCell(i.value)}","${sanitizeCsvCell(i.description ?? "")}",${sanitizeCsvCell(i.confidence ?? "")},${sanitizeCsvCell(i.first_seen ?? "")}`,
     );
     const blob = new Blob([[header, ...rows].join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);

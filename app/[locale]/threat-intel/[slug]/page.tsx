@@ -13,8 +13,7 @@ import { CVEArticleBody } from "@/components/cve/CVEArticleBody";
 import { SidebarAd, InArticleAd } from "@/components/ads/AdSense";
 import Image from "next/image";
 
-// Only serve pre-rendered slugs; unknown slugs return 404 cleanly (not 500)
-export const dynamicParams = false;
+// Allow dynamic params so new articles work before a full rebuild on VPS
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
