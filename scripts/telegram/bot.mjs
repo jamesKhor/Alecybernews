@@ -173,9 +173,9 @@ function askClaude(prompt) {
 }
 
 // ── Quick shell command (no Claude, instant) ──────────────────────────────
-function shell(cmd) {
+function shell(cmd, timeoutMs = 15_000) {
   return new Promise((resolve) => {
-    execFile("bash", ["-c", cmd], { cwd: ROOT, timeout: 15_000 }, (err, stdout, stderr) => {
+    execFile("bash", ["-c", cmd], { cwd: ROOT, timeout: timeoutMs, maxBuffer: 1024 * 1024 }, (err, stdout, stderr) => {
       if (err) resolve(`❌ ${stderr || err.message}`.trim());
       else resolve(stdout.trim() || "(no output)");
     });
@@ -270,9 +270,9 @@ const COMMANDS = {
     handler: async (chatId) => {
       await sendTyping(chatId);
       const out = await shell(
-        "ls -1t content/en/posts/*.mdx 2>/dev/null | head -10 | while read f; do " +
-        "title=$(grep '^title:' \"$f\" | head -1 | sed 's/^title: *//;s/^[\"'\\'']*//;s/[\"'\\'']*$//'); " +
-        "date=$(basename \"$f\" | grep -oP '^\\d{4}-\\d{2}-\\d{2}'); " +
+        "ls -1t content/en/posts/*.mdx content/en/threat-intel/*.mdx 2>/dev/null | head -10 | while read f; do " +
+        "title=$(grep \"^title:\" \"$f\" | head -1 | sed \"s/^title: *//;s/^[\\\"']*//;s/[\\\"']*$//\"); " +
+        "date=$(grep \"^date:\" \"$f\" | head -1 | sed \"s/^date: *//;s/[\\\"' ]//g\"); " +
         "echo \"📄 $date — $title\"; done"
       );
       await sendMessage(chatId, `📰 *Recent Articles:*\n\n${out || "No articles found"}`);
@@ -308,13 +308,10 @@ const COMMANDS = {
         chatId,
         "🚀 *Run AI content pipeline*\nThis will generate up to 5 articles and takes 1-2 minutes.",
         async () => {
-          await sendMessage(chatId, "🚀 Pipeline started... Please wait 1-2 minutes.");
+          await sendMessage(chatId, "🚀 Pipeline started... Please wait.");
           await sendTyping(chatId);
-          const reply = await askClaude(
-            "Run the pipeline NOW by executing: bash scripts/run-pipeline.sh --max-articles=5 " +
-            "Wait for it to finish. Report how many articles were generated and if it succeeded or failed. Keep response under 500 chars."
-          );
-          await sendMessage(chatId, reply);
+          const reply = await shell("bash scripts/run-pipeline.sh --max-articles=5 2>&1 | tail -20", 300_000);
+          await sendMessage(chatId, `📋 *Pipeline Result:*\n\`\`\`\n${reply}\n\`\`\``);
         }
       );
     },
