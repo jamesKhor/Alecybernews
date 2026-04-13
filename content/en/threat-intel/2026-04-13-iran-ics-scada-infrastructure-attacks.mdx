@@ -1,0 +1,90 @@
+---
+title: Iran-Linked Hackers Target ICS/SCADA Systems in Critical Infrastructure
+slug: 2026-04-13-iran-ics-scada-infrastructure-attacks
+date: '2026-04-13'
+excerpt: >-
+  US Gov Warns Iran-Linked Actors Are Manipulating PLCs and SCADA Systems to
+  Disrupt Critical Infrastructure
+category: threat-intel
+tags:
+  - ics
+  - scada
+  - plc
+  - iran
+  - critical-infrastructure
+language: en
+source_urls:
+  - >-
+    https://www.securityweek.com/industry-reactions-to-iran-hacking-ics-in-critical-infrastructure-feedback-friday/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-iran-ics-scada-infrastructure-attacks
+severity: high
+threat_actor_origin: Iran
+affected_sectors:
+  - energy
+  - water
+  - manufacturing
+affected_regions:
+  - United States
+---
+## Executive Summary
+Iran-linked threat actors have been observed targeting Industrial Control Systems (ICS) and Supervisory Control and Data Acquisition (SCADA) environments, with confirmed manipulation of Programmable Logic Controllers (PLCs). According to advisories from U.S. government agencies, these activities pose a credible risk of operational disruption across critical infrastructure sectors including energy and water utilities. 
+
+## Technical Analysis
+Initial reporting indicates that adversaries are leveraging techniques designed to interact directly with field-level control devices such as PLCs. These controllers manage physical processes like valve operations, motor controls, and sensor feedback loops within industrial environments. Unlike traditional enterprise breaches focused on data theft, this activity suggests intent to influence real-world operational technology (OT) outcomes.
+
+The attacks likely involve reconnaissance of network topologies followed by lateral movement into OT segments via compromised IT infrastructure or unsecured remote access solutions. While specific exploit chains remain undisclosed, historical precedent shows that attackers often abuse default credentials, known vulnerabilities in legacy protocols, and weak segmentation between IT and OT networks.
+
+Security researchers note that many PLCs lack authentication mechanisms or rely on outdated communication standards such as Modbus or DNP3 without encryption, making them susceptible to command injection and unauthorized reprogramming if accessible over the network.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+Based on available intelligence, the following TTPs have been associated with similar campaigns attributed to Iranian state-sponsored groups:
+
+- **Reconnaissance**: Mapping network architecture to identify exposed OT assets
+- **Credential Access**: Exploitation of default or weak passwords on engineering workstations and HMI systems
+- **Lateral Movement**: Using legitimate administrative tools and RDP to traverse IT/OT boundaries
+- **Command Execution on PLCs**: Direct interaction with controller logic through native protocol commands
+- **Persistence**: Installation of backdoors in both IT and OT layers to maintain long-term presence
+
+Attribution is not definitive but aligns with prior behavior from threat clusters tracked under aliases such as APT33 and TEMP.Hex.
+
+## Threat Actor Context
+While no explicit group name has been tied to recent intrusions, the methods resemble those historically used by Iranian-aligned advanced persistent threat (APT) actors. Past operations involving similar targets include campaigns linked to the Islamic Revolutionary Guard Corps (IRGC)-affiliated units responsible for cyber operations against Saudi Arabia's oil sector in 2017.
+
+Iran has previously demonstrated capability in conducting disruptive cyber operations against industrial targets, particularly in the energy and petrochemical industries. Motivations may include geopolitical retaliation, economic coercion, or preparation for potential kinetic conflicts.
+
+## Detection & Hunting Queries
+Organizations should monitor their SIEM and EDR platforms for anomalous behavior indicative of OT-targeted intrusion:
+
+- Unusual outbound connections from OT hosts to external IPs
+- Logins during off-hours to engineering stations or HMIs
+- Unexpected changes in PLC program files (`*.awl`, `*.sdb`) or configuration dumps
+- Anomalous use of industrial protocols outside normal baselines (Modbus TCP port 502, DNP3 port 20000)
+- High-frequency read/write requests to PLC registers from non-standard sources
+
+Sample Splunk query:
+```
+tag=modbus earliest=-7d@d | stats count by src_ip, dest_ip | where count > 1000
+```
+
+YARA rules scanning for suspicious binary modifications in known ICS software directories can also aid in detection.
+
+## Mitigations & Recommendations
+To reduce exposure to ICS-focused threats, asset owners should implement layered defensive strategies:
+
+- Enforce strict network segmentation separating IT and OT zones using firewalls with deep packet inspection capabilities
+- Disable unnecessary protocols and services on PLCs and HMIs
+- Regularly audit device configurations and firmware versions
+- Deploy application whitelisting on engineering workstations
+- Rotate administrative credentials frequently and enforce strong password policies
+- Implement secure remote access solutions such as jump servers with multi-factor authentication
+- Monitor logs from OT devices and correlate anomalies using dedicated OT security monitoring tools
+
+Additionally, organizations are advised to review guidance published jointly by CISA, NSA, and FBI regarding protection of control systems from nation-state threats.
+
+## References
+- [SecurityWeek - Industry Reactions to Iran Hacking ICS](https://www.securityweek.com/industry-reactions-to-iran-hacking-ics-in-critical-infrastructure-feedback-friday/)

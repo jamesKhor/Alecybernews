@@ -1,0 +1,88 @@
+---
+title: 伊朗关联黑客瞄准关键基础设施中的ICS/SCADA系统
+slug: 2026-04-13-iran-ics-scada-infrastructure-attacks
+date: '2026-04-13'
+excerpt: 美国政府警告称，与伊朗有关联的攻击者正在操控PLC和SCADA系统以破坏关键基础设施
+category: threat-intel
+tags:
+  - ics
+  - scada
+  - plc
+  - iran
+  - critical-infrastructure
+language: zh
+source_urls:
+  - >-
+    https://www.securityweek.com/industry-reactions-to-iran-hacking-ics-in-critical-infrastructure-feedback-friday/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-iran-ics-scada-infrastructure-attacks
+severity: high
+threat_actor_origin: Iran
+affected_sectors:
+  - energy
+  - water
+  - manufacturing
+affected_regions:
+  - United States
+---
+## 执行摘要
+与伊朗有关的威胁行为者被发现针对工业控制系统（ICS）和监控与数据采集系统（SCADA）环境，并已确认对可编程逻辑控制器（PLC）进行了操控。根据美国政府机构发布的公告，这些活动对包括能源和供水设施在内的关键基础设施领域构成了切实的操作中断风险。
+
+## 技术分析
+初步报告显示，攻击者正在使用专门设计用于直接与现场级控制设备（如PLC）交互的技术。这些控制器负责管理工业环境中诸如阀门操作、电机控制以及传感器反馈回路等物理过程。不同于以窃取数据为主要目的的传统企业网络入侵，此类活动表明其意图在于影响现实世界的运营技术（OT）运行结果。
+
+攻击可能涉及首先侦察网络拓扑结构，然后通过已被攻破的信息技术（IT）基础设施或未受保护的远程访问解决方案横向移动至OT网段。尽管具体的漏洞利用链尚未公开披露，但历史经验显示，攻击者经常滥用默认凭证、老旧协议中的已知漏洞，以及IT与OT网络之间薄弱的隔离措施。
+
+安全研究人员指出，许多PLC缺乏身份验证机制，或者依赖于未经加密的过时通信标准（例如Modbus或DNP3），一旦可以通过网络访问，则容易受到命令注入和未经授权重新编程的影响。
+
+## 入侵指标
+目前尚未识别出任何明确的入侵指标。
+
+## 战术、技术与程序
+基于现有情报，以下TTPs曾出现在疑似由伊朗国家支持的黑客组织实施的类似活动中：
+
+- **侦察**：绘制网络架构图以识别暴露在外的OT资产  
+- **凭据获取**：利用工程工作站和人机界面（HMI）系统上的默认或弱密码  
+- **横向移动**：借助合法的管理工具及RDP穿越IT/OT边界  
+- **在PLC上执行命令**：通过原生协议指令直接与控制器逻辑互动  
+- **持久化**：在IT层和OT层安装后门以维持长期存在  
+
+虽然尚无确凿归因证据，但上述行为模式符合此前追踪到的一些威胁组织的行为特征，其中包括别名为APT33和TEMP.Hex的群体。
+
+## 威胁行为者背景
+尽管近期入侵事件中并未明确关联具体团体名称，但所采用的方法与历史上伊朗相关高级持续性威胁（APT）组织常用的手段相似。过去类似的行动包括2017年针对沙特阿拉伯石油行业的网络攻击活动，该行动被认为是由隶属于伊斯兰革命卫队（IRGC）的单位发起。
+
+伊朗此前已经展示过对工业目标实施破坏性网络攻击的能力，特别是在能源和石化行业。潜在动机可能涵盖地缘政治报复、经济施压，或是为未来可能发生的实体冲突做准备。
+
+## 检测与溯源查询
+各机构应密切监视SIEM和EDR平台，查找可能指示OT定向入侵的异常行为：
+
+- 来自OT主机对外部IP地址的异常外联请求  
+- 在非工作时间登录工程站或HMI系统的记录  
+- PLC程序文件（如`*.awl`, `*.sdb`）或配置转储出现意外更改  
+- 工业协议在正常基线之外的异常使用情况（如Modbus TCP端口502，DNP3端口20000）  
+- 非标准来源频繁读写PLC寄存器的操作  
+
+示例Splunk查询语句：
+```
+tag=modbus earliest=-7d@d | stats count by src_ip, dest_ip | where count > 1000
+```
+
+此外，在已知ICS软件目录中扫描可疑二进制文件修改的YARA规则也可辅助检测。
+
+## 缓解措施与建议
+为了降低面向ICS的威胁所带来的风险，资产所有方应当部署多层次防御策略：
+
+- 强制实行严格的网络分段，利用具备深度包检测功能的防火墙将IT区域与OT区域隔离开来  
+- 禁用PLC和HMI上不必要的协议和服务  
+- 定期审核设备配置和固件版本  
+- 对工程工作站部署应用程序白名单机制  
+- 经常轮换管理员账户凭据并强制执行强密码策略  
+- 实施安全的远程接入方案，例如启用多因素认证的跳板机  
+- 监控来自OT设备的日志信息，并结合专用OT安全监测工具进行异常关联分析  
+
+另外，建议各单位参考CISA、NSA和FBI联合发布的关于防范国家级对手控制系统的指导文件。
+
+## 参考资料
+- [SecurityWeek - 行业对伊朗攻击ICS的反应](https://www.securityweek.com/industry-reactions-to-iran-hacking-ics-in-critical-infrastructure-feedback-friday/)

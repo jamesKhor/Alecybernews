@@ -1,0 +1,82 @@
+---
+title: Storm-2755 Targets Canadian Payroll Systems in Salary Theft Campaign
+slug: 2026-04-13-storm-2755-canadian-payroll-theft
+date: '2026-04-13'
+excerpt: >-
+  Financially motivated group Storm-2755 compromises employee payroll accounts
+  to redirect salary payments in Canada.
+category: threat-intel
+tags:
+  - storm-2755
+  - payroll-pirate
+  - salary-theft
+  - account-compromise
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/microsoft/microsoft-canadian-employees-targeted-in-payroll-pirate-attacks/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-storm-2755-canadian-payroll-theft
+severity: high
+threat_actor: Storm-2755
+affected_sectors:
+  - corporate
+  - government
+affected_regions:
+  - Canada
+---
+## Executive Summary
+A financially motivated threat actor tracked as **Storm-2755** is targeting Canadian employees by compromising payroll systems to steal salary payments. The group, which Microsoft has dubbed "Payroll Pirate," hijacks employee accounts and modifies direct deposit information to siphon wages into attacker-controlled bank accounts.
+
+## Technical Analysis
+Microsoft's investigation revealed that Storm-2755 leverages credential theft and social engineering techniques to gain initial access to employee accounts within Canadian organizations. Once inside, attackers manipulate payroll configurations to reroute salary deposits. The operation appears to focus on both private sector firms and government entities based in Canada, according to [BleepingComputer reporting](https://www.bleepingcomputer.com/news/microsoft/microsoft-canadian-employees-targeted-in-payroll-pirate-attacks/).
+
+There is no indication yet that zero-day exploits or malware deployment play a central role in these intrusions. Instead, the emphasis seems to be on account takeover via stolen credentials, possibly sourced through phishing or credential stuffing campaigns.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+Storm-2755 exhibits behavior consistent with financially driven cybercrime operations. Observed TTPs include:
+
+- Initial compromise via stolen user credentials
+- Social engineering tactics to obtain sensitive login details
+- Modification of legitimate payroll system settings (e.g., direct deposit routing)
+- Targeting of Canadian-based corporate and public sector institutions
+
+The group avoids overtly destructive actions, focusing instead on stealthy manipulation of financial workflows to avoid detection until pay periods are processed.
+
+## Threat Actor Context
+Microsoft refers to the group behind these attacks as **Storm-2755**, also known internally as "Payroll Pirate." While limited open-source intelligence exists about this specific cluster, its methods align with those of financially motivated threat actors who specialize in banking fraud and wage theft rather than ransomware or espionage.
+
+No confirmed ties have been established between Storm-2755 and previously documented adversary groups. Attribution remains preliminary due to lack of unique tooling or infrastructure overlap with known clusters.
+
+## Detection & Hunting Queries
+Organizations should monitor for anomalous changes to payroll-related records such as:
+
+```sql
+SELECT * FROM audit_logs WHERE action = 'modify_direct_deposit' AND timestamp > NOW() - INTERVAL 30 DAYS;
+```
+
+Additionally, look for concurrent suspicious logins around payroll processing deadlines:
+
+```sql
+SELECT ip_address, username FROM auth_logs WHERE result = 'success' AND timestamp BETWEEN 'pay_period_start' AND 'pay_period_end';
+```
+
+Network defenders can also hunt using behavioral analytics focused on privilege escalation followed by database record modifications tied to HR/payroll applications.
+
+## Mitigations & Recommendations
+To reduce exposure to similar attacks, organizations should implement layered defenses including:
+
+- Enforce multi-factor authentication (MFA) across all payroll and human resources platforms
+- Monitor for unauthorized changes to employee banking or compensation data
+- Conduct regular audits of payroll system permissions and access logs
+- Provide ongoing security awareness training focused on credential hygiene
+- Implement just-in-time access controls for administrative functions related to payroll management
+
+Due to the high impact potential of successful breaches, organizations handling payroll data should treat any unexplained modifications as potential compromises requiring immediate investigation.
+
+## References
+- [Microsoft: Canadian employees targeted in payroll pirate attacks – BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/microsoft-canadian-employees-targeted-in-payroll-pirate-attacks/)

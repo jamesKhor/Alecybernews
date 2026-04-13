@@ -1,0 +1,82 @@
+---
+title: Storm-2755 Targets Canadian Payroll Systems in Salary Theft Campaign
+slug: 2026-04-13-storm-2755-canadian-payroll-theft
+date: '2026-04-13'
+excerpt: 以经济利益为目的的组织 Storm-2755 入侵员工薪资账户，以在加拿大转移工资支付。
+category: threat-intel
+tags:
+  - storm-2755
+  - payroll-pirate
+  - salary-theft
+  - account-compromise
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/microsoft/microsoft-canadian-employees-targeted-in-payroll-pirate-attacks/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-storm-2755-canadian-payroll-theft
+severity: high
+threat_actor: Storm-2755
+affected_sectors:
+  - corporate
+  - government
+affected_regions:
+  - Canada
+---
+# Storm-2755 瞄准加拿大薪资系统的薪资窃取活动
+
+## 执行摘要
+一个以财务为动机的威胁行为者，被追踪为 **Storm-2755**，正通过妥协薪资系统窃取薪资支付来针对加拿大员工。该组织，微软将其称为“薪资海盗”，劫持员工账户并修改直接存款信息，将工资转移到攻击者控制的银行账户中。
+
+## 技术分析
+微软的调查显示，Storm-2755 利用凭证窃取和社会工程学技术来获得加拿大组织内员工账户的初始访问权限。进入系统后，攻击者操纵薪资配置以重新路由薪资存款。根据 [BleepingComputer 的报道](https://www.bleepingcomputer.com/news/microsoft/microsoft-canadian-employees-targeted-in-payroll-pirate-attacks/)，此操作似乎集中在加拿大的私营部门公司和政府实体。
+
+目前尚无迹象表明零日漏洞或恶意软件部署在这些入侵中起着核心作用。相反，重点似乎在于通过盗取的凭证实现账户接管，可能通过钓鱼或凭证填充活动获取。
+
+## 入侵指标
+目前未识别出任何指标。
+
+## 战术、技术与程序
+Storm-2755 的行为与以财务为动机的网络犯罪活动一致。观察到的 TTP 包括：
+
+- 通过盗取的用户凭证实现初始妥协
+- 社会工程学策略以获取敏感登录详细信息
+- 修改合法薪资系统设置（例如，直接存款路由）
+- 瞄准加拿大的企业和公共部门机构
+
+该组织避免明显的破坏性行为，而是专注于隐蔽地操纵金融工作流程，以避免在处理薪资期间被检测到。
+
+## 威胁行为者背景
+微软将发起这些攻击的组织称为 **Storm-2755**，内部也称为“薪资海盗”。虽然关于这一特定集群的开源情报有限，但其方法与专注于银行欺诈和薪资窃取的以财务为动机的威胁行为者一致，而不是勒索软件或间谍活动。
+
+Storm-2755 与已记录的对手组织之间尚未建立确认的联系。由于缺乏与已知集群的独特工具或基础设施重叠，归因仍处于初步阶段。
+
+## 检测与溯源查询
+组织应监控薪资相关记录的异常更改，例如：
+
+```sql
+SELECT * FROM audit_logs WHERE action = 'modify_direct_deposit' AND timestamp > NOW() - INTERVAL 30 DAYS;
+```
+
+此外，在薪资处理截止日期附近查找同时发生的可疑登录：
+
+```sql
+SELECT ip_address, username FROM auth_logs WHERE result = 'success' AND timestamp BETWEEN 'pay_period_start' AND 'pay_period_end';
+```
+
+网络防御者还可以使用行为分析来溯源，该分析专注于特权升级，后跟与 HR/薪资应用程序相关的数据库记录修改。
+
+## 缓解措施与建议
+为了减少类似攻击的暴露，组织应实施分层防御，包括：
+
+- 在所有薪资和人力资源平台上强制执行多因素身份验证（MFA）
+- 监控员工银行或薪酬数据的未经授权更改
+- 定期审计薪资系统权限和访问日志
+- 提供专注于凭证卫生的持续安全意识培训
+- 为与薪资管理相关的管理功能实施按需访问控制
+
+由于成功突破的高影响潜力，处理薪资数据的组织应将任何未解释的更改视为潜在的妥协，需要立即调查。
+
+## 参考资料
+- [Microsoft: Canadian employees targeted in payroll pirate attacks – BleepingComputer](https://www.bleepingcomputer.com/news/microsoft/microsoft-canadian-employees-targeted-in-payroll-pirate-attacks/)

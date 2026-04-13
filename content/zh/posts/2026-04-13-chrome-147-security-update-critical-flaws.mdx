@@ -1,0 +1,59 @@
+---
+title: Chrome 147 Addresses 60 Bugs Including Two Critical Flaws
+slug: 2026-04-13-chrome-147-security-update-critical-flaws
+date: '2026-04-13'
+excerpt: Google 发布 Chrome 147 以修复 60 个漏洞，包括 WebML 组件中的两个严重缺陷。
+category: vulnerabilities
+tags:
+  - google-chrome
+  - webml
+  - browser-security
+  - vulnerability-patch
+language: zh
+source_urls:
+  - >-
+    https://www.securityweek.com/chrome-147-patches-60-vulnerabilities-including-two-critical-flaws-worth-86000/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-chrome-147-security-update-critical-flaws
+severity: critical
+---
+## 执行摘要
+Google 已发布其 Chrome 浏览器的更新，版本 147.0.758.37，解决了总共 60 个安全漏洞。其中，两个被评为关键漏洞，影响浏览器的 **WebML (Web 机器学习) API** 组件。根据 [SecurityWeek](https://www.securityweek.com/chrome-147-patches-60-vulnerabilities-including-two-critical-flaws-worth-86000/) 的报道，这些漏洞是由匿名研究人员发现的，并获得了总计 $86,000 的 bug 赏金。
+
+## 技术分析
+两个关键漏洞位于 **WebML API** 中，该 API 允许在浏览器中直接进行机器学习模型推理。虽然具体的利用细节尚未公开，但此类 API 的漏洞通常会导致内存损坏、类型混淆或任意代码执行，当处理恶意模型或输入时。由于 WebML 仍然是实验性的，并且默认情况下未启用，利用可能需要用户交互或特定的配置，尽管由于远程泄露的潜在风险仍然显著。
+
+其余 58 个漏洞的严重程度从高到低不等，包括诸如使用后释放错误、政策执行不足和缓冲区溢出等问题，涉及的组件包括 V8、Blink 和 GPU 进程。
+
+## 入侵指标
+目前尚未发现任何入侵指标。
+
+## 战术、技术与程序
+虽然尚未公开披露与这些漏洞相关的具体 TTP，但攻击者历史上曾通过以下方式利用类似的漏洞：
+
+- 通过受损或恶意网站传递恶意 ML 模型
+- 通过精心设计的 JavaScript 或 WebGL 内容利用内存损坏漏洞
+- 通过钓鱼活动针对用户，鼓励他们访问攻击者控制的网站
+
+## 威胁行为者背景
+尚未有特定的威胁行为者与这些漏洞的活跃利用有关联。然而，考虑到关键性质和远程代码执行的潜在性，很可能高级持续威胁 (APT) 组织和经济利益驱动的攻击者将监视公开披露以寻找机会来利用类似的漏洞。
+
+## 检测与溯源查询
+使用端点检测和响应 (EDR) 工具的组织可以监测与浏览器利用相关的异常行为：
+
+```spl
+process_name="chrome.exe" AND (mem_anomaly OR anomalous_thread_creation)
+```
+
+网络防御者还应检查与 WebML 相关的 API 调用或来自不受信任来源的异常模型加载行为的流量模式。
+
+## 缓解措施与建议
+- **立即更新**：所有 Chrome 用户都应升级到版本 **147.0.758.37** 或更高版本。
+- **禁用实验功能**：由于 WebML 是实验性的，在 `chrome://flags` 中禁用它可以减少攻击面。
+- **应用最小权限**：限制本地管理员权限以减少成功利用的影响。
+- **启用沙盒**：确保 Chrome 的多进程架构和沙盒功能处于活动状态。
+- **监测利用**：部署签名或行为分析以检测可疑的浏览器活动。
+
+## 参考资料
+- [SecurityWeek - Chrome 147 修复 60 个漏洞](https://www.securityweek.com/chrome-147-patches-60-vulnerabilities-including-two-critical-flaws-worth-86000/)

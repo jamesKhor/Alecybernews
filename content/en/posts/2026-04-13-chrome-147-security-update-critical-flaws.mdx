@@ -1,0 +1,61 @@
+---
+title: Chrome 147 Addresses 60 Bugs Including Two Critical Flaws
+slug: 2026-04-13-chrome-147-security-update-critical-flaws
+date: '2026-04-13'
+excerpt: >-
+  Google releases Chrome 147 to fix 60 vulnerabilities, including two critical
+  flaws in the WebML component.
+category: vulnerabilities
+tags:
+  - google-chrome
+  - webml
+  - browser-security
+  - vulnerability-patch
+language: en
+source_urls:
+  - >-
+    https://www.securityweek.com/chrome-147-patches-60-vulnerabilities-including-two-critical-flaws-worth-86000/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-chrome-147-security-update-critical-flaws
+severity: critical
+---
+## Executive Summary
+Google has released an update to its Chrome browser, version 147.0.758.37, addressing a total of 60 security vulnerabilities. Among these, two were rated as critical and affect the browser's **WebML (Web Machine Learning) API** component. According to [SecurityWeek](https://www.securityweek.com/chrome-147-patches-60-vulnerabilities-including-two-critical-flaws-worth-86000/), the flaws were discovered by anonymous researchers and earned bug bounty rewards totaling $86,000.
+
+## Technical Analysis
+The two critical vulnerabilities lie within the **WebML API**, which enables machine learning model inference directly in the browser. While specific exploit details remain undisclosed, flaws in such APIs can typically lead to memory corruption, type confusion, or arbitrary code execution when processing malicious models or input. Given that WebML is still experimental and not enabled by default, exploitation may require user interaction or specific configurations, though the risk remains significant due to the potential for remote compromise.
+
+The remaining 58 vulnerabilities range from high to low severity and include issues like use-after-free errors, insufficient policy enforcement, and buffer overflows across various components including V8, Blink, and the GPU process.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+While specific TTPs related to these vulnerabilities have not been publicly disclosed, attackers historically leverage similar flaws through:
+
+- Delivering malicious ML models via compromised or malicious websites
+- Exploiting memory corruption bugs via crafted JavaScript or WebGL content
+- Targeting users through phishing campaigns encouraging visits to attacker-controlled sites
+
+## Threat Actor Context
+No specific threat actors have been tied to active exploitation of these vulnerabilities. However, given the critical nature and the presence of remote code execution potential, it is likely that advanced persistent threat (APT) groups and financially motivated attackers will monitor public disclosures for opportunities to weaponize similar flaws.
+
+## Detection & Hunting Queries
+Organizations using endpoint detection and response (EDR) tools can monitor for anomalous behavior associated with browser exploitation:
+
+```spl
+process_name="chrome.exe" AND (mem_anomaly OR anomalous_thread_creation)
+```
+
+Network defenders should also inspect traffic patterns involving WebML-related API calls or abnormal model loading behaviors from untrusted origins.
+
+## Mitigations & Recommendations
+- **Update immediately**: All Chrome users should upgrade to version **147.0.758.37** or later.
+- **Disable experimental features**: Since WebML is experimental, disabling it in `chrome://flags` reduces attack surface.
+- **Apply least privilege**: Limit local administrator rights to reduce impact of successful exploits.
+- **Enable sandboxing**: Ensure Chrome's multi-process architecture and sandboxing features are active.
+- **Monitor for exploitation**: Deploy signatures or behavioral analytics for suspicious browser activity.
+
+## References
+- [SecurityWeek - Chrome 147 Patches 60 Vulnerabilities](https://www.securityweek.com/chrome-147-patches-60-vulnerabilities-including-two-critical-flaws-worth-86000/)

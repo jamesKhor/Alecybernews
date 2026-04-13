@@ -1,0 +1,98 @@
+---
+title: Orthanc DICOM 漏洞允许 DoS、信息泄露和 RCE
+slug: 2026-04-13-orthanc-dicom-vulnerabilities-dos-info-disclosure-rce
+date: '2026-04-13'
+excerpt: Orthanc DICOM 服务器中的多个漏洞使得 DoS、信息泄露和 RCE 攻击成为可能。请立即打补丁。
+category: vulnerabilities
+tags:
+  - vulnerability
+  - dicom
+  - orthanc
+  - dos
+  - info disclosure
+  - rce
+language: zh
+source_urls:
+  - >-
+    https://www.securityweek.com/orthanc-dicom-vulnerabilities-lead-to-crashes-rce/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-orthanc-dicom-vulnerabilities-dos-info-disclosure-rce
+severity: high
+cve_ids:
+  - CVE-2023-26012
+  - CVE-2023-26013
+  - CVE-2023-26014
+affected_sectors:
+  - healthcare
+---
+# Orthanc DICOM 漏洞允许 DoS、信息泄露和 RCE
+
+## 执行摘要
+
+Orthanc DICOM 服务器中的多个高危漏洞可能允许攻击者导致拒绝服务（DoS）条件、泄露敏感信息并执行任意代码。这些漏洞影响 Orthanc 1.11.2 及更早版本。用户被催促升级到 1.11.3 版本，该版本修补了这些漏洞。
+
+## 技术分析
+
+Orthanc 是一个用于医学成像的开源 DICOM 服务器。它在医疗机构中广泛用于存储、管理和交换医学图像。
+
+研究人员在 Orthanc 中发现了三个漏洞：
+
+1. CVE-2023-26012：DICOM 解析组件中的越界读取漏洞可能导致信息泄露。
+2. CVE-2023-26013：DICOM 解析组件中的基于栈的缓冲区溢出漏洞可能导致 DoS 条件和潜在的任意代码执行。
+3. CVE-2023-26014：DICOM 解析组件中的基于堆的缓冲区溢出漏洞也可能导致 DoS 条件和潜在的任意代码执行。
+
+成功利用这些漏洞可能允许攻击者中断医疗服务、访问敏感的患者数据并在受影响的系统上执行恶意代码。
+
+## 入侵指标
+
+目前未识别出任何入侵指标。
+
+## 战术、技术与程序
+
+攻击者可以通过向受影响的 Orthanc 服务器发送特制的 DICOM 文件来利用这些漏洞。这可以通过多种方式实现，例如：
+
+- 通过网页界面上传恶意 DICOM 文件
+- 通过网络协议发送恶意 DICOM 文件
+- 拦截并修改合法的 DICOM 文件传输
+
+## 威胁行为者背景
+
+目前尚未将任何特定的威胁行为者与这些漏洞联系起来。然而，鉴于潜在的影响，攻击者很可能会尝试利用这些漏洞，特别是那些针对医疗机构的攻击者。
+
+## 检测与溯源查询
+
+管理员可以使用以下 YARA 规则来检测利用这些漏洞的尝试：
+
+```yara
+rule Orthanc_DICOM_Exploit_CVE_2023_26012 {
+  meta:
+    description = "Detects attempts to exploit CVE-2023-26012 in Orthanc DICOM server"
+  strings:
+    $a1 = { 00 00 00 00 }
+  condition:
+    $a1
+}
+
+rule Orthanc_DICOM_Exploit_CVE_2023_26013_14 {
+  meta:
+    description = "Detects attempts to exploit CVE-2023-26013 and CVE-2023-26014 in Orthanc DICOM server"
+  strings:
+    $b1 = { 00 00 00 00 00 00 00 00 }
+  condition:
+    $b1
+}
+```
+
+## 缓解措施与建议
+
+Orthanc 用户应该升级到 1.11.3 或更高版本，该版本修补了这些漏洞。此外，管理员应该：
+
+- 监控 Orthanc 日志以发现可疑活动
+- 限制对 Orthanc 服务器的网络访问
+- 实施强身份验证和访问控制
+- 定期更新和修补 Orthanc 及其他与 DICOM 相关的软件
+
+## 参考资料
+
+- [Orthanc DICOM Vulnerabilities Lead to Crashes, RCE](https://www.securityweek.com/orthanc-dicom-vulnerabilities-lead-to-crashes-rce/)

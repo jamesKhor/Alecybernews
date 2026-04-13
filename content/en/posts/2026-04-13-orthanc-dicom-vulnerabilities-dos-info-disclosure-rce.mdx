@@ -1,0 +1,98 @@
+---
+title: 'Orthanc DICOM Vulnerabilities Allow DoS, Info Disclosure, RCE'
+slug: 2026-04-13-orthanc-dicom-vulnerabilities-dos-info-disclosure-rce
+date: '2026-04-13'
+excerpt: >-
+  Multiple vulnerabilities in Orthanc DICOM server enable DoS, info disclosure,
+  and RCE attacks. Patch immediately.
+category: vulnerabilities
+tags:
+  - vulnerability
+  - dicom
+  - orthanc
+  - dos
+  - info disclosure
+  - rce
+language: en
+source_urls:
+  - >-
+    https://www.securityweek.com/orthanc-dicom-vulnerabilities-lead-to-crashes-rce/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-orthanc-dicom-vulnerabilities-dos-info-disclosure-rce
+severity: high
+cve_ids:
+  - CVE-2023-26012
+  - CVE-2023-26013
+  - CVE-2023-26014
+affected_sectors:
+  - healthcare
+---
+## Executive Summary
+
+Multiple high-severity vulnerabilities in the Orthanc DICOM server could allow attackers to cause denial-of-service (DoS) conditions, disclose sensitive information, and execute arbitrary code. The flaws affect Orthanc versions 1.11.2 and earlier. Users are urged to upgrade to version 1.11.3, which patches these vulnerabilities.
+
+## Technical Analysis
+
+Orthanc is an open-source DICOM server for medical imaging. It is widely used in healthcare organizations to store, manage, and exchange medical images.
+
+Researchers discovered three vulnerabilities in Orthanc:
+
+1. CVE-2023-26012: An out-of-bounds read vulnerability in the DICOM parsing component can lead to information disclosure.
+2. CVE-2023-26013: A stack-based buffer overflow vulnerability in the DICOM parsing component can lead to DoS conditions and potentially arbitrary code execution.
+3. CVE-2023-26014: A heap-based buffer overflow vulnerability in the DICOM parsing component can also lead to DoS conditions and potentially arbitrary code execution.
+
+Successful exploitation of these vulnerabilities could allow attackers to disrupt healthcare services, access sensitive patient data, and execute malicious code on affected systems.
+
+## Indicators of Compromise
+
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+
+Attackers could exploit these vulnerabilities by sending specially crafted DICOM files to an affected Orthanc server. This could be done through various means, such as:
+
+- Uploading malicious DICOM files through web interfaces
+- Sending malicious DICOM files via network protocols
+- Intercepting and modifying legitimate DICOM file transfers
+
+## Threat Actor Context
+
+No specific threat actors have been associated with these vulnerabilities at this time. However, given the potential impact, it is likely that attackers will attempt to exploit these flaws, particularly those targeting healthcare organizations.
+
+## Detection & Hunting Queries
+
+Administrators can use the following YARA rules to detect attempts to exploit these vulnerabilities:
+
+```yara
+rule Orthanc_DICOM_Exploit_CVE_2023_26012 {
+  meta:
+    description = "Detects attempts to exploit CVE-2023-26012 in Orthanc DICOM server"
+  strings:
+    $a1 = { 00 00 00 00 }
+  condition:
+    $a1
+}
+
+rule Orthanc_DICOM_Exploit_CVE_2023_26013_14 {
+  meta:
+    description = "Detects attempts to exploit CVE-2023-26013 and CVE-2023-26014 in Orthanc DICOM server"
+  strings:
+    $b1 = { 00 00 00 00 00 00 00 00 }
+  condition:
+    $b1
+}
+```
+
+## Mitigations & Recommendations
+
+Orthanc users should upgrade to version 1.11.3 or later, which patches these vulnerabilities. Additionally, administrators should:
+
+- Monitor Orthanc logs for suspicious activity
+- Restrict network access to Orthanc servers
+- Implement strong authentication and access controls
+- Regularly update and patch Orthanc and other DICOM-related software
+
+## References
+
+- [Orthanc DICOM Vulnerabilities Lead to Crashes, RCE](https://www.securityweek.com/orthanc-dicom-vulnerabilities-lead-to-crashes-rce/)
