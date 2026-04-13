@@ -1,0 +1,48 @@
+---
+title: OT安全因缺乏后量子密码准备工具而受阻
+slug: 2026-04-13-ot-security-lack-tools-post-quantum-crypto-readiness
+date: '2026-04-13'
+excerpt: 运营技术资产所有者面临监管压力，需要证明其后量子密码准备情况，但缺乏必要的发现和库存工具，导致表面合规。
+category: industry
+tags:
+  - OT Security
+  - Cryptography
+  - Compliance
+  - Quantum Computing
+  - ICS
+language: zh
+source_urls:
+  - >-
+    https://www.darkreading.com/ics-ot-security/ot-lacks-tools-cryptographic-readiness
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-ot-security-lack-tools-post-quantum-crypto-readiness
+severity: medium
+affected_sectors:
+  - Critical Infrastructure
+  - Manufacturing
+  - Energy
+  - Transportation
+---
+## OT安全因缺乏后量子密码准备工具而受阻
+
+## 执行摘要
+关键基础设施中的运营技术环境缺乏库存和评估密码资产所需的基本工具，这使得基于监管的后量子密码准备声明在很大程度上是表演性的。根据Claroty的Team82的一份报告，资产所有者被迫声明他们对量子计算威胁的准备情况，而没有能力发现密码学在他们的OT和IoT资产中的部署位置和方式。这一差距造成了一个重大的合规假象，其中文书工作代替了真正的安全姿态，使得关键系统容易受到未来量子攻击和当前密码弱点的影响。
+
+## 技术分析
+核心技术挑战是缺乏能够映射OT和IoT设备中密码实现的专门发现和被动评估工具。与IT系统不同，OT环境由专有的、遗留的和嵌入式设备组成，其中密码库通常内置于固件中或通过不明确的工业协议通信。Team82的研究表明，当前的资产管理和网络监控解决方案不适合识别使用的特定密码算法（例如，RSA、ECC、SHA-1）、它们的密钥强度或它们在复杂的控制系统网络中的部署环境。这造成了一个基础的可见性差距：组织无法管理或迁移他们首先无法发现和库存的东西。因此，由NIST选定的算法和监管框架等标准推动的后量子准备，正在超越在工业环境中有意义执行所需的操作能力。
+
+## 入侵指标
+目前没有识别出任何入侵指标。
+
+## 战术、技术与程序
+目前没有识别出任何战术、技术与程序。
+
+## 威胁行为者背景
+这份报告没有将描述的情况归因于特定的活跃威胁行为者。主要关注的是系统性的、全行业的能力差距，这使得关键基础设施对未来一类攻击没有准备。威胁背景是预期出现的与密码学相关的量子计算机的出现，这可能会破坏当前的公钥密码学，可能允许对手解密历史上捕获的数据或伪造数字签名。已知国家行为者正在进行“现在收集，以后解密”的活动，为未来的解密收集今天加密的数据。OT网络中缺乏密码学可见性使得这些环境成为此类长期数据收集操作的特别高价值目标。
+
+## 缓解措施与建议
+组织应优先考虑基础密码资产管理，而不是过早的声明。首先，投资或开发能够进行被动网络监控和设备询问的工具，以发现和库存所有密码资产，包括库、密钥、证书和协议使用情况。其次，为关键OT资产建立密码材料清单，以了解依赖关系和漏洞。第三，与供应商接触，要求密码透明度和后量子迁移路线图。第四，分割网络以限制密码失败的影响范围并保护最关键的资产。最后，监管机构和标准机构应将要求与当前可行技术的现状对齐，专注于在发现和库存方面可衡量的进展，而不是二元声明。
+
+## 参考资料
+- [https://www.darkreading.com/ics-ot-security/ot-lacks-tools-cryptographic-readiness](https://www.darkreading.com/ics-ot-security/ot-lacks-tools-cryptographic-readiness)

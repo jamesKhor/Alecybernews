@@ -1,0 +1,49 @@
+---
+title: 严重wolfSSL漏洞允许攻击者伪造TLS证书
+slug: 2026-04-13-critical-wolfssl-flaw-forged-tls-certificates
+date: '2026-04-13'
+excerpt: wolfSSL库中的一个严重漏洞（CVE-2022-39173）允许攻击者伪造TLS证书，使得MITM攻击和冒充受信任服务成为可能。
+category: vulnerabilities
+tags:
+  - wolfssl
+  - tls
+  - cryptography
+  - vulnerability
+  - opensource
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/critical-flaw-in-wolfssl-library-enables-forged-certificate-use/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-critical-wolfssl-flaw-forged-tls-certificates
+severity: critical
+cve_ids:
+  - CVE-2022-39173
+---
+## 执行摘要
+广泛使用的wolfSSL加密库中存在一个关键漏洞，允许攻击者伪造TLS证书，可能使他们能够冒充受信任的服务器和服务。这个漏洞被追踪为**CVE-2022-39173**，源于在证书验证过程中对ECDSA签名的不当验证。成功利用可能导致中间人（MITM）攻击、数据拦截以及在合法更新的幌子下部署恶意软件。该漏洞影响wolfSSL 5.5.0之前的版本，并已在最新版本中修复。
+
+## 技术分析
+漏洞**CVE-2022-39173**存在于wolfSSL处理X.509证书链中的椭圆曲线数字签名算法（ECDSA）签名。根据分析，库的验证函数`wc_ecc_verify_hash`未能正确验证提供的哈希算法及其输出大小是否与用于签名的曲线参数相对应。具体来说，该函数没有强制哈希长度与相关椭圆曲线的预期大小相匹配，例如要求NIST P-256曲线需要256位哈希。
+
+这种疏忽允许攻击者制作一个恶意证书，其中签名是使用与证书签名算法标识符中指示的不同（通常较弱）的哈希函数计算的。在验证过程中，wolfSSL会错误地接受这个不匹配的签名。在实践中，这可能允许攻击者生成一个看起来由受信任的证书颁发机构（CA）签名但实际上是用伪造的、无效签名签名的证书。核心影响是破坏了TLS的基本信任链，使得网站、服务和软件更新服务器的欺骗成为可能。
+
+## 入侵指标
+目前没有识别出任何入侵指标。检测将依赖于监控TLS握手中的异常证书或意外的证书颁发机构，这在没有专用工具的情况下并不简单。组织应优先修补易受攻击的库实例。
+
+## 战术、技术与程序
+与此漏洞相关的主要技术是**Adversary-in-the-Middle (AiTM)**或经典的中间人攻击（T1557）。通过呈现一个被易受攻击的wolfSSL客户端错误验证的伪造证书，攻击者可以拦截并可能解密客户端与合法服务器之间的TLS加密通信。这可以用来收集凭证，抽取敏感数据，或提供伪装成来自受信任域的合法内容的恶意负载。攻击需要能够将自己定位在受害者和目标服务器之间，例如在被破坏的网络段上。
+
+## 威胁行为者背景
+在撰写本文时，没有证据表明CVE-2022-39173在野外被积极利用。然而，概念验证的公开披露和可用性增加了被纳入对手工具包的风险。具有网络拦截能力的威胁行为者，包括国家支持的团体和复杂的网络犯罪分子，可能会对这一漏洞感兴趣。其价值在针对使用wolfSSL并连接到外部更新服务器或API的设备或应用程序的场景中得到提升，例如在物联网、嵌入式系统和一些企业软件中。
+
+## 缓解措施与建议
+最主要的也是最关键的缓解措施是立即更新wolfSSL库到**5.5.0或更高版本**。使用wolfSSL的组织和开发人员应：
+1. **立即修补：**将所有集成的wolfSSL实例升级到包含此漏洞修复的版本5.5.0。
+2. **清点使用情况：**识别所有可能包含wolfSSL库的应用程序、设备和嵌入式系统，因为它通常用于物联网、网络设备和定制的企业软件。
+3. **监控利用情况：**虽然直接的IOC很少，但监控网络流量中意外的证书更改或TLS握手中的关键基础设施异常。
+4. **深度防御：**保持强大的网络分段，并在可行的情况下使用证书固定，以减少基于证书的MITM攻击的有效性，即使在修补后也是如此。
+
+## 参考资料
+- https://www.bleepingcomputer.com/news/security/critical-flaw-in-wolfssl-library-enables-forged-certificate-use/

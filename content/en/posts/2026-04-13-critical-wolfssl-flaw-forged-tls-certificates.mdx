@@ -1,0 +1,52 @@
+---
+title: Critical wolfSSL Flaw Allows Attackers to Forge TLS Certificates
+slug: 2026-04-13-critical-wolfssl-flaw-forged-tls-certificates
+date: '2026-04-13'
+excerpt: >-
+  A critical vulnerability (CVE-2022-39173) in the wolfSSL library allows
+  attackers to forge TLS certificates, enabling MITM attacks and impersonation
+  of trusted services.
+category: vulnerabilities
+tags:
+  - wolfssl
+  - tls
+  - cryptography
+  - vulnerability
+  - opensource
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/critical-flaw-in-wolfssl-library-enables-forged-certificate-use/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-critical-wolfssl-flaw-forged-tls-certificates
+severity: critical
+cve_ids:
+  - CVE-2022-39173
+---
+## Executive Summary
+A critical vulnerability in the widely used wolfSSL cryptographic library enables attackers to forge TLS certificates, potentially allowing them to impersonate trusted servers and services. Tracked as **CVE-2022-39173**, the flaw stems from improper verification of ECDSA signatures during certificate validation. Successful exploitation could facilitate man-in-the-middle (MITM) attacks, data interception, and the deployment of malicious software under the guise of legitimate updates. The vulnerability affects wolfSSL versions prior to 5.5.0 and has been patched in the latest release.
+
+## Technical Analysis
+The vulnerability, **CVE-2022-39173**, resides in wolfSSL's handling of Elliptic Curve Digital Signature Algorithm (ECDSA) signatures within X.509 certificate chains. According to analysis, the library's verification function, `wc_ecc_verify_hash`, fails to properly validate that the provided hash algorithm and its output size correspond to the curve parameters used for the signature. Specifically, the function does not enforce that the hash length matches the expected size for the associated elliptic curve, such as requiring a 256-bit hash for the NIST P-256 curve.
+
+This oversight allows an attacker to craft a malicious certificate where the signature is computed using a different, often weaker, hash function than the one indicated in the certificate's signing algorithm identifier. During verification, wolfSSL would incorrectly accept this mismatched signature. In practice, this could allow an attacker to generate a certificate that appears to be signed by a trusted Certificate Authority (CA) but is actually signed with a forged, invalid signature. The core impact is a breakdown in the chain of trust fundamental to TLS, enabling the spoofing of websites, services, and software update servers.
+
+## Indicators of Compromise
+None identified at this time. Detection would rely on monitoring for anomalous certificates or unexpected certificate authorities in TLS handshakes, which is not trivial without specialized tooling. Organizations should prioritize patching vulnerable library instances.
+
+## Tactics, Techniques & Procedures
+The primary technique associated with this vulnerability is **Adversary-in-the-Middle (AiTM)** or classic man-in-the-middle attacks (T1557). By presenting a forged certificate that is incorrectly validated by a vulnerable wolfSSL client, an attacker can intercept and potentially decrypt TLS-encrypted communications between the client and a legitimate server. This could be used to harvest credentials, siphon sensitive data, or serve malicious payloads disguised as legitimate content from trusted domains. The attack requires the ability to position oneself between the victim and the target server, such as on a compromised network segment.
+
+## Threat Actor Context
+There is no evidence of active exploitation of CVE-2022-39173 in the wild at the time of writing. However, the public disclosure and availability of a proof-of-concept increases the risk of incorporation into adversary toolkits. Threat actors with capabilities for network interception, including state-sponsored groups and sophisticated cybercriminals, would likely be interested in this vulnerability. Its value is heightened in scenarios targeting devices or applications that use wolfSSL and connect to external update servers or APIs, such as in IoT, embedded systems, and some enterprise software.
+
+## Mitigations & Recommendations
+The primary and most critical mitigation is to immediately update the wolfSSL library to version **5.5.0 or later**. Organizations and developers using wolfSSL should:
+1.  **Patch Immediately:** Upgrade all integrated instances of wolfSSL to version 5.5.0, which contains the fix for this vulnerability.
+2.  **Inventory Usage:** Identify all applications, devices, and embedded systems that may incorporate the wolfSSL library, as it is commonly used in IoT, networking equipment, and custom enterprise software.
+3.  **Monitor for Exploitation:** While direct IOCs are scarce, monitor network traffic for unexpected certificate changes or anomalies in TLS handshakes to critical infrastructure.
+4.  **Defense-in-Depth:** Maintain robust network segmentation and employ certificate pinning where feasible to reduce the effectiveness of certificate-based MITM attacks, even after patching.
+
+## References
+- https://www.bleepingcomputer.com/news/security/critical-flaw-in-wolfssl-library-enables-forged-certificate-use/

@@ -1,0 +1,50 @@
+---
+title: LinkedIn 浏览器扩展因企业间谍指控受到审查
+slug: 2026-04-13-linkedin-browser-extension-scrutinized-corporate-espionage-claims
+date: '2026-04-13'
+excerpt: 安全研究人员正在分析LinkedIn的浏览器扩展，此前有公开指控称其促进了企业间谍活动，发现数据收集行为，但对所谓的行动规模和意图存在争议。
+category: threat-intel
+tags:
+  - linkedin
+  - browser-extension
+  - data-collection
+  - microsoft
+language: zh
+source_urls:
+  - >-
+    https://www.securityweek.com/browsergate-claims-of-linkedin-spying-clash-with-security-research-findings/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-linkedin-browser-extension-scrutinized-corporate-espionage-claims
+severity: medium
+---
+## 执行摘要
+公众指控微软通过LinkedIn浏览器扩展进行大规模企业间谍活动的说法，并没有得到现有技术证据的支持。虽然该扩展收集用户浏览数据，但安全研究人员分析其行为后发现，其行为与增强LinkedIn平台的声明目的大体一致，并不表明存在公众声称的广泛、秘密的监视行动。
+
+## 技术分析
+公众指控的核心集中在LinkedIn浏览器扩展上，特别是其访问和传输用户网络浏览活动数据的能力。根据SecurityWeek引用的技术分析，该扩展确实收集了访问的URL、页面标题和时间戳等信息。这种数据收集在扩展的隐私政策中有所披露，声明用于显示谁查看了LinkedIn个人资料以及提供个性化内容推荐等功能。
+该扩展的权限允许它“读取和更改您访问的所有网站上的所有数据”，这是许多需要深度页面交互的浏览器插件常见的广泛范围。研究人员指出，尽管数据收集范围广泛，但传输似乎主要是到LinkedIn拥有的域名，并与平台现有的广告和分析基础设施集成。没有来自安全研究人员的公开证据表明，该扩展以构成间谍活动的方式从非LinkedIn页面中窃取敏感数据，如密码、财务信息或专有文件。
+
+## 入侵指标
+目前未识别出任何入侵指标。
+
+## 战术、技术与程序
+如公众声称中所描述的行动，将涉及大规模部署数据收集工具（浏览器扩展）作为合法商业工具的幌子。所描述的TTPs将包括：
+*   **通过浏览器扩展持久存在：** 在用户浏览器内建立持久存在以监控活动。
+*   **从网页收集数据：** 从所有访问的网站抓取元数据（URL、页面标题）。
+*   **数据外泄到云服务：** 将收集的浏览遥测数据传输到远程服务器。
+然而，安全研究人员警告说，这些技术行为本身并不能确认恶意意图，因为它们与许多大型网络平台用于分析、个性化和广告定位的常见做法有显著重叠。
+
+## 威胁行为者背景
+公众指控没有将活动归因于已知的网络犯罪分子或国家支持的威胁行为者。相反，它们将微软，作为LinkedIn的母公司，描绘成企业情报行动的策划者。叙述暗示目标是通过聚合对其用户群的专业研究和浏览习惯的洞察来获得竞争优势。独立安全研究人员没有证实这种描述，指出缺乏超出典型平台数据聚合意图的证据。
+
+## 缓解措施与建议
+关注浏览器扩展权限和数据隐私的组织和用户应考虑以下行动：
+*   **进行扩展库存：** 审核并批准在公司管理的设备上使用的所有浏览器扩展。删除任何未明确授权用于商业目的的扩展。
+*   **仔细审查权限：** 在安装任何扩展之前，审查它请求的权限。对于要求访问“读取和更改您访问的所有网站上的所有数据”的扩展要警惕，除非该功能对其核心、合法目的至关重要。
+*   **实施组策略：** 对于企业环境，使用浏览器组策略限制未经安全团队审查的扩展的安装。
+*   **利用浏览器安全设置：** 利用内置浏览器控件限制特定网站上的扩展权限或定期删除未使用的扩展。
+*   **优先考虑透明度：** 优先选择来自具有清晰、可访问隐私政策的知名开发人员的扩展，这些政策解释了收集了哪些数据以及如何使用这些数据。
+
+## 参考资料
+*   [https://www.securityweek.com/browsergate-claims-of-linkedin-spying-clash-with-security-research-findings/](https://www.securityweek.com/browsergate-claims-of-linkedin-spying-clash-with-security-research-findings/)

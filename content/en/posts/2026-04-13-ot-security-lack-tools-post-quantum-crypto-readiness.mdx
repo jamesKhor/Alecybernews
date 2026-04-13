@@ -1,0 +1,49 @@
+---
+title: OT Security Hampered by Lack of Tools for Post-Quantum Crypto Readiness
+slug: 2026-04-13-ot-security-lack-tools-post-quantum-crypto-readiness
+date: '2026-04-13'
+excerpt: >-
+  Operational Technology asset owners face regulatory pressure to attest to
+  post-quantum cryptographic readiness but lack the necessary discovery and
+  inventory tools, leading to superficial compliance.
+category: industry
+tags:
+  - OT Security
+  - Cryptography
+  - Compliance
+  - Quantum Computing
+  - ICS
+language: en
+source_urls:
+  - >-
+    https://www.darkreading.com/ics-ot-security/ot-lacks-tools-cryptographic-readiness
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-ot-security-lack-tools-post-quantum-crypto-readiness
+severity: medium
+affected_sectors:
+  - Critical Infrastructure
+  - Manufacturing
+  - Energy
+  - Transportation
+---
+## Executive Summary
+Operational Technology environments in critical infrastructure lack the fundamental tooling required to inventory and assess cryptographic assets, rendering regulatory-driven attestations of post-quantum cryptographic readiness largely performative. According to a report by Claroty's Team82, asset owners are being compelled to declare preparedness for quantum computing threats without possessing the ability to discover where and how cryptography is deployed across their OT and IoT estates. This gap creates a significant compliance facade, where paperwork substitutes for genuine security posture, leaving critical systems vulnerable to future quantum attacks and present-day cryptographic weaknesses.
+
+## Technical Analysis
+The core technical challenge is the absence of specialized discovery and passive assessment tools capable of mapping cryptographic implementations within OT and IoT devices. Unlike IT systems, OT environments consist of proprietary, legacy, and embedded devices where cryptographic libraries are often baked into firmware or communicate over obscure industrial protocols. Team82's research indicates that current asset management and network monitoring solutions are ill-equipped to identify the specific cryptographic algorithms (e.g., RSA, ECC, SHA-1) in use, their key strengths, or their deployment context across complex control system networks. This creates a foundational visibility gap: organizations cannot manage or migrate what they cannot first discover and inventory. The push for post-quantum readiness, driven by standards like NIST's selected algorithms and regulatory frameworks, is therefore running ahead of the operational capabilities needed to execute it meaningfully in industrial environments.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+None identified at this time.
+
+## Threat Actor Context
+This report does not attribute the described situation to a specific active threat actor. The primary concern is a systemic, industry-wide capability gap that leaves critical infrastructure unprepared for a future class of attacks. The threat context is the anticipated emergence of cryptographically relevant quantum computers, which could break current public-key cryptography, potentially allowing adversaries to decrypt historically captured data or forge digital signatures. Nation-state actors are known to be conducting "harvest now, decrypt later" campaigns, collecting encrypted data today for future decryption. The lack of cryptographic visibility in OT networks makes these environments particularly high-value targets for such long-term data harvesting operations.
+
+## Mitigations & Recommendations
+Organizations should prioritize foundational cryptographic asset management over premature attestation. First, invest in or develop tooling capable of passive network monitoring and device interrogation to discover and inventory all cryptographic assets, including libraries, keys, certificates, and protocol usage. Second, establish a cryptographic bill of materials for critical OT assets to understand dependencies and vulnerabilities. Third, engage with vendors to demand cryptographic transparency and roadmaps for post-quantum migration. Fourth, segment networks to limit the blast radius of cryptographic failures and protect most critical assets. Finally, regulators and standards bodies should align requirements with the current state of feasible technology, focusing on measurable progress in discovery and inventory rather than binary attestations.
+
+## References
+- https://www.darkreading.com/ics-ot-security/ot-lacks-tools-cryptographic-readiness
