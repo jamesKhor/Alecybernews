@@ -16,9 +16,14 @@ jobs:
           username: zcybernews
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
             cd /home/zcybernews/zcybernews
+            echo "⬇️  Pulling latest code..."
             git pull origin main
+            echo "📦 Installing dependencies..."
             HUSKY=0 npm ci --production=false
+            echo "🔨 Building..."
             npm run build
+            echo "♻️  Restarting PM2..."
             pm2 restart zcybernews
             echo "✅ Deployed successfully at $(date)"
