@@ -52,21 +52,6 @@ Storm-2755 的行为与以财务为动机的网络犯罪活动一致。观察到
 
 Storm-2755 与已记录的对手组织之间尚未建立确认的联系。由于缺乏与已知集群的独特工具或基础设施重叠，归因仍处于初步阶段。
 
-## 检测与溯源查询
-组织应监控薪资相关记录的异常更改，例如：
-
-```sql
-SELECT * FROM audit_logs WHERE action = 'modify_direct_deposit' AND timestamp > NOW() - INTERVAL 30 DAYS;
-```
-
-此外，在薪资处理截止日期附近查找同时发生的可疑登录：
-
-```sql
-SELECT ip_address, username FROM auth_logs WHERE result = 'success' AND timestamp BETWEEN 'pay_period_start' AND 'pay_period_end';
-```
-
-网络防御者还可以使用行为分析来溯源，该分析专注于特权升级，后跟与 HR/薪资应用程序相关的数据库记录修改。
-
 ## 缓解措施与建议
 为了减少类似攻击的暴露，组织应实施分层防御，包括：
 

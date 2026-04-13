@@ -42,9 +42,6 @@ The TTPs for these incidents are not fully detailed in the source material. Howe
 ## Threat Actor Context
 No specific threat actor groups have been publicly attributed to these incidents. The exploitation of the Windows zero-day suggests involvement by financially motivated or state-aligned groups capable of developing or acquiring such exploits. The supercomputer hack is consistent with the objectives of **state-sponsored cyber espionage** actors, though the originating nation is not named. The actor behind the Stryker attack remains unidentified; potential candidates include ransomware-as-a-service (RaaS) affiliates or data extortion groups.
 
-## Detection & Hunting Queries
-Organizations should prioritize deploying the Microsoft patch for CVE-2024-21338 (February 2024 update). Security teams can hunt for potential exploitation by monitoring for unusual process creation or privilege escalation events originating from `win32k.sys` or related kernel components. For general defense, enhanced monitoring of network traffic to and from research computing clusters and healthcare provider networks is advised. Hunting for anomalous authentication patterns, especially for administrative accounts on high-value assets, is recommended.
-
 ## Mitigations & Recommendations
 *   **Patch Management**: Immediately apply the February 2024 Microsoft security updates to address CVE-2024-21338 and other disclosed vulnerabilities.
 *   **Healthcare Sector Vigilance**: Healthcare organizations and their suppliers should review access controls, segment networks where possible, and ensure robust incident response plans are in place for supply chain incidents.

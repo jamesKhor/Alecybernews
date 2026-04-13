@@ -55,21 +55,6 @@ Storm-2755 initiates campaigns with credential harvesting via phishing emails ta
 ## Threat Actor Context
 Storm-2755 is described as a financially motivated cybercriminal collective primarily focused on payroll manipulation targeting Canadian businesses [^1]. While attribution remains uncertain, operational security practices suggest moderate sophistication and possible prior experience with credential-based fraud. No confirmed nation-state ties have been reported.
 
-## Detection & Hunting Queries
-Organizations can search logs for anomalies indicating potential AiTM activity:
-- Unusual geolocation shifts during authentication flows
-- Unexpected increases in outbound traffic from internal IP addresses to known suspicious domains
-- Repeated failed modifications followed by one successful change to payroll records
-
-Example Splunk query:
-```
-tag=authentication action=success earliest=-7d@d 
-| iplocation src_ip 
-| stats count by Country, user, _raw
-```
-
-SIEM rules should also flag repeated POST requests to `/login` endpoints originating from single IPs but associated with multiple usernames over short intervals.
-
 ## Mitigations & Recommendations
 To defend against AiTM-enabled payroll theft:
 - Implement **step-up authentication** for financial transactions, especially those altering banking details.

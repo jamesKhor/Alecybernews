@@ -43,14 +43,6 @@ While specific TTPs for exploiting AI agent identities are still emerging, the a
 ## Threat Actor Context
 This evolving landscape presents an opportunistic target for a broad range of threat actors. Financially motivated groups, such as ransomware operators, would seek to compromise highly privileged AI agents to encrypt data or extort organizations. State-sponsored advanced persistent threat (APT) groups would likely be interested in using AI agents as persistent, autonomous vectors for espionage or data collection. Even lower-skill attackers could exploit poorly secured agents in public-facing applications for initial access or resource theft. The lack of mature defensive tools specifically for this vector makes it an attractive area for experimentation by all actor classes.
 
-## Detection & Hunting Queries
-Effective detection requires moving beyond traditional host-based logging to encompass the agent's decision logic and resource consumption patterns. Security teams should begin developing hunts for:
-*   **Anomalous API Call Sequences:** AI agents interacting with APIs or data stores in an order or frequency that deviates from their trained or expected behavior pattern.
-*   **Privilege Escalation via Agent:** New credentials (keys, tokens) being generated or assigned following the launch of an AI agent process.
-*   **Unusual Data Egress Volume:** An AI agent process transmitting significantly more data externally than its stated task would necessitate.
-*   **Agent Process Spawning:** A single agent process spawning multiple sub-processes or network connections to disparate internal systems, indicating potential lateral movement.
-*   **Changes to Agent Code or Model:** Unauthorized modifications to the source code, weights, or prompt instructions of a deployed production AI agent.
-
 ## Mitigations & Recommendations
 Organizations must extend Zero Trust principles to encompass AI and machine identities as a unified frontier. Key recommendations include:
 1.  **Establish Unified Governance:** Create a central policy framework that defines the lifecycle management for both traditional machine identities and AI agents, enforced through automated platforms.

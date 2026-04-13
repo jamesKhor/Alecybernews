@@ -38,12 +38,6 @@ The hypothetical threat model aligns with established software supply chain atta
 ## Threat Actor Context
 There is no evidence linking this specific project to any known threat actor. The context is opportunistic rather than targeted. The risk is that any actor—from a script kiddie to a sophisticated APT—could identify similar niche OS port projects as high-efficiency, low-visibility vectors. Such projects often have a single maintainer, limited security scrutiny, and an audience of technically curious users who may prioritize functionality over security verification, making them attractive targets for broad or targeted espionage campaigns.
 
-## Detection & Hunting Queries
-For environments where Raspberry Pis are deployed, monitoring for the use of unauthorized operating systems is key. No specific signatures for a compromised Oberon image exist, but behavioral detection is possible.
-*   **Network Detection:** Hunt for HTTP/HTTPS requests from Raspberry Pi hardware MAC addresses (OUI `DC:A6:32`, `B8:27:EB`, `E4:5F:01`) to unexpected domains or IPs, especially if the host is not running a standard Linux distribution.
-*   **Endpoint/Host Detection:** On the SD card itself, analysts could attempt to verify the integrity of the `OberonSystem3Native.img` file against a cryptographically signed hash provided by a trusted source—though no such trusted source currently exists for this artifact.
-*   **Process Analysis:** This is not applicable for monitoring from a host-based perspective on the Pi running Oberon, as any monitoring agent would likely be part of the compromised stack.
-
 ## Mitigations & Recommendations
 1.  **Avoid Pre-built Images for Critical Use:** Do not flash binary operating system images from unverifiable sources onto hardware used for any sensitive or networked purpose. This is the primary mitigation.
 2.  **Demand Reproducible Builds:** For open-source projects distributing binaries, maintainers should provide a verifiable build process. Users should advocate for and use projects that offer this capability.

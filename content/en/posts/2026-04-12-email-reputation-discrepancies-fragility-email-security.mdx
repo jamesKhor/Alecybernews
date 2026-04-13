@@ -46,13 +46,6 @@ While not a malicious attack, the scenario illustrates procedural techniques rel
 ## Threat Actor Context
 This is not an activity attributed to a specific threat actor. The "threat" in this context is systemic, arising from the concentrated market power and operational secrecy of major email platform providers. Their control over inbox placement functions as a de facto gatekeeping capability that can disrupt legitimate business operations without clear recourse, a dynamic that could potentially be exploited by adversaries through sophisticated poisoning attacks on sender reputation.
 
-## Detection & Hunting Queries
-Organizations can monitor for similar deliverability issues using the following methods:
-* **DMARC Aggregate Report Analysis:** Regularly parse DMARC RUA reports to check for discrepancies in disposition (`quarantine`, `reject`) between different receiving domains, especially `google.com`.
-* **Engagement Metrics Tracking:** Implement logging to track open/click rates segmented by receiving domain (e.g., Gmail vs. others). A sustained, domain-specific drop may signal a reputation issue.
-* **Gmail Postmaster Tools:** Monitor the Sender Reputation and Delivery Errors dashboards in Google's Postmaster Tools for domains sending significant volume to Gmail.
-* **Internal Bounce/Block Logs:** Query internal mail transfer agent logs for soft bounce messages containing Google-specific SMTP error codes or enhanced status codes (e.g., `421-4.7.0`).
-
 ## Mitigations & Recommendations
 To mitigate the risk of opaque email filtering:
 1.  **Diversify Communication Channels:** Reduce critical dependence on email for user onboarding or transaction completion where possible.

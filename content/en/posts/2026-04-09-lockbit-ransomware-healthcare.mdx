@@ -130,33 +130,6 @@ Attribution confidence is **high** based on code similarities with prior LockBit
 
 Healthcare targeting is consistent with the group's established pattern of prioritizing high-pressure sectors where encryption has immediate life-safety consequences.
 
-## Detection & Hunting Queries
-
-### Splunk — DLL Side-Loading Detection
-
-```spl
-index=endpoint sourcetype=sysmon EventCode=7
-ImageLoaded="*\\fontdrvhost.dll"
-NOT ImageLoaded="C:\\Windows\\System32\\*"
-| stats count by ComputerName, Image, ImageLoaded, Signed, SignatureStatus
-```
-
-### Splunk — Unusual PowerShell Environment Variable Usage
-
-```spl
-index=endpoint sourcetype=sysmon EventCode=1
-Image="*\\powershell.exe"
-CommandLine="*FromBase64String*$env:*"
-| stats count by ComputerName, User, CommandLine, ParentImage
-```
-
-### Key Log Sources
-
-- Windows Sysmon (Events 1, 7, 10, 11, 13)
-- VPN appliance authentication logs (failed + successful)
-- EDR telemetry for LSASS memory access
-- NetFlow for outbound TOR exit node IPs
-
 ## Mitigations & Recommendations
 
 **Immediate (0–24 hours)**

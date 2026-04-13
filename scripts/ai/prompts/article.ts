@@ -18,7 +18,6 @@ REQUIRED SECTIONS (exact H2 headers in this order):
 ## Indicators of Compromise
 ## Tactics, Techniques & Procedures
 ## Threat Actor Context
-## Detection & Hunting Queries
 ## Mitigations & Recommendations
 ## References
 
@@ -46,7 +45,7 @@ OUTPUT FORMAT — respond with ONLY valid JSON, no markdown fences:
   "affected_regions": [],
   "iocs": [],
   "ttp_matrix": [],
-  "body": "full markdown article body (all 8 sections)"
+  "body": "full markdown article body (all 7 sections)"
 }
 
 SOURCES:

@@ -41,12 +41,6 @@ This release does not involve malicious TTPs. However, the changes introduce ope
 ## Threat Actor Context
 There is no specific threat actor associated with this software release. The changes are developmental and philosophical, driven by the Trisquel project's commitment to free software. However, the reduction in attack surface from a deblobbed kernel and a more secure package manager could indirectly affect the targeting calculus of actors who rely on proprietary driver or firmware vulnerabilities.
 
-## Detection & Hunting Queries
-For organizations monitoring Linux endpoints, the following signatures may indicate an upgrade to Trisquel 12.0:
-*   **Package Manager Activity**: Look for command-line executions or logs featuring `apt 3.0` or specific version strings like `apt/3.0.6`.
-*   **Kernel Identification**: System logs or `uname -a` output will show kernel versions containing `6.8.0` and likely the `-gnu` or `-libre` suffix.
-*   **Hardware Failure Logs**: An increase in kernel messages (`dmesg`) related to missing firmware (e.g., `failed to load firmware`) on newly imaged machines may indicate deployment of this OS on incompatible hardware.
-
 ## Mitigations & Recommendations
 Organizations considering deploying Trisquel 12.0 should take the following steps:
 1.  **Conduct Thorough Hardware Compatibility Testing**: Prior to wide-scale deployment, validate that all critical hardware (network interfaces, graphics, storage controllers) functions with the deblobbed kernel. Maintain a list of certified hardware.

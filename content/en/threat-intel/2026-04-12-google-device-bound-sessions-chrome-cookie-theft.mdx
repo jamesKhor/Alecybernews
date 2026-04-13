@@ -42,12 +42,6 @@ The defense is targeted at the post-exploitation phase, specifically the techniq
 ## Threat Actor Context
 Session cookie theft is a commoditized capability leveraged by a broad spectrum of threat actors, from financially motivated cybercriminals to state-sponsored advanced persistent threat (APT) groups. Criminal ecosystems have mature markets for stolen cookies, often paired with IP-masking services, to bypass password-based authentication and multi-factor authentication (MFA) for account takeover. By invalidating the core asset—the portable session token—DBSC raises the cost and complexity of these attacks, potentially disrupting established fraud and intelligence-gathering workflows.
 
-## Detection & Hunting Queries
-While DBSC is a preventive control, security teams can monitor for its adoption and related anomalies. Hunting queries in endpoint detection or SIEM platforms could focus on:
-*   **Chrome Version Tracking:** Identify endpoints running Chrome versions prior to 146 to assess exposure to traditional cookie theft.
-    *   Example logic: `process.name: "chrome.exe" AND chrome_version < "146.*"`
-*   **Authentication Log Analysis:** Monitor Google Workspace or identity provider logs for authentication attempts that fail due to missing or invalid device-bound key assertions, which may indicate attempted token replay from an unauthorized system.
-
 ## Mitigations & Recommendations
 Organizations and users should take the following actions to leverage this security improvement:
 1.  **Enforce Chrome Updates:** Ensure Chrome browsers are updated to version 146+ on Windows and, eventually, macOS to receive the DBSC feature automatically. Enterprise administrators should prioritize this rollout.

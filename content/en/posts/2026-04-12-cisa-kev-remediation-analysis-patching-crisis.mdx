@@ -37,9 +37,6 @@ The primary technique observed in this meta-analysis is the rapid weaponization 
 ## Threat Actor Context
 The research does not attribute this trend to a specific threat actor or group. Instead, it describes a systemic behavior adopted broadly by both sophisticated advanced persistent threat (APT) groups and financially motivated cybercriminals. The widespread availability of exploit code and the automation of scanning and exploitation tools have democratized this capability, making rapid exploitation a standard operating procedure across the threat landscape.
 
-## Detection & Hunting Queries
-Organizations should prioritize detection of exploitation attempts over reliance on patch status alone. Queries should focus on network and endpoint behavior indicative of known exploit patterns for KEV-listed vulnerabilities. For example, hunting for process creation events from unlikely parent processes (e.g., `spoolsv.exe` spawning `cmd.exe` for PrintNightmare-related exploits) or anomalous network connections to external IPs following the disclosure of a critical remote code execution flaw in perimeter devices. Continuous monitoring for IOCs related to newly added KEV entries is essential, as exploitation often begins before widespread patching.
-
 ## Mitigations & Recommendations
 The analysis underscores the need for a paradigm shift from human-timed patching to automated, risk-driven remediation. Key recommendations include:
 *   **Prioritize Automation:** Implement automated patch deployment for critical vulnerabilities, especially those on the CISA KEV catalog, with minimal testing delays for high-severity, actively exploited flaws.

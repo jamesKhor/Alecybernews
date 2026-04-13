@@ -57,22 +57,6 @@ While no explicit group name has been tied to recent intrusions, the methods res
 
 Iran has previously demonstrated capability in conducting disruptive cyber operations against industrial targets, particularly in the energy and petrochemical industries. Motivations may include geopolitical retaliation, economic coercion, or preparation for potential kinetic conflicts.
 
-## Detection & Hunting Queries
-Organizations should monitor their SIEM and EDR platforms for anomalous behavior indicative of OT-targeted intrusion:
-
-- Unusual outbound connections from OT hosts to external IPs
-- Logins during off-hours to engineering stations or HMIs
-- Unexpected changes in PLC program files (`*.awl`, `*.sdb`) or configuration dumps
-- Anomalous use of industrial protocols outside normal baselines (Modbus TCP port 502, DNP3 port 20000)
-- High-frequency read/write requests to PLC registers from non-standard sources
-
-Sample Splunk query:
-```
-tag=modbus earliest=-7d@d | stats count by src_ip, dest_ip | where count > 1000
-```
-
-YARA rules scanning for suspicious binary modifications in known ICS software directories can also aid in detection.
-
 ## Mitigations & Recommendations
 To reduce exposure to ICS-focused threats, asset owners should implement layered defensive strategies:
 

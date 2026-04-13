@@ -45,12 +45,6 @@ This highlights a procedural failure to account for the architecture of modern C
 ## Threat Actor Context
 This was not a malicious cyber operation. The proximate cause was legal action by football broadcasting rights holders, enforced by the Spanish judiciary and carried out by ISPs and infrastructure providers like Cloudflare. However, the incident illustrates how legal and regulatory actions can mimic the disruptive effects of a distributed denial-of-service (DDoS) attack, albeit unintentionally. It serves as a case study in how non-malicious entities can become a source of systemic internet risk through technically unsophisticated mandates.
 
-## Detection & Hunting Queries
-Organizations can monitor for symptoms of such infrastructure-level blocking. Key detection strategies include:
-*   **Uptime Monitoring Alerts**: A sudden, geographically concentrated spike in connection timeouts or failures for services known to use Cloudflare or other major CDNs, specifically from users in a single country or region.
-*   **DNS Resolution Analysis**: Compare DNS `A`/`AAAA` record results for critical external domains (e.g., `registry-1.docker.io`) from inside the affected region versus from a vantage point outside it. Divergence in resolved IPs may indicate regional blocking.
-*   **Traceroute Analysis**: Network engineers can use commands like `traceroute` or `mtr` to identify where traffic to a service IP (e.g., `104.18.124.25`) is being dropped. A consistent drop at the ISP level, shortly after the traffic enters the local network, is indicative of a mandated block.
-
 ## Mitigations & Recommendations
 To mitigate the impact of such third-party infrastructure disruptions:
 1.  **Implement Redundant Image Registries**: Mirror critical container images (e.g., base OS images, core application images) to an internal, private registry or a secondary public registry. Configure container engines with fallback registries.

@@ -40,12 +40,6 @@ While not attributed to a specific threat actor, the systemic vulnerability is e
 ## Threat Actor Context
 This is not a threat actor in the conventional sense, but a structural condition. The "actor" is the collective of downstream corporate and institutional users who benefit from open-source software while externalizing the full cost of its security maintenance. The origin is the pervasive industry mindset that treats open source as a commons to be harvested rather than a shared infrastructure requiring investment. The primary motivation is cost reduction and operational convenience, shifting liability and workload upstream to volunteers.
 
-## Detection & Hunting Queries
-Detection in this context relates to organizational self-audit. Organizations can query their own dependency lists and contribution policies:
-*   **Dependency Audit:** `List all production dependencies (direct and transitive) and map each to a funding model (e.g., volunteer, single-company sponsored, foundation-backed, commercial).`
-*   **Contribution Gap Analysis:** `Compare the volume of internal usage of key open-source projects against the organization's contributions (code, documentation, funding, security review) to those projects over the last 24 months.`
-*   **Issue Tracker Analysis:** Search internal communications for patterns of demanding fixes from maintainers without offering resources, or for treating community issue trackers as free support desks for security issues.
-
 ## Mitigations & Recommendations
 Mitigation requires shifting from individual responsibility to collective action. Recommendations for downstream consumers include:
 1.  **Direct Funding:** Allocate budget to fund critical dependencies through sponsorships, bounties for security audits, or paid support contracts.

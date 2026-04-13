@@ -46,13 +46,6 @@ The reported activity aligns with known TTPs of Iranian APTs, particularly the *
 ## Threat Actor Context
 The activity is attributed to Iranian state-sponsored cyber actors, specifically groups tracked as **CyberAv3ngers** and **Soldier of Fortune**. These groups have a documented history of targeting critical infrastructure, with a pronounced focus on Israel and its allies, including the United States. Their campaigns often blend cyber effects with geopolitical messaging. The targeting of U.S. water and wastewater systems in late 2023 is a direct precursor to this wider exposure finding. The actors demonstrate intent to cause disruption and demonstrate capability, rather than purely espionage. It is unclear if all exposed devices have been actively probed or compromised, but their accessibility aligns perfectly with the actor's stated targeting patterns.
 
-## Detection & Hunting Queries
-Organizations, especially in critical infrastructure, should hunt for the following activity:
-*   Network traffic logs showing connection attempts to OT assets (particularly Rockwell PLCs on TCP/44818) from unexpected external IP addresses, especially those geolocated to regions associated with Iranian infrastructure.
-*   **Zeek/Suricata Signature:** Alert for `ET SCAN Rockwell EtherNet/IP Scanner` or similar signatures detecting scans for port 44818.
-*   **Internal Network Hunting:** Look for connections to PLCs from engineering workstations or servers that do not normally communicate with them, indicating potential lateral movement.
-*   **Firewall/Proxy Logs:** Query for outbound connections from the OT network to known threat intelligence feeds or unfamiliar external IPs, which may indicate beaconing from a compromised HMI.
-
 ## Mitigations & Recommendations
 Immediate action is required to reduce this attack surface.
 1.  **Network Segmentation:** Remove all OT devices, including PLCs, HMIs, and engineering workstations, from direct internet access. Implement a properly configured firewall and use a **demilitarized zone (DMZ)** architecture for any necessary remote access.

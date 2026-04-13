@@ -36,13 +36,6 @@ The issue did not involve a malicious threat actor. The procedural failure was e
 ## Threat Actor Context
 This is not a threat actor campaign. The "threat" in this context is a financial and operational risk stemming from a software defect in a critical cloud service provider's billing infrastructure. The risk profile is similar to other cloud misconfiguration or logic errors that have led to substantial unexpected charges for enterprises, though on a smaller, individual-user scale in this instance.
 
-## Detection & Hunting Queries
-Organizations monitoring their own API consumption to third-party services like Anthropic should implement the following anomaly detection logic:
-
-*   **Burn Rate Alerting:** Calculate the expected daily or hourly burn rate based on plan quota and alert if consumption exceeds, for example, 20% of the monthly total within a 24-hour period.
-*   **Cloud Cost Monitoring Query (Example - Generic):** `service.api_requests | filter cost > threshold | rate(5m) > expected_rate` – Continuously monitor the rate of cost accrual.
-*   **API Client-Side Logging:** Instrument application code to log cumulative cost per session or job and halt execution if a user-defined soft limit is approached.
-
 ## Mitigations & Recommendations
 For API consumers:
 1.  **Implement Client-Side Hard Limits:** Do not rely solely on the provider's quota system. Code your applications to stop making calls after reaching a user-defined percentage (e.g., 80%) of your monthly plan limit.

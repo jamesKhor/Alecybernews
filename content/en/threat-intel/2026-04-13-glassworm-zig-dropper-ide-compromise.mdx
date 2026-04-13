@@ -57,12 +57,6 @@ None identified at this time. The campaign employs dynamically generated URLs an
 ## Threat Actor Context
 GlassWorm has been active since early 2024, primarily targeting software developers to gain early‑stage access to source code and intellectual property. The group’s previous campaigns used Go‑based droppers and leveraged compromised GitHub accounts. The shift to Zig suggests an effort to evade signature‑based detection and to produce smaller binaries. Attribution remains uncertain; however, the operational patterns align with previously observed activity linked to a loosely organized cyber‑crime forum based in Eastern Europe.
 
-## Detection & Hunting Queries
-- **Windows Sysmon**: `EventID=1 AND ImageLoaded LIKE "%extension.js%"`
-- **Endpoint logs**: `process_name: "code.exe" AND command_line:*"specstudio.code-wakatime-activity-tracker*"`
-- **Network**: `dst.domain: "dlz9x.cloudfront.net" AND dst.port:443`
-- **File integrity**: Alert on newly created hidden files under `%USERPROFILE%\.vscode\` or JetBrains config directories.
-
 ## Mitigations & Recommendations
 1. **Validate extensions** – Require developers to install extensions only from verified sources; enforce a whitelist in IDE policy settings.
 2. **Supply‑chain scanning** – Integrate SAST/SCA tools that can detect compiled binaries within extension packages.

@@ -45,13 +45,6 @@ DBSC does not prevent the initial theft of the cookie data but invalidates its u
 ## Threat Actor Context
 Session cookie theft is a foundational technique for a wide range of threat actors, from financially motivated cybercriminals to advanced persistent threats (APTs). Criminal groups operating information-stealer malware-as-a-service (MaaS) have commoditized the theft and resale of these cookies, often bundled with victim profiles. APT groups also leverage stolen session tokens to maintain persistent, authenticated access to target email and cloud collaboration platforms, bypassing multi-factor authentication (MFA) that only checks at initial login. DBSC raises the cost and complexity of these operations by requiring attackers to compromise the specific endpoint hardware, not just its data.
 
-## Detection & Hunting Queries
-While DBSC is a protective control, defenders should continue monitoring for the initial compromise vectors that lead to cookie theft. Relevant hunting queries include:
-*   **Process Creation:** Detecting the execution of known information-stealer binaries or scripts.
-*   **Network Traffic:** Outbound connections from user workstations to known C2 infrastructure associated with stealers.
-*   **Browser Artifact Access:** Suspicious processes (non-browser) reading browser `Local State`, `Cookies`, or `Login Data` SQLite database files.
-*   **Authentication Logs (Cloud):** Monitoring for impossible travel scenarios or sign-ins from unfamiliar devices, which may indicate a failed replay attempt of a stolen, non-DBSC cookie.
-
 ## Mitigations & Recommendations
 1.  **Update Chrome:** Ensure Chrome is updated to version 146 or later on all Windows endpoints. The feature is enabled by default; no administrative configuration is required.
 2.  **Enable TPM:** For maximum security, ensure devices have a TPM (1.2 or 2.0) available and enabled in the system BIOS/UEFI. Chrome will utilize the TPM to store the device-bound key.

@@ -60,30 +60,6 @@ Attackers could exploit these vulnerabilities by sending specially crafted DICOM
 
 No specific threat actors have been associated with these vulnerabilities at this time. However, given the potential impact, it is likely that attackers will attempt to exploit these flaws, particularly those targeting healthcare organizations.
 
-## Detection & Hunting Queries
-
-Administrators can use the following YARA rules to detect attempts to exploit these vulnerabilities:
-
-```yara
-rule Orthanc_DICOM_Exploit_CVE_2023_26012 {
-  meta:
-    description = "Detects attempts to exploit CVE-2023-26012 in Orthanc DICOM server"
-  strings:
-    $a1 = { 00 00 00 00 }
-  condition:
-    $a1
-}
-
-rule Orthanc_DICOM_Exploit_CVE_2023_26013_14 {
-  meta:
-    description = "Detects attempts to exploit CVE-2023-26013 and CVE-2023-26014 in Orthanc DICOM server"
-  strings:
-    $b1 = { 00 00 00 00 00 00 00 00 }
-  condition:
-    $b1
-}
-```
-
 ## Mitigations & Recommendations
 
 Orthanc users should upgrade to version 1.11.3 or later, which patches these vulnerabilities. Additionally, administrators should:

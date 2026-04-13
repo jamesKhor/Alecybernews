@@ -37,9 +37,6 @@ The primary **TTP** employed by Webloc users is **T1585 - Establish Accounts** a
 ## Threat Actor Context
 The attributed users are state-level law enforcement and intelligence agencies, not traditional cybercriminal groups. Citizen Lab identified the **Hungarian Constitutional Protection Office** (the domestic intelligence agency) and the **National Civil Police of El Salvador** as specific users. Several unnamed U.S. law enforcement and police departments were also listed. The vendor ecosystem is notable: Cobwebs Technologies, the original developer, is an Israeli firm specializing in **open-source intelligence (OSINT)** and web monitoring tools for government clients. Its absorption into U.S.-based Penlink, a provider of law enforcement data analysis platforms, suggests a normalization and broadening of this surveillance methodology within Western policing and intelligence tradecraft.
 
-## Detection & Hunting Queries
-Direct detection of Webloc's use is challenging as it operates on the backend of advertising data exchanges. However, organizations concerned about this vector of surveillance can monitor for anomalous or persistent location data harvesting from their mobile applications. Network traffic analysis for outbound connections to known advertising and analytics domains from corporate mobile devices may indicate data leakage. For individuals, technical hunting is impractical, but reviewing and restricting app location permissions on a regular basis reduces the available data feed. There are no specific, publicly available network signatures or queries for Webloc itself.
-
 ## Mitigations & Recommendations
 Mitigation against surveillance via systems like Webloc requires action at both the individual and policy levels. For **individuals and employees**:
 *   Rigorously audit and disable location permissions for mobile apps, allowing them only when absolutely necessary for core app function.

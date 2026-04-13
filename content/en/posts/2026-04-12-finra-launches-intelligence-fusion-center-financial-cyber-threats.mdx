@@ -51,13 +51,6 @@ The Fusion Center is intended to address threats from a broad spectrum of advers
 *   **Insider Threats:** Malicious or compromised employees who misuse access to systems and data.
 *   **Fraud Rings:** Organizations dedicated to securities fraud, market manipulation, and account takeover schemes. The center's explicit combination of cybersecurity and fraud analysis suggests a particular focus on the converging TTPs of cybercriminals and traditional fraudsters.
 
-## Detection & Hunting Queries
-The source material does not provide specific queries or detection rules developed by the Fusion Center. However, based on its mission, effective hunting for similar threats within a broker-dealer environment would involve correlating logs across security and business systems. Potential starting points could include:
-*   Correlating VPN or remote access logins from unusual geographies with subsequent access to sensitive customer data repositories or order entry systems.
-*   Hunting for sequences where a user account's password is reset, followed shortly by logins from a new device and the downloading of large volumes of client account statements.
-*   Joining internal network authentication events with external threat intelligence feeds on indicators associated with known financial malware command-and-control infrastructure.
-*   Analyzing trading activity logs for patterns that coincide with the publication of fraudulent press releases or social media campaigns ("pump-and-dump" schemes).
-
 ## Mitigations & Recommendations
 FINRA's establishment of the Fusion Center implies several recommended practices for member firms and the broader financial sector:
 1.  **Break Down Internal Silos:** Firms should foster operational collaboration between their cybersecurity teams, fraud departments, and compliance/legal units. Threat intelligence should flow bidirectionally.

@@ -46,12 +46,6 @@ This tool release is a response to the evolving landscape where threat actors ma
 *   **Software Supply Chain Poisoning:** AI assistants recommending compromised or typosquatted packages from public repositories.
 The Apiiro CLI is positioned as a mitigative control against these threats by inserting a security analysis step directly into the code suggestion and acceptance loop.
 
-## Detection & Hunting Queries
-Detection queries are not applicable for this defensive tool. However, security teams could hunt for the *absence* of such guardrails by monitoring for development activities that indicate high risk. Example queries for SIEM or IDE telemetry might include:
-*   Identifying developers or automated systems generating large volumes of code via AI assistant APIs without subsequent static application security testing (SAST) scans in version control.
-*   Searching for the installation of AI coding assistant plugins in development environments that lack integrated security plugins or CLI tools.
-*   Correlating rapid code commit velocity from new AI-assisted workflows with a spike in security ticket creation for basic vulnerabilities.
-
 ## Mitigations & Recommendations
 Organizations concerned with the security implications of AI-assisted development should consider the following, based on the capabilities described for the Apiiro CLI:
 1.  **Integrate Security into the AI Prompt Loop:** Do not treat AI-generated code as inherently trustworthy. Implement tools or processes that scan code *during* generation, not just after commit.

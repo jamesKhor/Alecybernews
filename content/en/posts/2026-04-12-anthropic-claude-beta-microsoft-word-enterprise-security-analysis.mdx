@@ -38,14 +38,6 @@ While no active exploitation has been reported, the integration establishes seve
 ## Threat Actor Context
 No specific threat actor is currently targeting the Claude for Word add-in. However, the integration is strategically relevant to a broad range of potential adversaries. **Cybercriminals** focused on data theft for extortion or espionage would be incentivized to probe the new data channel. **Advanced Persistent Threat (APT) groups** engaged in corporate and intellectual property theft may view the tool as a novel method for exfiltrating information from air-gapped or monitored networks if strict egress filtering is not applied to the add-in's communications. **Insider threats** could misuse the tool to summarize or analyze large volumes of restricted documents more efficiently than manual methods, bypassing traditional DLP alerts that may not yet be configured for AI tool traffic.
 
-## Detection & Hunting Queries
-Security teams should monitor for new network connections and process activity related to the Word add-in. Hunting queries should focus on:
-*   **Network Traffic:** Egress traffic from Microsoft Word processes (`WINWORD.EXE`) to new, unfamiliar FQDNs associated with Anthropic's infrastructure (e.g., `*.anthropic.com`, `*.claude.ai`).
-*   **Process Execution:** The installation and loading of the Claude add-in DLL or helper processes within the Word context.
-*   **Data Volume:** Unusually large or frequent outbound data transfers from user workstations to AI service endpoints, which could indicate bulk document processing.
-*   **Logging:** Authentication events from Word to cloud AI services, if applicable, to detect compromised accounts being used to access the AI feature.
-Organizations should baseline normal traffic patterns for Word before and after the add-in's deployment to identify anomalies.
-
 ## Mitigations & Recommendations
 Enterprises should apply a risk-based approach before enabling this integration. Primary mitigations include:
 1.  **Policy & Governance:** Establish clear acceptable use policies for AI-powered office add-ins, defining prohibited data types (e.g., PII, source code, financials, M&A documents). Mandate employee training on the risks of prompt injection and data leakage.

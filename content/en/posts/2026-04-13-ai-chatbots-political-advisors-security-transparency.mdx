@@ -47,13 +47,6 @@ The potential TTPs for malicious actors exploiting this pattern of AI adoption i
 ## Threat Actor Context
 While no specific threat actor is linked to Senator Sanders' actions, the pattern of behavior creates an attractive surface for several advanced persistent threat (APT) groups. Nation-state actors with strategic interests in U.S. policy, particularly those from China (e.g., APT41), Russia (e.g., APT29), or Iran, have clear motivations to understand or influence political thinking. Commercial spyware vendors and politically motivated hacktivists could also find value in targeting the AI-assisted research workflows of political figures, staff, and think tanks. The primary motivation would be **intelligence collection** and **ideological influence**.
 
-## Detection & Hunting Queries
-Organizations, particularly in government and political sectors, should hunt for patterns indicating sensitive use of AI chatbots. Detection is challenging due to the legitimate use of web services, but potential approaches include:
-- Monitoring network logs for high-volume traffic to major AI provider domains (e.g., `*.anthropic.com`, `*.openai.com`, `*.google.com`) from executive or research workstations.
-- Analyzing document metadata and content for stylistic hallmarks of LLM-generated text in policy drafts or briefings.
-- Implementing Data Loss Prevention (DLP) rules to flag or block the pasting of large text segments containing keywords related to internal projects, legislation, or constituent data into unknown web portals.
-- Hunting for the use of unofficial, potentially compromised third-party applications or browser extensions that proxy requests to AI APIs, as these pose a higher risk of credential or data theft.
-
 ## Mitigations & Recommendations
 Mitigating the risks associated with AI in political and governmental work requires policy and technical controls.
 1.  **Establish Clear Usage Policies:** Government offices and campaigns should create formal guidelines governing the use of public AI chatbots for official business, classifying types of information that must not be submitted.

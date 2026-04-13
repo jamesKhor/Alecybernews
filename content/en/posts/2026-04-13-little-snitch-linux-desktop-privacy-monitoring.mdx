@@ -36,14 +36,6 @@ None identified at this time.
 ## Threat Actor Context
 This release is not a response to a specific threat actor or campaign. Instead, it mitigates a class of privacy and security risks inherent to any modern desktop operating system: **covert data exfiltration** and **unexpected telemetry**. Malware, compromised legitimate software, or applications with overly broad data collection practices can silently communicate with command-and-control servers or tracking endpoints. The lack of user-friendly, process-aware monitoring on Linux desktops has made these activities harder for average users to detect compared to macOS, where similar tools have existed for years.
 
-## Detection & Hunting Queries
-For analysts operating in environments where Little Snitch for Linux is deployed, its logs become a primary source for hunting. Queries should focus on anomalous process connections. While the specific log format is not detailed in the source, hunting principles would include:
-*   Identifying processes making network connections that do not align with their known function (e.g., a text editor connecting to an external IP).
-*   Correlating connection timestamps with other suspicious system events.
-*   Baselining normal application behavior to flag new or unexpected destination domains or IP addresses.
-
-System administrators can also monitor for the installation of the tool's packages (e.g., `little-snitch-linux` or similar) to understand its deployment footprint.
-
 ## Mitigations & Recommendations
 For Linux desktop users seeking to improve their privacy posture:
 1.  **Evaluate Little Snitch for Linux**: The free beta provides an opportunity to test the tool's effectiveness in your specific environment. Monitor for performance impact and stability.

@@ -36,9 +36,6 @@ None identified at this time.
 ## Threat Actor Context
 This update is a product enhancement, not a response to a specific active threat. However, the underlying driver for such features is the persistent threat of data compromise at the service-provider level, whether through legal coercion, insider threats, or sophisticated attacks against cloud infrastructure. By implementing client-side encryption, organizations can mitigate risks associated with data exposure while data is at rest or in transit within Google's systems, aligning with a zero-trust model where the cloud vendor is not implicitly trusted with plaintext data.
 
-## Detection & Hunting Queries
-For administrators monitoring their Google Workspace environment, the primary method of detection for the use of this feature would be through audit logs. Administrators can hunt for log events related to the sending or opening of client-side encrypted messages. Specific event names in Google Workspace audit logs, such as those pertaining to `encryption_key_access` or activities filtered by the `event_name` for Gmail CSE actions, would be the focal point. Exact query syntax depends on the organization's logging platform and the specific nomenclature used in Google's log entries.
-
 ## Mitigations & Recommendations
 This announcement is a capability release, not a vulnerability. Therefore, mitigations are framed as security recommendations for eligible organizations:
 

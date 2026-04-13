@@ -59,27 +59,6 @@ From a threat modeling perspective, GPT-5 enhances attacker capability across:
 
 No specific threat actor is attributed. The capability uplift affects the full spectrum of threat actors: nation-state APTs with existing AI investment, ransomware affiliates, and opportunistic cybercriminals. Nation-state groups (particularly those from China, Russia, Iran, and North Korea) are assessed to be rapidly integrating frontier LLMs — either via API access through front companies or by training equivalent models domestically.
 
-## Detection & Hunting Queries
-
-### Detecting AI-Generated Phishing Content
-
-Current AI content detectors (e.g., GPTZero, Originality.ai) are increasingly unreliable for GPT-5 content. More reliable signals include:
-
-1. **Email metadata anomalies**: AI-generated campaigns often show unusual sending infrastructure or temporal clustering
-2. **Linguistic pattern baselines**: Establish per-sender writing style baselines; flag significant deviations
-3. **OSINT correlation**: Flag emails that reference highly specific OSINT about recipients but arrive from external senders
-
-### Splunk — Unusual External Email Volume Spikes
-
-```spl
-index=email sourcetype=o365:management:activity
-Operation=Send
-| bucket span=1h _time
-| stats count by _time, SenderDomain
-| eventstats avg(count) as avg_count, stdev(count) as stdev_count by SenderDomain
-| where count > avg_count + (2 * stdev_count)
-```
-
 ## Mitigations & Recommendations
 
 **Immediate (0–24 hours)**

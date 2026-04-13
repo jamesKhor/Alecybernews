@@ -41,9 +41,6 @@ The DBSC feature mitigates a specific subset of attacker **TTPs** related to cre
 ## Threat Actor Context
 This defense impacts a broad range of threat actors who rely on session cookie theft for persistence and lateral movement. This includes financially motivated cybercriminals operating malware-as-a-service (MaaS) schemes, advanced persistent threat (APT) groups conducting espionage, and ransomware affiliates seeking initial access. The protection is most relevant against actors who obtain cookies post-authentication but lack root-level access to the victim's secure hardware to extract the bound private key.
 
-## Detection & Hunting Queries
-As a client-side browser security feature, DBSC is not directly detectable via network or endpoint monitoring for defensive purposes. However, organizations can monitor for the failure states that the protection would cause. Security teams could hunt for anomalous authentication patterns from Google services where a session cookie is presented but fails validation, which may indicate an attempted cookie replay attack. Logging and analyzing Google Workspace or Cloud Identity authentication logs for error codes related to invalid device attestation could provide signals, though the exact error mechanisms are not yet public.
-
 ## Mitigations & Recommendations
 *   **Ensure Chrome is Updated**: The feature is being rolled out progressively. Organizations and users should ensure Chrome is updated to the latest stable version (M124+).
 *   **Enable Hardware Security**: The protection relies on TPM 2.0 or equivalent secure hardware. Enterprise device provisioning should mandate and verify the presence and enablement of these features.

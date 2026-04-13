@@ -52,21 +52,6 @@ Microsoft refers to the group behind these attacks as **Storm-2755**, also known
 
 No confirmed ties have been established between Storm-2755 and previously documented adversary groups. Attribution remains preliminary due to lack of unique tooling or infrastructure overlap with known clusters.
 
-## Detection & Hunting Queries
-Organizations should monitor for anomalous changes to payroll-related records such as:
-
-```sql
-SELECT * FROM audit_logs WHERE action = 'modify_direct_deposit' AND timestamp > NOW() - INTERVAL 30 DAYS;
-```
-
-Additionally, look for concurrent suspicious logins around payroll processing deadlines:
-
-```sql
-SELECT ip_address, username FROM auth_logs WHERE result = 'success' AND timestamp BETWEEN 'pay_period_start' AND 'pay_period_end';
-```
-
-Network defenders can also hunt using behavioral analytics focused on privilege escalation followed by database record modifications tied to HR/payroll applications.
-
 ## Mitigations & Recommendations
 To reduce exposure to similar attacks, organizations should implement layered defenses including:
 

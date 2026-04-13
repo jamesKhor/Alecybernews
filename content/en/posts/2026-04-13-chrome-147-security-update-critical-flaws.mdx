@@ -41,15 +41,6 @@ While specific TTPs related to these vulnerabilities have not been publicly disc
 ## Threat Actor Context
 No specific threat actors have been tied to active exploitation of these vulnerabilities. However, given the critical nature and the presence of remote code execution potential, it is likely that advanced persistent threat (APT) groups and financially motivated attackers will monitor public disclosures for opportunities to weaponize similar flaws.
 
-## Detection & Hunting Queries
-Organizations using endpoint detection and response (EDR) tools can monitor for anomalous behavior associated with browser exploitation:
-
-```spl
-process_name="chrome.exe" AND (mem_anomaly OR anomalous_thread_creation)
-```
-
-Network defenders should also inspect traffic patterns involving WebML-related API calls or abnormal model loading behaviors from untrusted origins.
-
 ## Mitigations & Recommendations
 - **Update immediately**: All Chrome users should upgrade to version **147.0.758.37** or later.
 - **Disable experimental features**: Since WebML is experimental, disabling it in `chrome://flags` reduces attack surface.

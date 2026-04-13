@@ -39,12 +39,6 @@ Based on the available information, the primary tactic appears to be **Initial A
 ## Threat Actor Context
 The identity and motivation of the threat actor behind this breach are currently unknown. The targeted nature of the data—specifically prescriptions for conditions often associated with social stigma—suggests a financially motivated actor specializing in sensitive data extortion, potentially a ransomware or extortion group. Alternatively, it could be the work of a hacktivist or individual seeking to cause reputational damage. Attribution remains speculative without further technical evidence or a claim of responsibility.
 
-## Detection & Hunting Queries
-Organizations, particularly in the healthcare sector, can hunt for similar activity by monitoring for anomalous access patterns to systems containing sensitive PHI. Relevant queries include:
-- Hunting for unusual logins to medical provider portals or electronic health record systems outside of normal hours or from unexpected geolocations.
-- Detecting bulk queries or exports of data tied to specific medication classes or sensitive health conditions where access patterns deviate from clinical norms.
-- Alerting on the creation of new, highly privileged user accounts or the escalation of privileges for existing accounts on systems handling prescription data.
-
 ## Mitigations & Recommendations
 Hims & Hers has stated it reset relevant passwords and implemented additional monitoring. For other healthcare and telehealth organizations, key mitigations include:
 - **Enforce Strict Access Controls:** Implement role-based access control (RBAC) and the principle of least privilege for all systems containing PHI, ensuring providers can only access data necessary for direct patient care.

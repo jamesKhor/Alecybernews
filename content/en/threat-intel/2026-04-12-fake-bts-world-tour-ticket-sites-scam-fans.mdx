@@ -41,12 +41,6 @@ The attackers' TTPs align with standard e-commerce fraud and phishing campaigns,
 ## Threat Actor Context
 The source report does not attribute this campaign to a known threat actor group. The operation's characteristics—financial motivation, broad geographic targeting, and exploitation of a popular cultural event—are consistent with opportunistic cybercriminal affiliates or fraud-as-a-service (FaaS) platforms. These actors typically lack a specific political or espionage agenda and are motivated solely by profit. Their infrastructure is likely agile and ephemeral, with domains being registered and abandoned quickly to evade takedowns.
 
-## Detection & Hunting Queries
-Organizations and individuals can hunt for related activity using the following logic:
-- **Domain Monitoring**: Hunt for new domain registrations containing strings like `bts`, `bangtan`, `btstour`, `btstickets`, or common misspellings, especially when combined with generic top-level domains (TLDs) not typically used by official vendors.
-- **Network Traffic**: Monitor for outbound HTTP/S connections from user endpoints to domains with recently created SSL certificates or low reputation scores, particularly following web searches for "BTS tickets."
-- **Endpoint Logs**: Search for processes spawning `msedge.exe`, `chrome.exe`, or `firefox.exe` with command-line arguments containing the aforementioned suspicious keywords, which may indicate visits to these sites.
-
 ## Mitigations & Recommendations
 - **For Fans**: Purchase tickets only from officially promoted and verified vendors. Be skeptical of sites found through social media ads or non-official search results. Use credit cards over debit cards for additional fraud protection, and monitor statements closely after any online purchase.
 - **For Financial Institutions**: Implement and tune fraud detection rules to flag transactions originating from newly registered or low-reputation e-commerce domains, particularly those with names related to high-demand events.

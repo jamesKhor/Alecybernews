@@ -43,13 +43,6 @@ None identified at this time.
 ## Threat Actor Context
 While this report does not detail an active cyber campaign, the energy sector remains a premier target for state-sponsored and criminal threat actors. The concentration of generation capacity in these seven nations could make their hydroelectric infrastructure an attractive target for adversaries seeking to cause widespread disruption. Threat groups known for targeting industrial control systems (ICS), such as those linked to state-sponsored campaigns tracked under names like **Sandworm** or **Berserk Bear**, have historically demonstrated capabilities against energy grids. The motivation could range from geopolitical coercion to demonstrating capability, particularly for nations where these resources are also key economic exports.
 
-## Detection & Hunting Queries
-Security teams responsible for protecting critical energy infrastructure, including hydroelectric facilities, should prioritize monitoring for known adversarial TTPs. While specific IOCs are not provided in the source material, hunting should focus on:
-* Network traffic anomalies to and from engineering workstations and PLCs in generation and transmission environments.
-* Use of legitimate remote access tools (e.g., RDP, VPN) outside of normal patterns or from suspicious geolocations.
-* Credential harvesting attempts targeting OT network engineers and third-party service providers.
-* Changes to control system logic or turbine governor setpoints that cannot be correlated with authorized operator activity.
-
 ## Mitigations & Recommendations
 For the nations highlighted and any organization managing similar critical renewable assets, we recommend a defense-in-depth strategy tailored to OT environments:
 1.  **Segment and Harden OT Networks:** Ensure strong segmentation between IT corporate networks and OT control networks. Implement robust firewalls and unidirectional gateways where possible to prevent lateral movement from IT compromises.

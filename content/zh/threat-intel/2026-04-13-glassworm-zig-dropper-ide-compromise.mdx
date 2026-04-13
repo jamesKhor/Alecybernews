@@ -52,12 +52,6 @@ affected_sectors:
 ## 威胁行为者背景
 GlassWorm 自 2024 年初活跃，主要针对软件开发者，以获取源码和知识产权的早期访问权。该组织之前的活动使用基于 Go 的投放器，并利用被入侵的 GitHub 账户。转向 Zig 表明其在规避基于签名的检测并生成更小二进制文件方面的意图。归因仍不确定；然而其作案模式与先前观察到的一个位于东欧的松散组织的网络犯罪论坛活动相符。
 
-## 检测与溯源查询
-- **Windows Sysmon**: `EventID=1 AND ImageLoaded LIKE "%extension.js%"`
-- **Endpoint logs**: `process_name: "code.exe" AND command_line:*"specstudio.code-wakatime-activity-tracker*"`
-- **Network**: `dst.domain: "dlz9x.cloudfront.net" AND dst.port:443`
-- **File integrity**: Alert on newly created hidden files under `%USERPROFILE%\.vscode\` or JetBrains config directories.
-
 ## 缓解措施与建议
 1. **验证扩展** – 要求开发者仅从已验证来源安装扩展；在 IDE 策略设置中实施白名单。
 2. **供应链扫描** – 集成能够检测扩展包内编译二进制的 SAST/SCA 工具。

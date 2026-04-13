@@ -37,12 +37,6 @@ While not attributable to a specific threat actor, the essay implicitly describe
 ## Threat Actor Context
 This is not a campaign by a named threat group. The "threat" is the systemic accumulation of technical debt and insecure design patterns within an organization's software development lifecycle. Adversaries of all sophistication levels, from opportunistic attackers to advanced persistent threats (APTs), subsequently scan for and exploit the vulnerabilities that arise from this environment. The origin of the risk is internal, stemming from development practices that prioritize perceived innovation or short-term velocity over robust, understandable design.
 
-## Detection & Hunting Queries
-Security teams can hunt for symptoms of non-idiomatic design that increase risk. These are not direct IOCs but risk indicators:
-*   **Code Churn Analysis:** Identify modules with abnormally high rates of corrective commits and bug fixes, which can signal underlying design instability.
-*   **Pull Request Metrics:** Flag reviews where a disproportionate amount of comment discussion is spent on understanding basic code flow rather than evaluating logic.
-*   **Static Analysis (SAST) Custom Rules:** Create rules to detect known anti-patterns that deviate from language-specific best practices (e.g., manual resource disposal instead of using idiomatic context managers).
-
 ## Mitigations & Recommendations
 Organizations should treat idiomatic design as a security control. Mitigations include:
 1.  **Adopt and Enforce Style Guides:** Expand style guides beyond formatting to include **idiomatic patterns** for error handling, resource management, and API design. Integrate these checks into the CI/CD pipeline.

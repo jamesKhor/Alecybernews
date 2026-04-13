@@ -23,7 +23,6 @@ TRANSLATION RULES:
   ## Indicators of Compromise → ## 入侵指标
   ## Tactics, Techniques & Procedures → ## 战术、技术与程序
   ## Threat Actor Context → ## 威胁行为者背景
-  ## Detection & Hunting Queries → ## 检测与溯源查询
   ## Mitigations & Recommendations → ## 缓解措施与建议
   ## References → ## 参考资料
 - Do NOT add any content not in the original

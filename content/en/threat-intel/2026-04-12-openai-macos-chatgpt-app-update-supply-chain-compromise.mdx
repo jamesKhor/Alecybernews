@@ -38,13 +38,6 @@ The threat actor employed a classic software supply chain attack, categorized un
 ## Threat Actor Context
 OpenAI's disclosure does not attribute this incident to a specific threat actor or group. The nature of the attack—targeting a foundational open-source component to potentially harvest data from a high-profile AI application's user base—suggests the involvement of a sophisticated actor. This could range from a state-sponsored group conducting espionage to a financially motivated criminal operation seeking training data or proprietary information. The lack of attribution at this early stage is common in ongoing investigations.
 
-## Detection & Hunting Queries
-Organizations monitoring their macOS endpoints can hunt for evidence of compromise by checking for the presence of the vulnerable ChatGPT application version. A primary focus should be on outbound network connections made by the desktop app that are not destined for OpenAI's official domains (`*.openai.com`). EDR queries should look for process creation events related to the ChatGPT app and subsequent network activity.
-
-- **Process Execution:** Look for the ChatGPT application binary (e.g., `ChatGPT.app/Contents/MacOS/ChatGPT`).
-- **Network Traffic:** Hunt for HTTP/HTTPS requests from the ChatGPT desktop process to domains not aligned with OpenAI's infrastructure. Suspicious traffic to newly registered domains or domains with names mimicking Axios or common CDNs should be investigated.
-- **File Integrity Monitoring:** Alert on unexpected modifications to the application's JavaScript bundle or node_modules directory post-installation.
-
 ## Mitigations & Recommendations
 The critical and immediate mitigation is to update the ChatGPT desktop application for macOS to the latest version provided by OpenAI through the official update mechanism or by downloading it directly from the OpenAI website. Users should not delay this action. As a general security practice, organizations should:
 1.  **Enforce Application Allowlisting:** Restrict which applications can run on corporate macOS devices, limiting the installation of unsanctioned desktop clients.

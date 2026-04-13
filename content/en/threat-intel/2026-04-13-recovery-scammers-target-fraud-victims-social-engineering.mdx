@@ -42,12 +42,6 @@ A key procedure is the use of urgency and authority, pressuring victims to act q
 ## Threat Actor Context
 The actors behind these schemes are financially motivated criminal groups, likely overlapping with or connected to the perpetrators of the initial frauds. ESET suggests the existence of a criminal ecosystem where victim data is a commodity, sold or shared among groups specializing in different fraud types. The origin of these groups is unclear from the available reporting, but their operations are global, targeting English-speaking victims primarily in the US, Canada, Australia, and the UK. Their business model is opportunistic, focusing on a proven high-conversion target demographic: individuals who have already demonstrated a susceptibility to fraud and are desperate for a resolution.
 
-## Detection & Hunting Queries
-Detection focuses on anomalous communications and financial red flags rather than endpoint telemetry.
-*   **Communication Monitoring:** Hunt for emails or calls claiming to be from government agencies (IC3, FTC, Secret Service) offering fund recovery services. Legitimate agencies do not initiate contact in this manner.
-*   **Financial Pattern Analysis:** Flag transactions where the narrative or memo line includes terms like "recovery fee," "tax bond," "unlock fee," or "government processing charge" directed to unknown individuals or entities.
-*   **Data Leak Hunting:** Organizations handling fraud reports should audit access logs for victim data portals to detect suspicious queries or bulk downloads that could indicate a credential compromise or insider threat.
-
 ## Mitigations & Recommendations
 Mitigation is primarily awareness-based for potential victims, with specific actions for organizations handling sensitive fraud data.
 For Individuals:

@@ -43,13 +43,6 @@ In the absence of observed malicious activity, potential TTPs can be theorized b
 ## Threat Actor Context
 No specific threat actor is currently associated with targeting Orange Business's AI-voice integration. However, the profile of the platform makes it an attractive target for multiple actor types. **Espionage-focused advanced persistent threat (APT) groups** may seek access to harvest sensitive business intelligence from executive communications. **Financially motivated actors** could target aggregated call data for blackmail, insider trading, or corporate fraud. **Data brokers and surveillance-for-hire firms** may also have interest in the rich behavioral and conversational analytics the system is designed to produce. The supply-chain nature of the service means an attack on Orange Business or its AI provider could potentially impact all downstream enterprise customers.
 
-## Detection & Hunting Queries
-Organizations adopting this or similar AI-enhanced voice services should implement enhanced monitoring. While vendor-specific logs are unavailable, generic hunting strategies include:
-*   Monitoring egress network traffic from telephony application servers for new, persistent connections to unknown external IP ranges or cloud service domains (e.g., `api.ai-provider.com`).
-*   Baselining and alerting on unusual process creation or module loads on voice infrastructure servers that may indicate injection of AI processing components.
-*   Auditing access logs for the administrative interfaces of the voice platform for suspicious patterns, such as accesses from unusual locations to download or export call transcripts and analytics.
-*   Implementing data loss prevention (DLP) rules to detect bulk transfers of text files containing meeting minutes or call summaries from authorized management systems.
-
 ## Mitigations & Recommendations
 Enterprises evaluating or deploying AI-integrated telecom services should adopt a stringent security posture:
 1.  **Demand Technical and Contractual Transparency:** Require detailed documentation from the provider on data flow diagrams, AI model provenance, API security, and the specifics of data encryption in transit and at rest within the AI pipeline.

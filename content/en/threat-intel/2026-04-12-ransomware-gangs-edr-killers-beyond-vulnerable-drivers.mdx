@@ -36,13 +36,6 @@ The primary TTP observed is the **Defense Evasion** technique of **Impair Defens
 ## Threat Actor Context
 While ESET's report does not attribute this specific technique to named threat groups, the adoption of signed driver-based EDR killers is consistent with the behavior of sophisticated, financially motivated ransomware operations. These groups continuously invest in research and development to overcome security improvements. The move from BYOVD to custom signed drivers suggests a level of resourcefulness and access to either code-signing certificate theft or underground markets where such certificates can be acquired. This tactic is not the domain of a single group but is becoming a standardized tool in the broader ransomware ecosystem, indicating knowledge sharing or parallel development among affiliates and core developers.
 
-## Detection & Hunting Queries
-Detection should focus on kernel-level activity and driver loading events, particularly for new or rarely seen drivers. Hunting queries should examine:
-- System logs for the loading of drivers with unusual metadata (e.g., recent timestamps, publisher names mismatching common vendors) via events like `Sysmon Event ID 6` (Driver loaded).
-- Process termination events (`Sysmon Event ID 5`) where the parent process is a kernel-mode driver or a system utility like `svchost.exe` or `services.exe` acting anomalously.
-- Command-line logging for the use of `PnPUtil.exe` or `sc.exe` to install drivers outside of standard software deployment or update cycles.
-- Monitoring for the creation of unsigned or suspiciously signed kernel-mode drivers in the `C:\Windows\System32\drivers\` directory.
-
 ## Mitigations & Recommendations
 Organizations should implement a layered defense strategy. Critical measures include:
 - **Enforcing Driver Allowlisting:** Configure policies to block the loading of drivers not explicitly signed by trusted publishers or not on an approved list. Microsoft's **Hypervisor-Protected Code Integrity (HVCI)** is a core technology for this.

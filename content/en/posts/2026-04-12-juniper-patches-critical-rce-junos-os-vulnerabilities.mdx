@@ -40,13 +40,6 @@ This flaw provides a direct path from external network access to full system con
 ## Threat Actor Context
 There is no public evidence of active exploitation of CVE-2024-2973 prior to the patch release. However, the technical details of the vulnerability—being remote, unauthenticated, and leading to root-level code execution—make it a prime candidate for rapid integration into the arsenals of both opportunistic threat actors and state-sponsored groups. Network infrastructure devices like firewalls and switches are high-value targets for espionage, network persistence, and traffic manipulation. The lack of authentication required significantly lowers the barrier to entry for exploitation.
 
-## Detection & Hunting Queries
-Organizations should prioritize patching. For detection in environments where immediate patching is not feasible, the following hunting strategies can be considered:
-*   Monitor network logs for HTTP requests to the `/juniper/` path or other J-Web-specific URIs on SRX and EX Series device IPs, particularly from unexpected source IPs or geolocations.
-*   Deploy intrusion detection signatures focused on anomalous HTTP packet sizes or structures targeting Juniper web interfaces, though these may be evaded by sophisticated attacks.
-*   Use endpoint detection on the underlying FreeBSD host to look for unexpected child processes spawned by the J-Web service or unauthorized changes to system files.
-*   Query for failed login attempts followed immediately by a successful exploitation attempt, though the flaw does not require authentication.
-
 ## Mitigations & Recommendations
 The primary and most effective mitigation is to apply the Junos OS software updates provided by Juniper Networks. The company has released fixed versions for multiple supported branches, including 21.4R3-S8, 22.2R3-S4, 22.3R3-S3, and others. Organizations should consult the official Juniper security bulletin (JSA75700) for the complete list of patched versions. If patching cannot be performed immediately, a critical workaround is to **disable the J-Web interface** entirely and use out-of-band (OOB) management or the Junos OS CLI for device administration. As a standard security practice, management interfaces for critical network infrastructure should never be exposed directly to the internet.
 

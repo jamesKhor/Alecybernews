@@ -165,7 +165,6 @@ Every article uses these exact H2 sections (AI prompt enforces this):
 ## Indicators of Compromise
 ## Tactics, Techniques & Procedures
 ## Threat Actor Context
-## Detection & Hunting Queries
 ## Mitigations & Recommendations
 ## References
 ```

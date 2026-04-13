@@ -46,12 +46,6 @@ The primary technique observed is **T1562.001: Impair Defenses: Disable or Modif
 ## Threat Actor Context
 The activity is attributed to the Iranian state, acting through its telecommunications regulatory body and mandated ISPs. The objective is political and social control, specifically to limit internal coordination and dissemination of information during periods of civil unrest or political significance, and to restrict external visibility into internal events. This pattern of intentional internet blackouts has been a documented tool of the Iranian government for several years, though the current duration marks a notable intensification.
 
-## Detection & Hunting Queries
-Network defenders outside of Iran are unlikely to directly detect this activity within their own perimeter. However, security and network monitoring teams can observe the broader impact and confirm outages via the following:
-*   **BGP Monitoring:** Query global BGP looking glasses or services like BGPStream for route withdrawal events from major Iranian ASNs (e.g., ASN 58224 (Iran Telecommunication Company PJS)).
-*   **Threat Intelligence Feeds:** Monitor network connectivity feeds from organizations like NetBlocks or Kentik for reports of anomalous drops in traffic destined for Iranian IP space.
-*   **Internal Telemetry:** Alert on a complete cessation of network traffic and connection attempts to business partners or assets based in Iran, which would present as a uniform failure rather than a gradual degradation.
-
 ## Mitigations & Recommendations
 For organizations and individuals within Iran, mitigation options are severely limited due to the state's control over the physical and logical network layer. Circumvention relies on tools that may themselves be blocked or illegal. General recommendations include:
 *   **Preparedness:** Assume periodic loss of international and domestic connectivity. Develop offline communication and data transfer protocols for critical business operations.

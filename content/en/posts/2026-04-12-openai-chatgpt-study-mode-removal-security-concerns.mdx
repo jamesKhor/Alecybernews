@@ -37,12 +37,6 @@ The core technique observed here is **T1589: Gather Victim Identity Information*
 ## Threat Actor Context
 This is not an action by a malicious cyber threat actor but a policy and operational change by the service provider, OpenAI. The **threat model** shifts from external attackers to the **supply chain and dependency risks** inherent in third-party AI services. Organizations that integrated this undocumented feature into their security controls effectively granted OpenAI the ability to alter their security configuration remotely and without notice. The actor's motivation appears to be platform simplification or feature consolidation, but the lack of transparency creates collateral security impact.
 
-## Detection & Hunting Queries
-Organizations should hunt for operational failures or behavioral changes in automated ChatGPT integrations.
-*   **Log Analysis:** Search application logs for errors or altered responses from ChatGPT API calls that previously included a `study` parameter. Look for new instances of network traffic from your AI integration layer to external web domains, which may indicate the unintended activation of web search capabilities.
-*   **API Monitoring:** Implement checks to confirm that desired constraints (like disabled file uploads) are still functionally enforced after each provider update. A simple probe could involve requesting a summary of a recent news event; a successful summary without the `study` flag would now indicate web search is active.
-*   **Process Monitoring:** Monitor for changes in the performance or cost profiles of AI workflows, as web searches and file processing consume different resources and may incur different fees.
-
 ## Mitigations & Recommendations
 1.  **Avoid Undocumented Features:** For any security-critical function, rely only on officially documented and supported API parameters and service guarantees. Undocumented features are subject to change without notice.
 2.  **Implement Proxy Controls:** To enforce isolation, do not depend on the AI provider's internal flags. Instead, route API calls through a controlled proxy that strips outbound requests to external web services and blocks file uploads to the AI service at the network layer.

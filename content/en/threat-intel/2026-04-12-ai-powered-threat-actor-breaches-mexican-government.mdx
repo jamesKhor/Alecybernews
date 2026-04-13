@@ -46,13 +46,6 @@ The core innovation lies in the operational use of large language models (LLMs) 
 ## Threat Actor Context
 The origin, affiliation, and motivation of the threat actor are not publicly attributed. The targeting of multiple Mexican government agencies and the theft of vast citizen data repositories could point to espionage, large-scale fraud, or data aggregation for future criminal operations. The technical sophistication, particularly the deliberate and effective use of AI, suggests a capable and resourceful actor, though it remains unclear if this is a state-sponsored group, an advanced cybercriminal outfit, or a highly skilled individual. The incident serves as a concrete case study for the emerging trend of "offensive AI" being used in real-world campaigns.
 
-## Detection & Hunting Queries
-Organizations should hunt for anomalies related to AI-augmented phishing and lateral movement with legitimate credentials:
-*   **Email Filtering:** Hunt for a high volume of internally themed emails with similar linguistic patterns but originating from external domains not whitelisted for official communication.
-*   **User Behavior Analytics (UEBA):** Query for logins from standard user accounts at unusual times, or from IP addresses not associated with the user's typical geography, followed by high-volume database queries or file access.
-*   **Network Traffic:** Look for large, sustained outbound data transfers from internal servers to unfamiliar external IP addresses or cloud storage providers, especially during off-hours.
-*   **Process Execution:** While not specified in this attack, hunting for unexpected PowerShell, `certutil`, or data archiving tool usage (like `7z`, `rar`) on servers containing sensitive data can indicate staging prior to exfiltration.
-
 ## Mitigations & Recommendations
 Defense against AI-enhanced attacks requires reinforcing fundamental security practices with a focus on human factors and strict access control:
 1.  **Phishing Defense:** Implement advanced email security solutions that analyze writing style and context, not just signatures. Mandate regular, realistic phishing simulation training that includes AI-generated lure examples.

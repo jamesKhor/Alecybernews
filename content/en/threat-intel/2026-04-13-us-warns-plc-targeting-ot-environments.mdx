@@ -41,17 +41,6 @@ Adversaries targeting PLCs typically rely on initial access through compromised 
 ## Threat Actor Context
 No specific threat actor was named in the referenced report. However, both nation-state actors and criminal entities have demonstrated capabilities in targeting ICS environments. Nation-sponsored groups such as APT28 (Fancy Bear), APT29 (Cozy Bear), and Sandworm (associated with Russia's GRU) have previously conducted intrusions into OT networks. Attribution remains speculative without forensic evidence linking observed activity to particular actors.
 
-## Detection & Hunting Queries
-Organizations should monitor for unusual traffic patterns between IT and OT network segments, particularly involving legacy protocols:
-```sql
-SELECT * FROM network_traffic WHERE protocol IN ('Modbus', 'DNP3') AND src_zone = 'IT' AND dst_zone = 'OT'
-```
-Additionally, query logs for repeated authentication failures against known PLC IP addresses:
-```sql
-SELECT count(*) AS login_attempts, src_ip FROM auth_logs WHERE device_type LIKE '%PLC%' GROUP BY src_ip HAVING login_attempts > 10
-```
-Anomalous binary changes or unexpected logic uploads to controllers should also raise suspicion.
-
 ## Mitigations & Recommendations
 To reduce risk of compromise, asset owners should:
 
