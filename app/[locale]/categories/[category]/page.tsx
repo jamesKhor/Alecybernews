@@ -33,14 +33,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, category } = await params;
   const t = await getTranslations({ locale, namespace: "categories" });
 
-  const label =
-    category in (t as unknown as Record<string, string>)
-      ? t(category as Parameters<typeof t>[0])
-      : category;
+  // Safe translation lookup — CategoryEnum.options are valid translation keys
+  const label = CategoryEnum.options.includes(category as never)
+    ? t(category as Parameters<typeof t>[0])
+    : category;
+  const isZh = locale === "zh";
+  const description = isZh
+    ? `浏览 ZCyberNews 上所有${label}文章。`
+    : `Browse all ${label} articles on ZCyberNews.`;
 
   return {
-    title: `${label} — ZCyberNews`,
-    description: `Browse all ${label} articles on ZCyberNews.`,
+    title: label,
+    description,
     alternates: {
       canonical: `/${locale}/categories/${category}`,
       languages: {
@@ -50,8 +54,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: `${label} — ZCyberNews`,
-      description: `Browse all ${label} articles on ZCyberNews.`,
+      title: label,
+      description,
       url: `/${locale}/categories/${category}`,
       siteName: "ZCyberNews",
       locale: locale === "zh" ? "zh_CN" : "en_US",

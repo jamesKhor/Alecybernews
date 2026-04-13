@@ -1,0 +1,50 @@
+---
+title: Critical Android SDK Flaw Exposed Millions of Crypto Wallet Private Keys
+slug: 2026-04-13-critical-android-sdk-flaw-exposed-crypto-wallet-private-keys
+date: '2026-04-13'
+excerpt: >-
+  A vulnerability in the EngageLab Push SDK, tracked as CVE-2023-4863, allowed
+  attackers to steal private keys from millions of Android cryptocurrency
+  wallets by intercepting push notifications.
+category: vulnerabilities
+tags:
+  - android
+  - cryptocurrency
+  - sdk
+  - push-notification
+  - cve-2023-4863
+language: en
+source_urls:
+  - >-
+    https://www.securityweek.com/microsoft-finds-vulnerability-exposing-millions-of-android-crypto-wallet-users/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-critical-android-sdk-flaw-exposed-crypto-wallet-private-keys
+severity: critical
+cve_ids:
+  - CVE-2023-4863
+affected_sectors:
+  - cryptocurrency
+---
+## Executive Summary
+A critical vulnerability in a widely used Android software development kit (SDK) exposed the private keys of millions of cryptocurrency wallet users, enabling complete account takeover. The flaw, identified by Microsoft researchers and tracked as **CVE-2023-4863**, resided in the **EngageLab Push SDK**. It allowed attackers to intercept and decrypt push notifications, which some wallet applications used to transmit sensitive seed phrases and private keys. Microsoft reported the vulnerability to EngageLab in December 2023, and a patched SDK version (v3.1.0) was released in March 2024.
+
+## Technical Analysis
+The vulnerability stemmed from a fundamental design flaw in how the EngageLab Push SDK handled encrypted push notification payloads. According to Microsoft's analysis, the SDK used a hardcoded secret key for **Advanced Encryption Standard (AES)** encryption and decryption. This static key was embedded within the SDK's code, shared across all applications integrating the library.
+
+An attacker could exploit this by performing a man-in-the-middle (MitM) attack to intercept encrypted push notifications sent from an application's backend server to a user's device. Because the decryption key was not unique to the app or device, the attacker could use the same universal key to decrypt the intercepted traffic. Microsoft's investigation revealed that several cryptocurrency wallet apps misused the push notification channel, transmitting highly sensitive data such as wallet recovery seed phrases and private keys through these encrypted messages. Successful decryption would grant the attacker full, irreversible control over the victim's cryptocurrency holdings.
+
+## Indicators of Compromise
+None identified at this time. The exploitation of CVE-2023-4863 would not leave traditional forensic artifacts on the victim's device, as the attack involves intercepting network traffic. Detection would rely on monitoring for anomalous network activity or unauthorized transactions from cryptocurrency wallets.
+
+## Tactics, Techniques & Procedures
+The primary technique observed in this threat is **Adversary-in-the-Middle (AiTM)** to capture network traffic. The attacker would position themselves to intercept communication between the targeted application's notification server and the Android device. Following interception, they would leverage the hardcoded cryptographic key (a form of **Static Key Exchange**) to decrypt the payloads. The subsequent theft of private keys or seed phrases falls under **Unsecured Credentials** and enables **Account Access Removal**, effectively locking the legitimate user out of their wallet.
+
+## Threat Actor Context
+Microsoft's disclosure did not attribute exploitation of this vulnerability to a specific threat actor or group. However, the flaw presented a highly attractive target for both financially motivated cybercriminals and advanced persistent threat (APT) groups with an interest in cryptocurrency theft. The widespread integration of the vulnerable SDK and the potential for direct financial gain significantly raised the likelihood of attempted exploitation.
+
+## Mitigations & Recommendations
+Application developers must immediately upgrade their integration to **EngageLab Push SDK v3.1.0** or later, which removes the hardcoded key and implements a more secure key management system. Developers of cryptocurrency and other financial applications must conduct a thorough audit to ensure that sensitive data, especially cryptographic seed material, is never transmitted via push notification channels, regardless of encryption. End-users should update all applications, particularly cryptocurrency wallets, as patches become available. Users should also monitor wallet transactions for any unauthorized activity and consider moving assets to a newly generated, secure wallet if they suspect compromise.
+
+## References
+- https://www.securityweek.com/microsoft-finds-vulnerability-exposing-millions-of-android-crypto-wallet-users/

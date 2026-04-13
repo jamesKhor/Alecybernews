@@ -4,26 +4,6 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import type { Metadata } from "next";
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  return {
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        en: "/en",
-        "zh-Hans": "/zh",
-        "x-default": "/en",
-      },
-    },
-  };
-}
-
 export default async function LocaleLayout({
   children,
   params,

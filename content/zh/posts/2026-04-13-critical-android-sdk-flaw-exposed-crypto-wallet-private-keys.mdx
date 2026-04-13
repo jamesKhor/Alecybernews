@@ -1,0 +1,49 @@
+---
+title: 关键Android SDK漏洞暴露数百万加密钱包私钥
+slug: 2026-04-13-critical-android-sdk-flaw-exposed-crypto-wallet-private-keys
+date: '2026-04-13'
+excerpt: >-
+  EngageLab Push
+  SDK中的一个漏洞，跟踪为CVE-2023-4863，允许攻击者通过拦截推送通知，从数百万Android加密货币钱包中窃取私钥。
+category: vulnerabilities
+tags:
+  - android
+  - cryptocurrency
+  - sdk
+  - push-notification
+  - cve-2023-4863
+language: zh
+source_urls:
+  - >-
+    https://www.securityweek.com/microsoft-finds-vulnerability-exposing-millions-of-android-crypto-wallet-users/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-critical-android-sdk-flaw-exposed-crypto-wallet-private-keys
+severity: critical
+cve_ids:
+  - CVE-2023-4863
+affected_sectors:
+  - cryptocurrency
+---
+## 执行摘要
+一个广泛使用的Android软件开发工具包（SDK）中存在一个关键漏洞，暴露了数百万加密货币钱包用户的私钥，使得攻击者能够完全接管账户。这个漏洞由微软研究人员发现，并被追踪为**CVE-2023-4863**，存在于**EngageLab Push SDK**中。它允许攻击者截获并解密推送通知，一些钱包应用程序使用这些通知传输敏感的种子短语和私钥。微软在2023年12月向EngageLab报告了这个漏洞，并在2024年3月发布了修补后的SDK版本（v3.1.0）。
+
+## 技术分析
+这个漏洞源于EngageLab Push SDK处理加密推送通知有效载荷的一个基本设计缺陷。根据微软的分析，SDK使用了**高级加密标准（AES）**加密和解密的硬编码密钥。这个静态密钥嵌入在SDK的代码中，所有集成该库的应用程序都共享这个密钥。
+
+攻击者可以通过执行中间人（MitM）攻击来截获从应用程序后端服务器发送到用户设备的加密推送通知。由于解密密钥不是针对应用程序或设备唯一的，攻击者可以使用相同的通用密钥来解密截获的流量。微软的调查发现，几个加密货币钱包应用程序误用了推送通知通道，通过这些加密消息传输高度敏感的数据，如钱包恢复种子短语和私钥。成功解密将使攻击者获得对受害者加密货币资产的完全、不可逆的控制权。
+
+## 入侵指标
+目前没有识别出任何入侵指标。利用CVE-2023-4863不会在受害者的设备上留下传统的取证痕迹，因为攻击涉及截获网络流量。检测将依赖于监控异常网络活动或来自加密货币钱包的未经授权的交易。
+
+## 战术、技术与程序
+在这种威胁中观察到的主要技术是**中间人攻击（AiTM）**以捕获网络流量。攻击者将自己定位为截获目标应用程序的通知服务器与Android设备之间的通信。截获后，他们会利用硬编码的加密密钥（一种**静态密钥交换**）来解密有效载荷。随后的私钥或种子短语被盗属于**未加密凭证**，并使**账户访问权限移除**，有效地将合法用户锁定在他们的钱包之外。
+
+## 威胁行为者背景
+微软的披露没有将这个漏洞的利用归因于特定的威胁行为者或团体。然而，这个漏洞对于财务驱动的网络犯罪分子和对加密货币盗窃感兴趣的高级持续性威胁（APT）团体来说，是一个极具吸引力的目标。漏洞SDK的广泛集成和直接财务收益的潜力显著提高了尝试利用的可能性。
+
+## 缓解措施与建议
+应用程序开发人员必须立即升级他们的集成到**EngageLab Push SDK v3.1.0**或更高版本，该版本移除了硬编码密钥并实现了更安全的密钥管理系统。加密货币和其他金融应用程序的开发人员必须进行彻底的审计，以确保敏感数据，特别是加密种子材料，永远不会通过推送通知通道传输，无论是否加密。最终用户应更新所有应用程序，特别是加密货币钱包，一旦补丁可用。用户还应监控钱包交易是否有任何未经授权的活动，并考虑在怀疑被入侵时将资产转移到新生成的安全钱包中。
+
+## 参考资料
+- https://www.securityweek.com/microsoft-finds-vulnerability-exposing-millions-of-android-crypto-wallet-users/

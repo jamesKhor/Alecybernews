@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : "In-depth threat analysis, vulnerability research, and security news for defenders.";
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: `/${locale}`,

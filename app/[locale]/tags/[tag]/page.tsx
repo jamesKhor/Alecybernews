@@ -25,9 +25,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, tag } = await params;
+  const isZh = locale === "zh";
   return {
-    title: `#${tag} — ZCyberNews`,
-    description: `Browse all articles tagged with "${tag}" on ZCyberNews.`,
+    title: `#${tag}`,
+    description: isZh
+      ? `浏览 ZCyberNews 上标签为「${tag}」的所有文章。`
+      : `Browse all articles tagged with "${tag}" on ZCyberNews.`,
     alternates: {
       canonical: `/${locale}/tags/${tag}`,
       languages: {
