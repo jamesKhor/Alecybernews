@@ -12,13 +12,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         const validUsername = process.env.ADMIN_USERNAME;
         const passwordHash = process.env.ADMIN_PASSWORD_HASH;
+        const legacyPassword = process.env.ADMIN_PASSWORD;
 
-        if (!validUsername || !passwordHash) return null;
+        if (!validUsername || (!passwordHash && !legacyPassword)) return null;
         if (credentials.username !== validUsername) return null;
 
         const password = String(credentials.password);
-        const valid = await bcrypt.compare(password, passwordHash);
-        if (!valid) return null;
+
+        if (passwordHash) {
+          // Preferred: bcrypt hash stored in ADMIN_PASSWORD_HASH
+          const valid = await bcrypt.compare(password, passwordHash);
+          if (!valid) return null;
+        } else if (legacyPassword) {
+          // Fallback: plaintext ADMIN_PASSWORD (migrate to hash when possible)
+          if (password !== legacyPassword) return null;
+        } else {
+          return null;
+        }
 
         return { id: "1", name: "Admin" };
       },

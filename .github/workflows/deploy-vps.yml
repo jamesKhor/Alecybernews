@@ -5,6 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Prevent concurrent deploys from queuing up and stomping each other
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,15 +23,24 @@ jobs:
           script: |
             set -e
             cd /home/zcybernews/zcybernews
-            echo "⬇️  Pulling latest code..."
-            git pull origin main
+
+            echo "⬇️  Syncing to latest remote main..."
+            # Use fetch + reset instead of pull to handle diverged local branches
+            # (pipeline commits locally before push; git pull fails on diverge)
+            git fetch origin main
+            git reset --hard origin/main
+
             echo "📦 Installing dependencies..."
             HUSKY=0 npm ci --production=false
+
             echo "🧹 Cleaning old build cache..."
             rm -rf .next
-            echo "🔨 Building..."
+
+            echo "🔨 Building (commit: $(git rev-parse --short HEAD))..."
             npm run build
+
             echo "♻️  Restarting PM2..."
             pm2 restart zcybernews || pm2 start npm --name zcybernews -- start
             pm2 save
-            echo "✅ Deployed successfully at $(date)"
+
+            echo "✅ Deployed $(git rev-parse --short HEAD) at $(TZ='Asia/Singapore' date '+%Y-%m-%d %H:%M:%S SGT')"

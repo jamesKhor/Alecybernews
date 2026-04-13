@@ -58,10 +58,19 @@ echo "  ZCyberNews Pipeline — $(TZ='Asia/Singapore' date '+%Y-%m-%d %H:%M:%S S
 echo "=============================================="
 
 # 1. Pull latest code from GitHub
-echo "[deploy] Pulling latest from main..."
-git pull origin main --ff-only || {
-  echo "[deploy] ⚠️  git pull failed — working tree may be dirty. Continuing with current code."
-}
+echo "[deploy] Syncing to latest remote main..."
+# fetch + rebase: keeps any unpushed local commits on top of remote changes
+# Falls back to hard-reset if rebase fails (e.g. conflicting history)
+git fetch origin main || echo "[deploy] ⚠️  git fetch failed — continuing with current code."
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/main)
+if [ "$LOCAL" != "$REMOTE" ]; then
+  git rebase origin/main || {
+    echo "[deploy] ⚠️  rebase failed — hard-resetting to origin/main"
+    git rebase --abort 2>/dev/null || true
+    git reset --hard origin/main
+  }
+fi
 
 # 2. Run the AI pipeline (disable errexit — partial failures are expected when
 #    some articles fail schema validation; we still want to publish the rest)
@@ -86,7 +95,8 @@ fi
 
 echo "[pipeline] $NEW_FILES new file(s) detected. Rebuilding site..."
 
-# 4. Rebuild Next.js
+# 4. Rebuild Next.js (clean first to avoid stale SSG cache from prior deploys)
+rm -rf .next
 NODE_OPTIONS="--max-old-space-size=512" HUSKY=0 npm run build
 
 # 5. Restart PM2
