@@ -29,6 +29,13 @@ WRITING RULES:
 - References section: list all source URLs as markdown links
 - If a section has no data (e.g. no IOCs), write "None identified at this time."
 
+CVE ID RULES (CRITICAL):
+- ONLY include real, verified CVE IDs that appear in the source material with their full numeric ID (e.g. CVE-2026-12345)
+- NEVER invent, guess, or use placeholder CVE IDs like CVE-2026-xxxxx, CVE-YYYY-NNNNN, CVE-2026-XXXX
+- If the source mentions a vulnerability but does NOT provide a specific CVE ID, write "CVE ID not yet assigned" or "CVE ID not publicly disclosed" in the text
+- Leave the "cve_ids" JSON array EMPTY if no confirmed CVE IDs exist in the sources
+- A wrong CVE ID is far worse than no CVE ID — when in doubt, omit it
+
 OUTPUT FORMAT — respond with ONLY valid JSON, no markdown fences:
 {
   "title": "SEO-friendly headline, max 80 chars",

@@ -43,7 +43,17 @@ export const GeneratedArticleSchema = z.object({
     .enum(["critical", "high", "medium", "low", "informational"])
     .nullable(),
   cvss_score: z.number().nullable(),
-  cve_ids: z.array(z.string()),
+  cve_ids: z.array(z.string()).transform((ids) => {
+    const validCvePattern = /^CVE-\d{4}-\d{4,}$/;
+    const filtered = ids.filter((id) => validCvePattern.test(id));
+    const rejected = ids.filter((id) => !validCvePattern.test(id));
+    if (rejected.length > 0) {
+      console.warn(
+        `[schema] Stripped invalid/placeholder CVE IDs: ${rejected.join(", ")}`,
+      );
+    }
+    return filtered;
+  }),
   threat_actor: z.string().nullable(),
   threat_actor_origin: z.string().nullable(),
   affected_sectors: z.array(z.string()),

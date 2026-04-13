@@ -10,6 +10,41 @@ const CONTENT_DIR = path.join(process.cwd(), "content");
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/;
 
 /**
+ * Valid CVE format: CVE-YYYY-NNNNN (year + at least 4 digits).
+ * Anything with x's, X's, or fewer than 4 trailing digits is a placeholder.
+ */
+const VALID_CVE_RE = /^CVE-\d{4}-\d{4,}$/;
+const PLACEHOLDER_CVE_RE = /CVE-\d{4}-[xX]{2,}[xX\d]*/g;
+
+/**
+ * Strip placeholder/hallucinated CVE IDs from article body text.
+ * Replaces patterns like "CVE-2026-xxxxx" with "a zero-day vulnerability".
+ */
+function sanitizePlaceholderCVEs(body: string): string {
+  if (!PLACEHOLDER_CVE_RE.test(body)) return body;
+  console.warn(
+    `[write] WARNING: Placeholder CVE IDs found in article body — stripping`,
+  );
+  // Reset regex lastIndex after .test()
+  PLACEHOLDER_CVE_RE.lastIndex = 0;
+  return body.replace(PLACEHOLDER_CVE_RE, "a zero-day vulnerability");
+}
+
+/**
+ * Filter cve_ids array to only valid CVE format, stripping placeholders.
+ */
+function filterValidCVEs(cveIds: string[]): string[] {
+  const valid = cveIds.filter((id) => VALID_CVE_RE.test(id));
+  const rejected = cveIds.filter((id) => !VALID_CVE_RE.test(id));
+  if (rejected.length > 0) {
+    console.warn(
+      `[write] Stripped invalid CVE IDs from frontmatter: ${rejected.join(", ")}`,
+    );
+  }
+  return valid;
+}
+
+/**
  * Validate that EN content doesn't contain Chinese characters
  * and ZH content has Chinese in the body (not just English).
  * Logs a warning and strips CJK from EN articles to prevent contamination.
@@ -54,7 +89,8 @@ function buildFrontmatter(
   if (overrides?.locale_pair) fm.locale_pair = overrides.locale_pair;
   if (article.severity) fm.severity = article.severity;
   if (article.cvss_score !== null) fm.cvss_score = article.cvss_score;
-  if (article.cve_ids.length) fm.cve_ids = article.cve_ids;
+  const validCves = filterValidCVEs(article.cve_ids);
+  if (validCves.length) fm.cve_ids = validCves;
   if (article.threat_actor) fm.threat_actor = article.threat_actor;
   if (article.threat_actor_origin)
     fm.threat_actor_origin = article.threat_actor_origin;
@@ -79,7 +115,8 @@ function writeMdx(
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
   const filePath = path.join(dir, `${datedSlug}.mdx`);
-  const cleanBody = validateLanguage(locale, body);
+  const langCleanBody = validateLanguage(locale, body);
+  const cleanBody = sanitizePlaceholderCVEs(langCleanBody);
   const file = matter.stringify(cleanBody, frontmatter);
   fs.writeFileSync(filePath, file, "utf-8");
   console.log(`[write] ${filePath}`);

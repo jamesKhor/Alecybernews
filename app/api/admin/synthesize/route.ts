@@ -159,6 +159,7 @@ CONTENT RULES:
 - Is ${wc.instruction}
 - Is factual, technically precise, no marketing language — write like Krebs on Security
 - Attributes claims where possible ("according to researchers", "Mandiant reports", etc.)
+- NEVER invent or guess CVE IDs — only use CVE IDs that appear verbatim in the sources with their full numeric format (e.g. CVE-2026-12345). If a vulnerability has no confirmed CVE ID, write "CVE ID not yet assigned" instead of making one up.
 
 SEO RULES:
 - Use the primary keyword (the main threat/CVE/actor name) naturally in the first 100 words
@@ -225,6 +226,7 @@ EXCERPT RULES:
 TAGS RULES:
 - Use specific terms that people actually search for
 - Include CVE IDs if present, specific malware names, threat actor aliases, affected vendor names
+- NEVER include placeholder CVE IDs (like cve-2026-xxxxx) in tags — only real, verified CVE IDs with full numeric format
 
 VALID CATEGORY VALUES (use EXACTLY one):
 ${CATEGORY_DESCRIPTIONS}
