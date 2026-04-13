@@ -1,0 +1,62 @@
+---
+title: >-
+  Obsidian Plugin Ecosystem Abused to Deliver PhantomPulse RAT in Targeted
+  Campaign
+slug: 2026-04-13-obsidian-plugin-abused-phantompulse-rat-targeted-campaign
+date: '2026-04-13'
+excerpt: >-
+  Threat actors tracked as REF6598 are abusing Obsidian's plugin system to
+  deliver the PhantomPulse RAT via social engineering, targeting financial and
+  cryptocurrency professionals.
+category: malware
+tags:
+  - obsidian
+  - phantompulse
+  - rat
+  - social-engineering
+  - ref6598
+language: en
+source_urls:
+  - 'https://www.elastic.co/security-labs/phantom-in-the-vault'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-obsidian-plugin-abused-phantompulse-rat-targeted-campaign
+severity: high
+threat_actor: REF6598
+affected_sectors:
+  - financial-services
+  - cryptocurrency
+---
+## Executive Summary
+A threat actor tracked as **REF6598** is conducting a targeted social engineering campaign that abuses the legitimate plugin ecosystem of the popular note-taking application **Obsidian** to deliver a previously undocumented remote access trojan (RAT) named **PhantomPulse**. The campaign, which began in early 2024, primarily targets professionals in the financial and cryptocurrency sectors through fake job offers on LinkedIn and Telegram. The attackers leverage the trust associated with Obsidian's community plugins to bypass security controls and establish a persistent foothold on victim systems.
+
+## Technical Analysis
+The attack chain begins with social engineering, where threat actors pose as recruiters or project managers on LinkedIn and Telegram. They engage potential victims with fake job opportunities related to cryptocurrency trading or quantitative analysis. After establishing rapport, the attackers direct the target to a GitHub repository containing a malicious Obsidian plugin, often named to align with the job ruse, such as `obsidian-quant-trading`. The victim is instructed to download and install this plugin within their local Obsidian application.
+
+The malicious plugin is a Node.js package containing obfuscated JavaScript. When installed and activated by the victim, the plugin executes a multi-stage payload retrieval process. It first contacts a command-and-control (C2) server to fetch an encrypted second-stage payload. This payload is decrypted using a hard-coded key and executed via the Windows Script Host (`cscript.exe`). The final payload is the PhantomPulse RAT, a .NET-based implant that provides extensive backdoor capabilities, including file system manipulation, process execution, screen capture, and keylogging. The RAT uses HTTPS for C2 communication, with traffic designed to blend in with legitimate Obsidian update requests.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+The campaign demonstrates a sophisticated blend of social engineering and software supply chain abuse. The threat actor's TTPs align with the following MITRE ATT&CK techniques:
+*   **T1589.001 (Gather Victim Identity Information: Credentials):** Use of fake LinkedIn profiles to identify and research targets in specific sectors.
+*   **T1588.002 (Obtain Capabilities: Tool):** Development and hosting of a malicious Obsidian plugin.
+*   **T1204.002 (User Execution: Malicious File):** Social engineering to convince users to manually download and install the malicious plugin.
+*   **T1554 (Compromise Client Software Binary):** Abuse of a trusted application's (Obsidian) extension mechanism to execute malicious code.
+*   **T1027 (Obfuscated Files or Information):** Use of obfuscated JavaScript within the plugin and encrypted second-stage payloads.
+*   **T1573.001 (Encrypted Channel: Symmetric Cryptography):** Use of HTTPS and custom encryption for C2 communication.
+
+## Threat Actor Context
+The threat actor is tracked by Elastic Security Labs as **REF6598**. Their specific origin or possible affiliation with a known advanced persistent threat (APT) group remains unclear. The targeting is deliberate, focusing on individuals within the financial and cryptocurrency industries, suggesting a motive of espionage or financial theft. The operational security is notable, with the actor using the inherent trust in a legitimate software ecosystem (Obsidian plugins) as a key attack vector, a technique less commonly observed in widespread campaigns.
+
+## Mitigations & Recommendations
+Organizations, particularly those in targeted sectors, should implement the following measures:
+1.  **User Training:** Educate employees, especially those in high-value roles, on advanced social engineering tactics, including fake job offers on professional networks.
+2.  **Application Control:** Restrict the installation of unauthorized software and plugins on corporate devices. Consider policies that limit or vet the use of community plugins in productivity tools.
+3.  **Network Monitoring:** Monitor outbound HTTPS traffic for anomalies, even to legitimate domains, as malware can blend in with normal application traffic. Look for connections from processes like `cscript.exe` to unfamiliar external resources.
+4.  **Endpoint Detection:** Deploy EDR solutions capable of detecting suspicious parent-child process relationships, such as Obsidian spawning `cscript.exe` or `powershell.exe`.
+5.  **Verification Procedures:** Implement strict procedures for verifying the legitimacy of software and components, especially those downloaded from community repositories, before installation.
+
+## References
+*   Elastic Security Labs. "Phantom in the vault: Obsidian abused to deliver PhantomPulse RAT." https://www.elastic.co/security-labs/phantom-in-the-vault

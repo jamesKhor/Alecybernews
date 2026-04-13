@@ -1,0 +1,59 @@
+---
+title: Obsidian 插件生态系统被滥用以在针对性活动中传递 PhantomPulse RAT
+slug: 2026-04-13-obsidian-plugin-abused-phantompulse-rat-targeted-campaign
+date: '2026-04-13'
+excerpt: >-
+  被追踪为 REF6598 的威胁行为者正在滥用 Obsidian 的插件系统，通过社会工程学传递 PhantomPulse
+  RAT，目标是金融和加密货币专业人士。
+category: malware
+tags:
+  - obsidian
+  - phantompulse
+  - rat
+  - social-engineering
+  - ref6598
+language: zh
+source_urls:
+  - 'https://www.elastic.co/security-labs/phantom-in-the-vault'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-obsidian-plugin-abused-phantompulse-rat-targeted-campaign
+severity: high
+threat_actor: REF6598
+affected_sectors:
+  - financial-services
+  - cryptocurrency
+---
+## 执行摘要
+一个被追踪为**REF6598**的威胁行为者正在进行一场针对性的社会工程学活动，滥用流行的笔记应用**Obsidian**的合法插件生态系统来分发一种名为**PhantomPulse**的以前未记录的远程访问木马（RAT）。这场活动始于2024年初，主要通过LinkedIn和Telegram上的假工作机会针对金融和加密货币行业的专业人士。攻击者利用与Obsidian社区插件相关的信任来绕过安全控制，并在受害者系统上建立持久的立足点。
+
+## 技术分析
+攻击链始于社会工程学，威胁行为者在LinkedIn和Telegram上冒充招聘人员或项目经理。他们用与加密货币交易或定量分析相关的假工作机会与潜在受害者接触。在建立了关系之后，攻击者将目标指向包含恶意Obsidian插件的GitHub仓库，插件名称通常与工作骗局相匹配，例如`obsidian-quant-trading`。受害者被指示在其本地Obsidian应用程序中下载并安装此插件。
+
+恶意插件是一个包含混淆JavaScript的Node.js包。当受害者安装并激活插件时，它会执行一个多阶段的有效载荷检索过程。它首先联系一个命令和控制（C2）服务器以获取加密的第二阶段有效载荷。这个有效载荷使用硬编码的密钥进行解密，并通过Windows脚本宿主（`cscript.exe`）执行。最终的有效载荷是PhantomPulse RAT，这是一个基于.NET的植入物，提供了广泛的后门功能，包括文件系统操作、进程执行、屏幕捕获和键盘记录。RAT使用HTTPS进行C2通信，流量设计得与合法的Obsidian更新请求融为一体。
+
+## 入侵指标
+目前未识别出任何入侵指标。
+
+## 战术、技术与程序
+这场活动展示了社会工程学和软件供应链滥用的复杂融合。威胁行为者的战术、技术与程序（TTP）与以下MITRE ATT&CK技术相符：
+*   **T1589.001（收集受害者身份信息：凭证）：** 使用假LinkedIn个人资料识别并研究特定行业的受害者。
+*   **T1588.002（获取能力：工具）：** 开发和托管恶意Obsidian插件。
+*   **T1204.002（用户执行：恶意文件）：** 社会工程学说服用户手动下载并安装恶意插件。
+*   **T1554（破坏客户端软件二进制文件）：** 滥用受信任应用程序（Obsidian）的扩展机制执行恶意代码。
+*   **T1027（混淆文件或信息）：** 在插件中使用混淆JavaScript和加密的第二阶段有效载荷。
+*   **T1573.001（加密通道：对称加密）：** 使用HTTPS和自定义加密进行C2通信。
+
+## 威胁行为者背景
+Elastic Security Labs追踪这个威胁行为者为**REF6598**。他们特定的起源或可能与已知的高级持续性威胁（APT）组织的关联尚不清楚。目标是故意的，专注于金融和加密货币行业的个人，暗示了间谍活动或金融盗窃的动机。操作安全是显著的，行为者使用对合法软件生态系统（Obsidian插件）的固有信任作为关键攻击向量，这是一种在广泛活动中不太常见的技术。
+
+## 缓解措施与建议
+组织，特别是那些被针对的行业，应实施以下措施：
+1.  **用户培训：** 教育员工，特别是那些在高价值角色中的员工，了解高级社会工程学策略，包括在专业网络上的假工作机会。
+2.  **应用程序控制：** 限制在企业设备上安装未经授权的软件和插件。考虑限制或审查在生产力工具中使用社区插件的政策。
+3.  **网络监控：** 监控出站HTTPS流量的异常情况，即使是合法域名，因为恶意软件可以与正常应用程序流量融为一体。寻找来自`cscript.exe`等进程到不熟悉的外部资源的连接。
+4.  **端点检测：** 部署能够检测可疑父子进程关系的EDR解决方案，例如Obsidian生成`cscript.exe`或`powershell.exe`。
+5.  **验证程序：** 实施严格的程序，以验证软件和组件的合法性，特别是那些从社区仓库下载的，在安装之前。
+
+## 参考资料
+*   Elastic Security Labs. "Phantom in the vault: Obsidian abused to deliver PhantomPulse RAT." https://www.elastic.co/security-labs/phantom-in-the-vault
