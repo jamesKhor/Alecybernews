@@ -1,0 +1,58 @@
+---
+title: JanelaRAT Evolves with New Anti-Analysis and Data Theft Capabilities
+slug: 2026-04-13-janelarat-evolves-anti-analysis-data-theft-capabilities
+date: '2026-04-13'
+excerpt: >-
+  Kaspersky researchers detail an updated JanelaRAT campaign targeting Latin
+  American users with enhanced anti-analysis, credential theft, and remote
+  access capabilities delivered via phishing.
+category: malware
+tags:
+  - janelarat
+  - remote-access-trojan
+  - latin-america
+  - financial-threat
+  - phishing
+language: en
+source_urls:
+  - 'https://securelist.com/janelarat-financial-threat-in-latin-america/119332/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-janelarat-evolves-anti-analysis-data-theft-capabilities
+severity: high
+affected_regions:
+  - Latin America
+---
+## Executive Summary
+An updated campaign distributing the **JanelaRAT** remote access trojan (RAT) is actively targeting users in Latin America, primarily for financial theft. According to Kaspersky's Global Research and Analysis Team (GReAT), the malware's operators have enhanced its capabilities with new anti-analysis techniques, expanded credential theft modules, and improved remote control functionality. The infection chain relies on phishing emails distributing malicious Microsoft Installer (`.msi`) files, which deploy a multi-stage payload designed to evade detection and establish persistence on victim systems.
+
+## Technical Analysis
+The infection begins with a phishing email containing a link to a password-protected RAR archive hosted on Google Drive. The archive contains a malicious `.msi` installer file. When executed, this installer drops and runs a legitimate, signed binary—often a driver management tool like `devcon.exe`—to perform a **Living-off-the-Land** (LotL) technique. This binary is then used to sideload a malicious DLL, `version.dll`, which serves as the first-stage payload.
+
+This initial DLL is heavily obfuscated and performs multiple anti-analysis checks. It verifies the system has a Portuguese or Spanish keyboard layout, attempts to detect virtual machines and analysis tools like Process Hacker and Wireshark, and checks for specific MAC address prefixes associated with VMware. If the environment is deemed safe, it proceeds to decrypt and load the core JanelaRAT payload from its `.rsrc` section.
+
+The final JanelaRAT payload is a feature-rich remote access trojan. Key functionalities include: executing commands via `cmd.exe`; managing files (upload, download, delete); capturing screenshots and keystrokes; and stealing credentials from a wide array of applications including browsers (Chrome, Edge, Firefox), email clients (Thunderbird, Outlook), FTP clients (FileZilla), and cryptocurrency wallets. The malware establishes persistence via a scheduled task and communicates with its command-and-control (C2) server using HTTP POST requests with Base64-encoded data.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+*   **Initial Access (TA0001):** Phishing emails with links to malicious archives on Google Drive (T1566.002).
+*   **Execution (TA0002):** Use of malicious MSI installers (T1204.002) and Living-off-the-Land binaries (`devcon.exe`) for DLL sideloading (T1574.002).
+*   **Defense Evasion (TA0005):** Environmental checks for VM/sandbox detection (T1497.001), obfuscated files, and use of trusted signed binaries to cloak malicious activity.
+*   **Persistence (TA0003):** Creation of a scheduled task (T1053.005).
+*   **Collection (TA0009) & Exfiltration (TA0010):** Theft of credentials from multiple applications and exfiltration via HTTP POST to C2.
+*   **Command and Control (TA0011):** HTTP-based communication with Base64 encoding.
+
+## Threat Actor Context
+The threat actor behind JanelaRAT remains unidentified. The malware's consistent focus on Portuguese and Spanish-speaking users, coupled with its primary goal of financial and credential theft, strongly suggests a financially motivated criminal group operating within or targeting Latin America. The use of cloud storage (Google Drive) for initial payload delivery and the ongoing development of the RAT's capabilities indicate a moderately sophisticated and active operation.
+
+## Mitigations & Recommendations
+*   **User Training:** Educate users, especially in Latin American regions, to identify phishing attempts and avoid downloading/executing files from unsolicited emails, even if hosted on trusted platforms like Google Drive.
+*   **Application Control:** Implement application allowlisting to prevent the execution of unauthorized binaries, including MSI installers from untrusted sources.
+*   **Network Monitoring:** Monitor outbound HTTP traffic for anomalous POST requests to unknown domains and for patterns of data exfiltration.
+*   **Endpoint Detection:** Deploy EDR solutions capable of detecting LotL techniques, DLL sideloading, and the creation of persistence mechanisms like scheduled tasks by suspicious processes.
+*   **Credential Security:** Enforce the use of hardware security keys or robust multi-factor authentication (MFA) for critical accounts to mitigate the impact of stolen credentials.
+
+## References
+*   https://securelist.com/janelarat-financial-threat-in-latin-america/119332/

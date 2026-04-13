@@ -1,0 +1,59 @@
+---
+title: Fake Claude AI Website Delivers PlugX RAT via DLL Sideloading
+slug: 2026-04-13-fake-claude-website-distributes-plugx-rat
+date: '2026-04-13'
+excerpt: >-
+  A fraudulent website impersonating Anthropic's Claude AI distributes a
+  self-deleting installer that deploys the PlugX remote access trojan via DLL
+  sideloading.
+category: malware
+tags:
+  - plugx
+  - dll-sideloading
+  - supply-chain
+  - ai
+  - rat
+language: en
+source_urls:
+  - 'https://www.securityweek.com/fake-claude-website-distributes-plugx-rat/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-fake-claude-website-distributes-plugx-rat
+severity: high
+---
+## Executive Summary
+A malicious website impersonating the legitimate Anthropic Claude AI service is distributing a self-contained installer that deploys the PlugX remote access trojan (RAT). The attack chain relies on **DLL sideloading** to execute the final payload and is designed to delete all traces of the initial infection vector, complicating forensic analysis. The campaign highlights the continued weaponization of trusted software brands and AI tools in software supply-chain attacks.
+
+## Technical Analysis
+The threat involves a fraudulent website designed to mimic the official Anthropic Claude platform. According to SecurityWeek, the site offers a malicious installer that presents itself as a legitimate Claude application. When executed, this installer performs a multi-stage deployment process. The primary technique is **DLL sideloading**, where a legitimate, signed executable is used to load a malicious dynamic-link library (DLL) placed in the same directory. This abuse of the Windows library search order allows the malicious code to run under the guise of a trusted process.
+
+The installer is self-contained and performs cleanup operations after successful execution. It is engineered to delete the initial downloaded file and other intermediate components, leaving only the final, persistent PlugX payload on the compromised system. This self-cleaning mechanism aims to hinder detection and incident response by removing the obvious initial infection vector. The final payload, PlugX, is a modular RAT with a long history of use by various threat actors, capable of full system control, data exfiltration, and serving as a backdoor for further malware deployment.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+The threat actor employs a consistent set of techniques to achieve initial access and execution.
+- **Tactic: Initial Access (TA0001)**
+  - **Technique: Drive-by Compromise (T1189)**: The attack begins with a victim visiting a fake Claude AI website, likely reached through search engine poisoning, malvertising, or phishing links.
+- **Tactic: Execution (TA0002)**
+  - **Technique: User Execution (T1204)**: Execution requires the victim to run the downloaded malicious installer, presumably believing it to be legitimate AI software.
+  - **Technique: Hijack Execution Flow (TA0005) / DLL Side-Loading (T1574.002)**: The core execution mechanism abuses a legitimate executable to load a malicious DLL, evading application whitelisting and leveraging the trust associated with the signed binary.
+- **Tactic: Defense Evasion (TA0005)**
+  - **Technique: File Deletion (T1070.004)**: The installer script deletes the initial download and intermediate files to cover its tracks.
+  - **Technique: Masquerading (T1036)**: The entire operation is disguised as an installation process for the popular Claude AI application.
+
+## Threat Actor Context
+The specific threat actor behind this campaign is not identified in the available reporting. PlugX is a commodity RAT with a decade-long history, used by a wide range of actors from Chinese-aligned espionage groups to criminal operators. Its presence in this campaign does not inherently point to a specific origin. The choice of impersonating a cutting-edge AI service suggests a threat actor attuned to current technological trends and seeking to exploit high user interest and trust in new AI platforms. The operational security measures, such as file cleanup, indicate a degree of sophistication aimed at persisting undetected.
+
+## Mitigations & Recommendations
+Organizations and individuals should implement defensive measures focused on initial access and execution prevention.
+- **Source Verification**: Download software only from official vendor websites and verified distribution channels. Be skeptical of sites offering AI or other tools that deviate from known official domains.
+- **Application Whitelisting**: Deploy application allowlisting solutions that can block unauthorized executables, including those involved in DLL sideloading attacks.
+- **Endpoint Detection & Response (EDR)**: Use EDR or advanced antivirus solutions capable of detecting behavioral patterns associated with sideloading and post-exploitation activity like the installation of RATs.
+- **User Training**: Educate users on the risks of downloading software from unofficial sources, especially for high-profile tools like AI assistants. Encourage verification of website URLs and digital signatures.
+- **Network Monitoring**: Monitor for outbound connections to known malicious infrastructure and anomalous data transfers that may indicate a PlugX or similar RAT beaconing.
+- **Principle of Least Privilege**: Limit user accounts to standard privileges to reduce the impact of successful execution and hinder system-wide persistence mechanisms.
+
+## References
+- https://www.securityweek.com/fake-claude-website-distributes-plugx-rat/

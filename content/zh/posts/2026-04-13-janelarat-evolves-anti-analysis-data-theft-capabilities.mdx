@@ -1,0 +1,55 @@
+---
+title: JanelaRAT 进化新增反分析和数据窃取能力
+slug: 2026-04-13-janelarat-evolves-anti-analysis-data-theft-capabilities
+date: '2026-04-13'
+excerpt: 卡巴斯基研究人员详细描述了一个更新的JanelaRAT活动，该活动针对拉丁美洲用户，通过钓鱼邮件提供增强的反分析、凭证窃取和远程访问能力。
+category: malware
+tags:
+  - janelarat
+  - remote-access-trojan
+  - latin-america
+  - financial-threat
+  - phishing
+language: zh
+source_urls:
+  - 'https://securelist.com/janelarat-financial-threat-in-latin-america/119332/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-13-janelarat-evolves-anti-analysis-data-theft-capabilities
+severity: high
+affected_regions:
+  - Latin America
+---
+## 执行摘要
+一个更新的活动正在分发 **JanelaRAT** 远程访问木马（RAT），积极针对拉丁美洲用户，主要是为了金融盗窃。根据卡巴斯基全球研究与分析团队（GReAT），恶意软件的操作者已经通过新的反分析技术、扩展的凭证盗窃模块和改进的远程控制功能增强了其能力。感染链依赖于分发恶意的 Microsoft 安装程序（`.msi`）文件的钓鱼邮件，这些文件部署了一个多阶段的有效载荷，旨在逃避检测并在受害者系统上建立持久性。
+
+## 技术分析
+感染始于一封包含链接到托管在 Google Drive 上的受密码保护的 RAR 归档的钓鱼邮件。归档包含一个恶意的 `.msi` 安装程序文件。执行时，此安装程序会放置并运行一个合法的、签名的二进制文件——通常是像 `devcon.exe` 这样的驱动程序管理工具——以执行 **Living-off-the-Land**（LotL）技术。然后使用此二进制文件来侧载恶意 DLL，`version.dll`，作为第一阶段的有效载荷。
+
+这个初始 DLL 被严重混淆，并执行多个反分析检查。它验证系统是否具有葡萄牙语或西班牙语键盘布局，尝试检测虚拟机和分析工具，如 Process Hacker 和 Wireshark，并检查与 VMware 相关的特定 MAC 地址前缀。如果环境被认为是安全的，它将解密并从其 `.rsrc` 部分加载核心 JanelaRAT 有效载荷。
+
+最终的 JanelaRAT 有效载荷是一个功能丰富的远程访问木马。关键功能包括：通过 `cmd.exe` 执行命令；管理文件（上传、下载、删除）；捕获屏幕截图和按键；以及从包括浏览器（Chrome、Edge、Firefox）、电子邮件客户端（Thunderbird、Outlook）、FTP 客户端（FileZilla）和加密货币钱包在内的多种应用程序中窃取凭证。恶意软件通过计划任务建立持久性，并使用 Base64 编码数据通过 HTTP POST 请求与其命令和控制（C2）服务器通信。
+
+## 入侵指标
+目前未识别出任何入侵指标。
+
+## 战术、技术与程序
+*   **初始访问 (TA0001)：** 带有链接到 Google Drive 上恶意归档的钓鱼邮件 (T1566.002)。
+*   **执行 (TA0002)：** 使用恶意 MSI 安装程序 (T1204.002) 和 Living-off-the-Land 二进制文件（`devcon.exe`）进行 DLL 侧载 (T1574.002)。
+*   **防御绕过 (TA0005)：** 环境检查用于 VM/沙箱检测 (T1497.001)，混淆文件，并使用可信签名二进制文件掩盖恶意活动。
+*   **持久性 (TA0003)：** 创建计划任务 (T1053.005)。
+*   **收集 (TA0009) & 外泄 (TA0010)：** 从多个应用程序中窃取凭证，并通过 HTTP POST 外泄至 C2。
+*   **命令与控制 (TA0011)：** 基于 HTTP 的通信，使用 Base64 编码。
+
+## 威胁行为者背景
+JanelaRAT 背后的威胁行为者仍然不明。恶意软件持续关注葡萄牙语和西班牙语用户，以及其主要的金融和凭证盗窃目标，强烈表明一个在拉丁美洲内或针对拉丁美洲的以财务为动机的犯罪集团。使用云存储（Google Drive）进行初始有效载荷交付和 RAT 能力的持续发展表明了一个中等复杂性和活跃的操作。
+
+## 缓解措施与建议
+*   **用户培训：** 教育用户，特别是在拉丁美洲地区，识别钓鱼企图并避免从未经请求的电子邮件中下载/执行文件，即使这些文件托管在像 Google Drive 这样的可信平台上。
+*   **应用控制：** 实施应用允许列表，以防止未经授权的二进制文件执行，包括来自不受信任来源的 MSI 安装程序。
+*   **网络监控：** 监控出站 HTTP 流量，寻找异常的 POST 请求到未知域名和数据外泄模式。
+*   **端点检测：** 部署能够检测 LotL 技术、DLL 侧载和可疑进程创建持久性机制（如计划任务）的 EDR 解决方案。
+*   **凭证安全：** 强制使用硬件安全密钥或强大的多因素认证（MFA）来减轻被盗凭证的影响。
+
+## 参考资料
+*   [https://securelist.com/janelarat-financial-threat-in-latin-america/119332/](https://securelist.com/janelarat-financial-threat-in-latin-america/119332/)
