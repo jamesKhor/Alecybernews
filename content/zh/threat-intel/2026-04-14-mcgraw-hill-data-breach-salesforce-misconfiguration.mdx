@@ -1,0 +1,49 @@
+---
+title: 麦格劳-希尔数据泄露与被利用的Salesforce配置错误相关
+slug: 2026-04-14-mcgraw-hill-data-breach-salesforce-misconfiguration
+date: '2026-04-14'
+excerpt: 麦格劳-希尔确认数据泄露，威胁行为者利用配置错误的Salesforce环境访问内部企业数据，导致勒索企图。
+category: threat-intel
+tags:
+  - data-breach
+  - misconfiguration
+  - extortion
+  - education
+  - salesforce
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/mcgraw-hill-confirms-data-breach-following-extortion-threat/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-mcgraw-hill-data-breach-salesforce-misconfiguration
+severity: medium
+affected_sectors:
+  - Education
+  - Publishing
+---
+## 执行摘要
+教育和出版巨头McGraw-Hill已确认，由于Salesforce环境配置不当，导致数据泄露。该公司表示，此次事件仅限于内部企业数据，并在攻击者发出勒索威胁后发生。据报道，没有客户、财务或学生信息被访问。此次泄露突显了即使是大型、成熟的企业，云服务配置不当所带来的持续风险。
+
+## 技术分析
+根据McGraw-Hill向BleepingComputer的声明，此次泄露源于公司使用的Salesforce环境中的一个配置错误。具体的配置错误性质没有详细说明，但这类问题通常涉及数据存储保护不当、暴露的管理界面或不充分的访问控制，允许未经授权的外部访问。威胁行为者利用这一缺陷访问了未指定数量的内部企业数据。公司与外部网络安全专家一起进行的调查得出结论，被访问的系统是隔离的，不包含客户、财务或学生数据。泄露已被控制，配置错误已得到纠正。入侵的技术细节和确切的数据类型外泄尚未公开披露。
+
+## 入侵指标
+目前未识别出任何指标。
+
+## 战术、技术与程序
+此次事件中使用的主要技术似乎是**利用公共应用程序**（T1190），特别是针对配置不当的云服务（Salesforce）。这属于更广泛的**初始访问**战术。攻击者可能使用扫描工具来识别暴露的资源。在数据访问之后，行为者通过尝试**数据操纵**和**财务勒索**（T1496, T1486）参与了**影响**战术，威胁如果不支付赎金就泄露被盗信息。报告中描述的缺乏部署的恶意软件或持久立足点表明，这是一个相对简单的操作，专注于从暴露的资产中窃取数据，用于立即勒索。
+
+## 威胁行为者背景
+McGraw-Hill泄露背后的特定威胁行为者或团体尚未被识别。利用云配置错误进行数据盗窃，然后提出勒索要求的作案手法与许多网络犯罪集团和初始访问经纪人的战术一致。这些行为者经常扫描Salesforce、Microsoft Azure或AWS S3桶等广泛使用的平台上的常见配置错误。此次事件没有显示出国家支持的活动的特征，后者通常涉及更复杂、持久的访问和战略情报收集，而不是公开勒索要求。动机似乎主要是财务。
+
+## 缓解措施与建议
+使用Salesforce等云平台的组织必须实施严格的配置管理和持续监控，以防止类似的泄露。关键行动包括：
+*   **实施最小权限访问：**使用基于角色的访问控制（RBAC）严格控制对云管理控制台和数据存储库的访问。
+*   **实施配置审计：**定期使用自动化工具（例如，CSPM - 云安全态势管理）审计云环境设置，以检测与安全基线的偏差，例如公开可读的存储或未受保护的API。
+*   **启用全面日志记录：**确保启用详细的云平台活动审计日志，集中并监控异常访问模式。
+*   **进行外部攻击面扫描：**定期从攻击者的角度扫描您自己的外部足迹，以识别无意中暴露的资产。
+*   **建立事件响应计划：**制定一个经过测试的计划，包括应对勒索企图的程序，包括与执法部门和法律顾问的接触。
+
+## 参考资料
+*   [https://www.bleepingcomputer.com/news/security/mcgraw-hill-confirms-data-breach-following-extortion-threat/](https://www.bleepingcomputer.com/news/security/mcgraw-hill-confirms-data-breach-following-extortion-threat/)

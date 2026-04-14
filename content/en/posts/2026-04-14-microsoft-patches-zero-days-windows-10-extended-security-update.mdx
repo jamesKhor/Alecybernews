@@ -1,0 +1,48 @@
+---
+title: Microsoft Patches Two Zero-Days in Final Windows 10 Extended Security Update
+slug: 2026-04-14-microsoft-patches-zero-days-windows-10-extended-security-update
+date: '2026-04-14'
+excerpt: >-
+  Microsoft's final extended security update for Windows 10, KB5082200, patches
+  two zero-day vulnerabilities exploited in the wild, alongside other critical
+  fixes for unsupported systems.
+category: vulnerabilities
+tags:
+  - microsoft
+  - windows 10
+  - zero-day
+  - patch tuesday
+  - extended security updates
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-windows-10-kb5082200-extended-security-update/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-microsoft-patches-zero-days-windows-10-extended-security-update
+severity: high
+---
+## Executive Summary
+Microsoft's April 2026 Patch Tuesday cycle included a critical Extended Security Update (ESU) for Windows 10, KB5082200, addressing multiple vulnerabilities, including two zero-days reported as being actively exploited. This update is significant as it represents one of the final security updates available for Windows 10 consumers and organizations relying on the paid ESU program, following the end of mainstream support. The specific CVE identifiers for the patched flaws, including the zero-days, were not disclosed in the available source material.
+
+## Technical Analysis
+The KB5082200 update is part of Microsoft's Extended Security Update (ESU) program, a paid offering for customers needing to run Windows 10 past its official end-of-support date. The update bundles all security fixes from the standard April 2026 Patch Tuesday release for supported Windows versions into a single package for ESU clients. The most critical components are fixes for two vulnerabilities that Microsoft has confirmed were being exploited in attacks prior to the release of the patch. The technical details of these vulnerabilities, including their attack vectors and the mechanisms of exploitation, are not publicly available at this time, as Microsoft typically withholds such information to allow time for widespread patching. The update also addresses other security flaws rated as important, though their exact number and nature are not specified in the source.
+
+## Indicators of Compromise
+None identified at this time. Microsoft's advisory and the accompanying reporting did not provide specific forensic artifacts, network signatures, or host-based indicators related to the exploitation of the patched zero-days.
+
+## Tactics, Techniques & Procedures
+The available source material does not detail the specific Tactics, Techniques, and Procedures (TTPs) used by threat actors exploiting the two zero-day vulnerabilities. Without public disclosure of the CVE IDs or technical advisories, it is impossible to map the exploits to a specific MITRE ATT&CK framework technique. Generally, exploitation of unpatched, publicly known zero-days in an operating system falls under initial access and execution tactics.
+
+## Threat Actor Context
+The source reporting does not attribute the exploitation of the two zero-day vulnerabilities to any named threat actor or group. Microsoft's standard notification states the flaws were "exploited in the wild," but does not identify whether the attacks are limited, targeted, or broad. The motivation behind the attacks—whether espionage, financial gain, or disruptive activity—remains unclear.
+
+## Mitigations & Recommendations
+The primary and immediate mitigation is to apply the KB5082200 Extended Security Update to all eligible Windows 10 systems enrolled in the ESU program. Organizations and users still running Windows 10 without an ESU license have no official path to receive this patch and are exposed to the patched vulnerabilities, including the zero-days. For those systems, the only secure recommendations are to:
+1.  **Accelerate migration plans** to a currently supported operating system, such as Windows 11 or Windows Server 2022/2025.
+2.  **Implement stringent network controls**, including application allow-listing, network segmentation, and robust endpoint detection and response (EDR) tools to reduce the attack surface and improve detection capabilities.
+3.  **Audit and harden configurations** to adhere to the principle of least privilege, minimizing the potential impact of a successful breach.
+Continuing to operate Windows 10 without security updates constitutes a severe and unacceptable risk, especially with known, exploited vulnerabilities in circulation.
+
+## References
+- https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-windows-10-kb5082200-extended-security-update/

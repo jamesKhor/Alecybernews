@@ -1,0 +1,45 @@
+---
+title: 微软在Windows 10最终扩展安全更新中修补了两个零日漏洞
+slug: 2026-04-14-microsoft-patches-zero-days-windows-10-extended-security-update
+date: '2026-04-14'
+excerpt: 微软对Windows 10的最终扩展安全更新KB5082200修补了在野外被利用的两个零日漏洞，以及对不支持系统的其他关键修复。
+category: vulnerabilities
+tags:
+  - microsoft
+  - windows 10
+  - zero-day
+  - patch tuesday
+  - extended security updates
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-windows-10-kb5082200-extended-security-update/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-microsoft-patches-zero-days-windows-10-extended-security-update
+severity: high
+---
+## 执行摘要
+微软2026年4月的补丁星期二周期包括针对Windows 10的关键扩展安全更新（ESU），KB5082200，解决了多个漏洞，包括两个被报告为正在积极利用的零日漏洞。这次更新非常重要，因为它代表了Windows 10消费者和依赖付费ESU计划的组织在主流支持结束后可获得的最终安全更新之一。修补漏洞的具体CVE标识符，包括零日漏洞，在可用的源材料中没有披露。
+
+## 技术分析
+KB5082200更新是微软扩展安全更新（ESU）计划的一部分，这是一个付费服务，为需要在官方支持结束日期之后运行Windows 10的客户提供。更新将标准2026年4月补丁星期二发布中对支持的Windows版本的所有安全修复捆绑成一个单一的ESU客户包。最关键的部分是修补了微软确认在补丁发布前被攻击利用的两个漏洞。这些漏洞的技术细节，包括它们的攻击向量和利用机制，目前尚未公开，因为微软通常会保留此类信息，以便为广泛的修补留出时间。更新还解决了其他被评为重要的安全漏洞，尽管它们确切的数量和性质在源材料中没有具体说明。
+
+## 入侵指标
+目前没有识别出任何入侵指标。微软的咨询和相关的报告没有提供与修补的零日漏洞利用相关的具体取证工件、网络签名或基于主机的指标。
+
+## 战术、技术与程序
+可用的源材料没有详细说明威胁行为者利用两个零日漏洞所使用的具体战术、技术和程序（TTPs）。没有公开披露CVE ID或技术咨询，就无法将漏洞利用映射到特定的MITRE ATT&CK框架技术。一般来说，在操作系统中利用未修补、公开已知的零日漏洞属于初始访问和执行战术。
+
+## 威胁行为者背景
+源报告没有将两个零日漏洞的利用归因于任何命名的威胁行为者或团体。微软的标准通知指出这些漏洞被“在野外利用”，但没有确定攻击是否有限、针对性或广泛。攻击背后的动机——无论是间谍活动、财务收益还是破坏活动——仍然不清楚。
+
+## 缓解措施与建议
+主要且立即的缓解措施是将KB5082200扩展安全更新应用于所有符合条件的Windows 10系统，这些系统已注册在ESU计划中。仍在运行Windows 10且没有ESU许可的组织和用户没有官方途径接收此补丁，并且暴露于修补的漏洞，包括零日漏洞。对于这些系统，唯一的安全建议是：
+1. **加快迁移计划**到当前支持的操作系统，如Windows 11或Windows Server 2022/2025。
+2. **实施严格的网络控制**，包括应用程序允许列表、网络分段和强大的端点检测和响应（EDR）工具，以减少攻击面并提高检测能力。
+3. **审计和加固配置**，以遵循最小权限原则，最小化成功违规的潜在影响。
+继续在没有安全更新的情况下运行Windows 10构成了严重且不可接受的风险，特别是已知的、被利用的漏洞在流通中。
+
+## 参考资料
+- https://www.bleepingcomputer.com/news/microsoft/microsoft-releases-windows-10-kb5082200-extended-security-update/
