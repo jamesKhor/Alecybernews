@@ -32,8 +32,11 @@ jobs:
             echo "📦 Installing dependencies..."
             HUSKY=0 npm ci --production=false
 
+            echo "⏹️  Stopping app during build..."
+            pm2 stop zcybernews 2>/dev/null || true
+
             echo "🧹 Cleaning old build cache..."
-            sudo rm -rf .next 2>/dev/null || rm -rf .next
+            rm -rf .next 2>/dev/null || true
 
             echo "🔨 Building (commit: $(git rev-parse --short HEAD))..."
             export NODE_OPTIONS="--max-old-space-size=1536"
