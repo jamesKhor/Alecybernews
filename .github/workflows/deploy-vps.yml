@@ -48,6 +48,16 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED"
 
+          # Safety: if the diff is empty (force-push, weird merge, dispatch
+          # without a real change), fall back to full rebuild. Better to do
+          # a needless rebuild than to silently "succeed" with no actual
+          # work on a divergent VPS.
+          if [ -z "$CHANGED" ]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Empty diff between HEAD~1 and HEAD — defaulting to full rebuild"
+            exit 0
+          fi
+
           # Paths that DON'T require a VPS rebuild — strip them out of the
           # change list; if nothing remains, it's a no-rebuild change.
           #
@@ -129,19 +139,60 @@ jobs:
             echo "🔄 Triggering ISR revalidation..."
             SECRET=$(grep '^REVALIDATE_SECRET=' .env.local | cut -d= -f2-)
             if [ -z "$SECRET" ]; then
-              echo "⚠️  REVALIDATE_SECRET not in .env.local — PM2 process will pick up new files at TTL expiry instead"
+              echo "::warning::REVALIDATE_SECRET not in .env.local — articles will appear at TTL expiry (up to 1h delay)"
             else
-              # Revalidate listing pages + content tag. Individual article pages
-              # already got revalidated by the admin publish API if that's how
-              # they landed; this catches pipeline commits too.
-              curl -sf -X POST \
-                -H "x-revalidate-secret: $SECRET" \
-                "http://localhost:3000/api/revalidate?tag=articles&path=/en/articles&path=/zh/articles" \
-                > /dev/null && echo "✅ Revalidated" \
-                || echo "⚠️  Revalidate call failed (non-fatal)"
+              # Retry revalidate up to 3 times with backoff. PM2 cluster
+              # reload, brief network blip, or worker mid-restart can all
+              # cause a transient curl failure; if we don't retry, articles
+              # sit stale for up to 1h until the next ISR refresh. The
+              # revalidate endpoint itself is idempotent — calling it
+              # multiple times in a row is safe.
+              REVALIDATED=false
+              for attempt in 1 2 3; do
+                if curl -sf -X POST \
+                  -H "x-revalidate-secret: $SECRET" \
+                  "http://localhost:3000/api/revalidate?tag=articles&path=/en/articles&path=/zh/articles" \
+                  > /dev/null; then
+                  echo "✅ Revalidated on attempt $attempt"
+                  REVALIDATED=true
+                  break
+                fi
+                echo "::warning::Revalidate attempt $attempt failed; retrying in $((2 * attempt))s"
+                sleep $((2 * attempt))
+              done
+              if [ "$REVALIDATED" != "true" ]; then
+                echo "::error::Revalidate failed after 3 attempts. New content is on disk but ISR cache is stale until 1h TTL. Check 'pm2 logs zcybernews' for /api/revalidate errors."
+                exit 1
+              fi
             fi
 
             echo "✅ Content sync complete at $(TZ='Asia/Singapore' date '+%Y-%m-%d %H:%M:%S SGT')"
+
+      - name: Notify Telegram — content-sync failure
+        # Same rationale as full-deploy failure-notify below: silent
+        # content-sync failures (git pull error, revalidate exhausting
+        # retries, SSH timeout) used to require checking GitHub Actions
+        # to discover. Now they ping Telegram.
+        if: ${{ failure() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            exit 0
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          SHA_SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)
+          MESSAGE="⚠️ <b>ZCyberNews content-sync deploy failed</b>"
+          MESSAGE+=$'\n'"Commit: ${SHA_SHORT}"
+          MESSAGE+=$'\n\n'"Run: ${RUN_URL}"
+          MESSAGE+=$'\n\n'"New content didn't reach VPS or revalidate failed. Articles will appear after 1h ISR TTL fallback. Check the run for details."
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode parse_mode="HTML" \
+            --data-urlencode disable_web_page_preview="true" \
+            --data-urlencode text="$MESSAGE" \
+            > /dev/null || true
 
   # Code path: full rebuild + PM2 reload. Only for real code changes.
   full-deploy:
@@ -219,3 +270,31 @@ jobs:
             }
 
             echo "✅ Deployed $(git rev-parse --short HEAD) at $(TZ='Asia/Singapore' date '+%Y-%m-%d %H:%M:%S SGT')"
+
+      - name: Notify Telegram — deploy failure
+        # Fires if any preceding step failed (build error, OOM, PM2 won't
+        # start, health-check 502, etc.). Without this, code deploy
+        # failures are invisible until a customer reports the site is
+        # down. The pipeline workflow has a similar step; this mirrors
+        # it for full code deploys.
+        if: ${{ failure() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "::warning::Telegram secrets not configured — can't send deploy-failure notification"
+            exit 0
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          SHA_SHORT=$(echo "$GITHUB_SHA" | cut -c1-7)
+          MESSAGE="🚨 <b>ZCyberNews FULL DEPLOY FAILED</b>"
+          MESSAGE+=$'\n'"Commit: ${SHA_SHORT}"
+          MESSAGE+=$'\n\n'"Run: ${RUN_URL}"
+          MESSAGE+=$'\n\n'"⚠️ Site may be DOWN — check pm2 status zcybernews"
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode parse_mode="HTML" \
+            --data-urlencode disable_web_page_preview="true" \
+            --data-urlencode text="$MESSAGE" \
+            > /dev/null || true

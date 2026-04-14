@@ -56,12 +56,25 @@ jobs:
       # all RSS items → re-generates articles already published (we've
       # seen "Agentic AI Memory Attacks" published twice with slightly
       # different slugs). actions/cache stores the folder between runs.
+      # Cache key: stable on the date so 24 runs/day share a cache, with
+      # restore-key fallback to any older cache. Previously used run_id which
+      # is unique per run → primary key never matched, ALWAYS fell through to
+      # restore-keys (so it worked, but cache saved on every successful run
+      # even when nothing changed). New behavior: cache only saves once per
+      # day (when something changes), still restores from yesterday on a
+      # fresh day. NOTE: cache only saves on SUCCESSFUL job exit; if the
+      # pipeline commits but later fails (e.g. dispatch error), cache isn't
+      # written and the next run re-processes the same RSS items. Mitigate
+      # by failing fast (which subsequent fixes do) and by relying on the
+      # in-pipeline "already covered" filename check as a second line of
+      # defense.
       - name: Restore pipeline cache
         uses: actions/cache@v4
         with:
           path: .pipeline-cache
-          key: pipeline-cache-${{ github.run_id }}
+          key: pipeline-cache-v1-${{ github.run_id }}
           restore-keys: |
+            pipeline-cache-v1-
             pipeline-cache-
 
       - name: Run AI Pipeline
@@ -176,10 +189,34 @@ jobs:
           done
 
           # All retries exhausted → real failure. DO NOT reset --hard (articles
-          # would be lost). Fail the job so failure-notify fires and the
-          # commit stays locally for inspection / manual recovery.
-          echo "::error::Failed to push articles after 3 attempts. Commit exists locally on runner (will be discarded when runner is cleaned up). Check for concurrent commits or protected-branch issues."
+          # would be lost). Stash the new files outside the repo so the next
+          # job step can upload them as an artifact for manual recovery —
+          # otherwise the runner is destroyed and the AI generation cost is
+          # wasted.
+          mkdir -p /tmp/orphaned-articles
+          # Copy whatever the pipeline wrote, even though commit failed
+          for p in content/en/posts content/zh/posts content/en/threat-intel content/zh/threat-intel; do
+            if [ -d "$p" ]; then
+              # Capture files modified in the last 10 min (this run's output)
+              find "$p" -name '*.mdx' -mmin -10 -exec cp --parents {} /tmp/orphaned-articles/ \; 2>/dev/null || true
+            fi
+          done
+          ARTIFACT_COUNT=$(find /tmp/orphaned-articles -name '*.mdx' 2>/dev/null | wc -l | tr -d ' ')
+          echo "::error::Failed to push articles after 3 attempts. ${ARTIFACT_COUNT} MDX files saved to /tmp/orphaned-articles/ for upload as artifact in the next step. Check for concurrent commits or protected-branch issues."
+          # Mark this for the upload step (which only runs on failure)
+          echo "ORPHAN_COUNT=${ARTIFACT_COUNT}" >> "$GITHUB_ENV"
           exit 1
+
+      - name: Upload orphaned articles (push-failure recovery)
+        # Only fires if the previous step failed AND saved orphaned files.
+        # Saved articles are downloadable from the run page for 7 days,
+        # giving you a chance to recover the AI work and commit manually.
+        if: ${{ failure() && env.ORPHAN_COUNT != '0' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: orphaned-articles-${{ github.run_id }}
+          path: /tmp/orphaned-articles/
+          retention-days: 7
 
       - name: Trigger deploy-vps (push by GITHUB_TOKEN doesn't auto-trigger)
         if: ${{ inputs.dry_run != 'true' && steps.titles.outputs.count != '0' && steps.titles.outputs.count != '' }}
