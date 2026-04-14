@@ -48,26 +48,43 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED"
 
-          # Paths that DON'T require a rebuild — strip them out of the change list
-          # and if nothing remains, it's a no-rebuild change.
+          # Paths that DON'T require a VPS rebuild — strip them out of the
+          # change list; if nothing remains, it's a no-rebuild change.
           #
-          #   Directory prefixes:
+          # The principle: anything that doesn't affect what the Next.js
+          # process serves at runtime should skip the full rebuild. The
+          # VPS still pulls the files (so local backup scripts stay in
+          # sync), but PM2 keeps serving traffic uninterrupted.
+          #
+          #   Content (served via ISR, regenerated on request):
           #     content/                    → MDX articles
           #     public/images/articles/     → article hero images
           #     .pipeline-cache/            → RSS dedup cache
           #     data/                       → subscribers.json, rss-sources.json
-          #     docs/                       → documentation (future)
-          #     .claude/                    → Claude Code session state (launch.json, etc.)
-          #     .github/ISSUE_TEMPLATE/     → issue templates
           #
-          #   Root-level exact matches (docs + meta):
-          #     README.md, CLAUDE.md, AGENTS.md, CONTRIBUTING.md, CHANGELOG.md
-          #     LICENSE, .gitignore, .env.example, .editorconfig, .prettierignore
-          #     vercel.json (Vercel-only config; VPS doesn't read it)
+          #   CI/CD configuration (runs on GitHub's runners, not the VPS):
+          #     .github/workflows/          → workflow YAML files
+          #     .github/actions/            → custom composite actions
+          #     .github/ISSUE_TEMPLATE/     → issue templates
+          #     .github/dependabot.yml, .github/FUNDING.yml, etc. (see root match)
+          #
+          #   Docs / editor config (not runtime):
+          #     docs/                       → documentation (future)
+          #     .claude/                    → Claude Code session state
+          #     .vscode/                    → editor settings (future)
+          #     .idea/                      → JetBrains editor settings (future)
+          #
+          #   Root-level meta (not runtime):
+          #     Any root *.md (README, CLAUDE, AGENTS, CHANGELOG...)
+          #     LICENSE, .gitignore, .env.example, .editorconfig,
+          #     .prettierignore, vercel.json (Vercel-only config)
           NON_CONTENT=$(echo "$CHANGED" \
-            | grep -v -E '^(content/|public/images/articles/|\.pipeline-cache/|data/|docs/|\.claude/|\.github/ISSUE_TEMPLATE/)' \
+            | grep -v -E '^(content/|public/images/articles/|\.pipeline-cache/|data/)' \
+            | grep -v -E '^\.github/(workflows|actions|ISSUE_TEMPLATE)/' \
+            | grep -v -E '^(docs|\.claude|\.vscode|\.idea)/' \
             | grep -v -E '^[^/]+\.md$' \
             | grep -v -E '^(LICENSE|\.gitignore|\.env\.example|\.editorconfig|\.prettierignore|vercel\.json)$' \
+            | grep -v -E '^\.github/[^/]+\.(yml|yaml)$' \
             || true)
 
           if [ -z "$NON_CONTENT" ]; then
