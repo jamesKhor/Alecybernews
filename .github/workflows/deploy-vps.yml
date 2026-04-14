@@ -4,14 +4,107 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      force_full_rebuild:
+        description: "Force full rebuild even for content-only changes"
+        required: false
+        type: boolean
+        default: false
 
-# Prevent concurrent deploys from queuing up and stomping each other
 concurrency:
   group: deploy-vps
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  # Detect what kind of change was pushed. Content-only = new MDX articles
+  # or updated default images. Code = everything else that needs rebuild.
+  classify:
+    name: Classify changes
+    runs-on: ubuntu-latest
+    outputs:
+      needs_rebuild: ${{ steps.check.outputs.needs_rebuild }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Detect changed files
+        id: check
+        run: |
+          # Manual dispatch with force_full_rebuild wins
+          if [ "${{ inputs.force_full_rebuild }}" = "true" ]; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::force_full_rebuild requested — doing full rebuild"
+            exit 0
+          fi
+
+          # First commit / no parent → full rebuild
+          if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::No parent commit — doing full rebuild"
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          # Content-only paths: MDX, article images, pipeline cache, subscriber data
+          NON_CONTENT=$(echo "$CHANGED" | grep -v -E '^(content/|public/images/articles/|\.pipeline-cache/|data/)' || true)
+
+          if [ -z "$NON_CONTENT" ]; then
+            echo "needs_rebuild=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Content-only change — skipping rebuild, will revalidate instead"
+          else
+            echo "needs_rebuild=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Code/config change detected — full rebuild needed"
+            echo "Non-content files changed:"
+            echo "$NON_CONTENT"
+          fi
+
+  # Content-only path: git pull + revalidate. ~10 seconds, zero downtime.
+  content-only:
+    name: Content sync (no rebuild)
+    needs: classify
+    if: needs.classify.outputs.needs_rebuild == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull + revalidate on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: zcybernews
+          key: ${{ secrets.VPS_SSH_KEY }}
+          command_timeout: 2m
+          script: |
+            set -e
+            cd /home/zcybernews/zcybernews
+
+            echo "⬇️  Pulling latest content..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "🔄 Triggering ISR revalidation..."
+            SECRET=$(grep '^REVALIDATE_SECRET=' .env.local | cut -d= -f2-)
+            if [ -z "$SECRET" ]; then
+              echo "⚠️  REVALIDATE_SECRET not in .env.local — PM2 process will pick up new files at TTL expiry instead"
+            else
+              # Revalidate listing pages + content tag. Individual article pages
+              # already got revalidated by the admin publish API if that's how
+              # they landed; this catches pipeline commits too.
+              curl -sf -X POST \
+                -H "x-revalidate-secret: $SECRET" \
+                "http://localhost:3000/api/revalidate?tag=articles&path=/en/articles&path=/zh/articles" \
+                > /dev/null && echo "✅ Revalidated" \
+                || echo "⚠️  Revalidate call failed (non-fatal)"
+            fi
+
+            echo "✅ Content sync complete at $(TZ='Asia/Singapore' date '+%Y-%m-%d %H:%M:%S SGT')"
+
+  # Code path: full rebuild + PM2 reload. Only for real code changes.
+  full-deploy:
+    name: Full rebuild + restart
+    needs: classify
+    if: needs.classify.outputs.needs_rebuild == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to VPS via SSH
@@ -43,7 +136,8 @@ jobs:
             npm run build
 
             echo "♻️  Restarting PM2..."
-            pm2 restart zcybernews || pm2 start npm --name zcybernews -- start
+            pm2 restart zcybernews --update-env 2>/dev/null \
+              || pm2 start npm --name zcybernews -- start
             pm2 save
 
             echo "🏥 Health check..."

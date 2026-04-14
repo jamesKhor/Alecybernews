@@ -141,6 +141,21 @@ export function getAllSlugs(locale: string, type: ContentType): string[] {
   return getAllPosts(locale, type).map((a) => a.frontmatter.slug);
 }
 
+/**
+ * Return the N most recent slugs by date. Used by generateStaticParams to
+ * pre-render only recent articles at build time — older ones render on
+ * demand via ISR. Keeps build duration bounded as the archive grows.
+ */
+export function getRecentSlugs(
+  locale: string,
+  type: ContentType,
+  limit: number,
+): string[] {
+  return getAllPosts(locale, type)
+    .slice(0, limit)
+    .map((a) => a.frontmatter.slug);
+}
+
 export function getAllTags(
   locale: string,
   type: ContentType = "posts",

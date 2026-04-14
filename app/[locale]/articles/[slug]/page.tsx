@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getPostBySlug, getAllSlugs, getRelatedPosts } from "@/lib/content";
+import { getPostBySlug, getRecentSlugs, getRelatedPosts } from "@/lib/content";
 import { compileMDX } from "@/lib/mdx";
 import { ArticleMeta } from "@/components/articles/ArticleMeta";
 import { IOCTable } from "@/components/threat-intel/IOCTable";
@@ -20,12 +20,26 @@ interface Props {
   params: Promise<{ locale: string; slug: string }>;
 }
 
+// ISR config — pages are cached as static HTML for 1 hour, then regenerate
+// on next visitor. The admin publish flow calls revalidatePath() after
+// committing, so new articles appear within seconds without a full rebuild.
+export const revalidate = 3600;
+
+// Allow slugs not in generateStaticParams to render on-demand (ISR new pages).
+// Without this, a newly-published article returns 404 until the next rebuild.
+export const dynamicParams = true;
+
+// Pre-render only the most recent N articles per locale at build time.
+// Older articles render on first request and are cached thereafter. Keeps
+// build time bounded as the article count grows.
+const PRERENDER_LIMIT = 50;
+
 export async function generateStaticParams() {
   const locales = ["en", "zh"];
   const params: { locale: string; slug: string }[] = [];
 
   for (const locale of locales) {
-    const slugs = getAllSlugs(locale, "posts");
+    const slugs = getRecentSlugs(locale, "posts", PRERENDER_LIMIT);
     slugs.forEach((slug) => params.push({ locale, slug }));
   }
 

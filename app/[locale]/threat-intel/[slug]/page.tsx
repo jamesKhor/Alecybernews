@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getPostBySlug, getAllSlugs, getRelatedPosts } from "@/lib/content";
+import { getPostBySlug, getRecentSlugs, getRelatedPosts } from "@/lib/content";
 import { compileMDX } from "@/lib/mdx";
 import { ArticleMeta } from "@/components/articles/ArticleMeta";
 import { ArticleCard } from "@/components/articles/ArticleCard";
@@ -14,17 +14,21 @@ import { SidebarAd, InArticleAd } from "@/components/ads/AdSense";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import Image from "next/image";
 
-// Allow dynamic params so new articles work before a full rebuild on VPS
-
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
 }
+
+// ISR: pre-render recent articles, regenerate older/new ones on demand
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+const PRERENDER_LIMIT = 50;
 
 export async function generateStaticParams() {
   const locales = ["en", "zh"];
   const params: { locale: string; slug: string }[] = [];
   for (const locale of locales) {
-    const slugs = getAllSlugs(locale, "threat-intel");
+    const slugs = getRecentSlugs(locale, "threat-intel", PRERENDER_LIMIT);
     slugs.forEach((slug) => params.push({ locale, slug }));
   }
   return params;

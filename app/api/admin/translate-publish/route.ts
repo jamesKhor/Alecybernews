@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import matter from "gray-matter";
 import { translateWithFallback, getActiveProvider } from "@/lib/ai-provider";
 import { adminGuard, isValidType } from "@/lib/admin-guard";
+import { commitFilesToGitHub } from "@/lib/github-commit";
+import { ArticleFrontmatterSchema } from "@/lib/types";
+import { triggerRevalidate } from "@/lib/revalidate-client";
 
 type TranslatePublishRequest = {
   title: string;
@@ -13,92 +17,27 @@ type TranslatePublishRequest = {
   author?: string;
 };
 
-const GH_HEADERS = {
-  Accept: "application/vnd.github+json",
-  "X-GitHub-Api-Version": "2022-11-28",
-  "Content-Type": "application/json",
-};
-
-async function getFileSha(
-  apiUrl: string,
-  token: string,
-): Promise<string | undefined> {
-  const res = await fetch(apiUrl, {
-    headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return undefined;
-  const data = (await res.json()) as { sha: string };
-  return data.sha;
-}
-
-async function commitToGitHub(
-  path: string,
-  content: string,
-  message: string,
-  retries = 2,
-): Promise<{ url: string }> {
-  const token = process.env.GITHUB_TOKEN;
-  const repo = process.env.GITHUB_REPO;
-  if (!token || !repo)
-    throw new Error("GITHUB_TOKEN or GITHUB_REPO not configured");
-
-  const encoded = Buffer.from(content, "utf-8").toString("base64");
-  const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
-  const branch = process.env.GITHUB_BRANCH ?? "main";
-
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    // Always re-fetch the current file SHA before each attempt so we have
-    // the latest blob SHA — stale SHAs cause the 409 conflict.
-    const sha = await getFileSha(apiUrl, token);
-
-    const body: Record<string, unknown> = { message, content: encoded, branch };
-    if (sha) body.sha = sha;
-
-    const res = await fetch(apiUrl, {
-      method: "PUT",
-      headers: { ...GH_HEADERS, Authorization: `Bearer ${token}` },
-      body: JSON.stringify(body),
-    });
-
-    if (res.ok) {
-      const data = (await res.json()) as { content: { html_url: string } };
-      return { url: data.content.html_url };
-    }
-
-    const errText = await res.text();
-
-    // 409 = branch/blob conflict — wait briefly then retry with fresh SHA
-    if (res.status === 409 && attempt < retries) {
-      await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
-      continue;
-    }
-
-    throw new Error(`GitHub API error ${res.status}: ${errText}`);
-  }
-
-  throw new Error("GitHub commit failed after retries");
-}
-
-function buildMdx(frontmatter: Record<string, unknown>, body: string): string {
+function buildMdx(
+  frontmatter: Record<string, unknown>,
+  body: string,
+): { mdx: string; parsedFrontmatter: unknown } {
   const date = new Date().toISOString().split("T")[0];
-  const tags =
-    Array.isArray(frontmatter.tags) && frontmatter.tags.length
-      ? `\n  - ${(frontmatter.tags as string[]).join("\n  - ")}`
-      : " []";
-  return `---
-title: "${String(frontmatter.title).replace(/"/g, '\\"')}"
-slug: "${frontmatter.slug}"
-date: "${date}"
-excerpt: "${String(frontmatter.excerpt).replace(/"/g, '\\"').slice(0, 200)}"
-category: "${frontmatter.category}"
-tags:${tags}
-language: "${frontmatter.language}"
-locale_pair: "${frontmatter.slug}"
-author: "${frontmatter.author ?? "ZCyberNews"}"
-draft: false
----
-
-${body}`;
+  const fm: Record<string, unknown> = {
+    title: String(frontmatter.title).replace(/\n/g, " "),
+    slug: String(frontmatter.slug),
+    date,
+    excerpt: String(frontmatter.excerpt).replace(/\n/g, " ").slice(0, 200),
+    category: frontmatter.category,
+    tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
+    language: frontmatter.language,
+    locale_pair: frontmatter.slug,
+    author: frontmatter.author ?? "ZCyberNews",
+    draft: false,
+  };
+  // gray-matter handles YAML escaping; also gives us back a parsed version
+  // we can validate with Zod.
+  const mdx = matter.stringify(body, fm);
+  return { mdx, parsedFrontmatter: fm };
 }
 
 export async function POST(req: NextRequest) {
@@ -123,8 +62,6 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-
-  // Validate inputs
   if (!isValidType(type)) {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   }
@@ -134,7 +71,6 @@ export async function POST(req: NextRequest) {
   if (content.length > 500_000) {
     return NextResponse.json({ error: "Content too large" }, { status: 400 });
   }
-
   if (getActiveProvider() === "none") {
     return NextResponse.json(
       {
@@ -145,7 +81,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Translate title + excerpt — use DeepSeek directly for speed (avoids free model queue + Kimi latency)
+  // Translate title + excerpt
   const metaRes = await translateWithFallback(
     `Translate these to Simplified Chinese. Keep threat actor names, malware names, ALL-CAPS acronyms (EDR, VPN, APT, CVE, IOC, TTP etc), product names in English. Return ONLY valid JSON: {"title": "...", "excerpt": "..."}\n\nTitle: ${title}\nExcerpt: ${excerpt}`,
     { maxOutputTokens: 300, temperature: 0.2, provider: "deepseek" },
@@ -177,52 +113,80 @@ ${content}`,
   const date = new Date().toISOString().split("T")[0];
   const filename = `${date}-${slug.replace(/^[\d-]+-/, "")}.mdx`;
 
-  const enFrontmatter = {
-    title,
-    slug,
-    excerpt,
-    category,
-    tags,
-    language: "en",
-    author: author ?? "ZCyberNews",
-  };
-  const zhFrontmatter = {
-    title: zhTitle,
-    slug,
-    excerpt: zhExcerpt,
-    category,
-    tags,
-    language: "zh",
-    author: author ?? "ZCyberNews",
-  };
+  const { mdx: enMdx, parsedFrontmatter: enFm } = buildMdx(
+    {
+      title,
+      slug,
+      excerpt,
+      category,
+      tags,
+      language: "en",
+      author: author ?? "ZCyberNews",
+    },
+    content,
+  );
+  const { mdx: zhMdx, parsedFrontmatter: zhFm } = buildMdx(
+    {
+      title: zhTitle,
+      slug,
+      excerpt: zhExcerpt,
+      category,
+      tags,
+      language: "zh",
+      author: author ?? "ZCyberNews",
+    },
+    bodyRes.text.trim(),
+  );
 
-  const enMdx = buildMdx(enFrontmatter, content);
-  const zhMdx = buildMdx(zhFrontmatter, bodyRes.text.trim());
+  // Zod-validate both frontmatters BEFORE committing — prevents bad MDX from
+  // reaching the repo and breaking ISR page renders at request time.
+  const enParse = ArticleFrontmatterSchema.safeParse(enFm);
+  const zhParse = ArticleFrontmatterSchema.safeParse(zhFm);
+  if (!enParse.success || !zhParse.success) {
+    return NextResponse.json(
+      {
+        error: "Invalid frontmatter",
+        details: {
+          en: enParse.success ? null : enParse.error.flatten(),
+          zh: zhParse.success ? null : zhParse.error.flatten(),
+        },
+      },
+      { status: 400 },
+    );
+  }
+
   const usedPaidFallback = metaRes.usedPaidFallback || bodyRes.usedPaidFallback;
 
   try {
-    // Commits must be sequential — parallel commits both read the same branch
-    // HEAD, the first succeeds and moves the tip, the second gets a 409 conflict.
-    const enResult = await commitToGitHub(
-      `content/en/${type}/${filename}`,
-      enMdx,
-      `content: add "${title}" [en]`,
+    // Single atomic commit containing BOTH files. One push event, one deploy.
+    const commit = await commitFilesToGitHub(
+      [
+        { path: `content/en/${type}/${filename}`, content: enMdx },
+        { path: `content/zh/${type}/${filename}`, content: zhMdx },
+      ],
+      `content: add "${title}" [en+zh]`,
     );
-    const zhResult = await commitToGitHub(
-      `content/zh/${type}/${filename}`,
-      zhMdx,
-      `content: add "${zhTitle}" [zh]`,
-    );
+
+    // Fire-and-forget revalidation for both locales so live site surfaces
+    // the new article within seconds without waiting for a rebuild.
+    const pathPrefix = type === "threat-intel" ? "threat-intel" : "articles";
+    await Promise.allSettled([
+      triggerRevalidate({ path: `/en/${pathPrefix}/${slug}` }),
+      triggerRevalidate({ path: `/zh/${pathPrefix}/${slug}` }),
+      triggerRevalidate({ tag: "articles" }),
+    ]);
 
     return NextResponse.json({
       success: true,
-      enGithubUrl: enResult.url,
-      zhGithubUrl: zhResult.url,
-      message: "Published EN + ZH. Vercel is deploying.",
+      commitSha: commit.sha,
+      commitUrl: commit.url,
+      files: commit.files,
+      message: "Published EN + ZH in one commit. Site will update shortly.",
       usedPaidFallback,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("[translate-publish]", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
