@@ -105,13 +105,17 @@ export default async function RootLayout({
             duration={5000}
           />
           {/* Plausible Analytics — privacy-friendly, no cookies */}
-          {process.env.PLAUSIBLE_DOMAIN && (
-            <Script
-              defer
-              data-domain={process.env.PLAUSIBLE_DOMAIN}
-              src="https://plausible.io/js/script.js"
-              strategy="afterInteractive"
-            />
+          {process.env.NEXT_PUBLIC_PLAUSIBLE_SRC && (
+            <>
+              <Script
+                async
+                src={process.env.NEXT_PUBLIC_PLAUSIBLE_SRC}
+                strategy="afterInteractive"
+              />
+              <Script id="plausible-init" strategy="afterInteractive">
+                {`window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`}
+              </Script>
+            </>
           )}
         </ThemeProvider>
       </body>
