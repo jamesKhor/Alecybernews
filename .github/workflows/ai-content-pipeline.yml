@@ -114,7 +114,18 @@ jobs:
           set -e
           git config user.name "zcybernews-bot"
           git config user.email "bot@zcybernews.com"
-          git add content/ public/images/articles/ .pipeline-cache/ data/ 2>/dev/null || true
+          # Add each path INDIVIDUALLY. `git add` aborts with exit 128 on the
+          # first missing pathspec and stages NOTHING from the other paths —
+          # even existing ones. So a batch 'git add content/ public/images/
+          # articles/ .pipeline-cache/ data/' would fail silently (with
+          # '|| true') when public/images/articles or .pipeline-cache doesn't
+          # exist on the runner, leaving content/ unstaged. Previously this
+          # caused "Nothing to commit" when a new article HAD been written.
+          for p in content public/images/articles .pipeline-cache data; do
+            if [ -e "$p" ]; then
+              git add "$p"
+            fi
+          done
           if git diff --staged --quiet; then
             echo "::notice::Nothing to commit — skipping push"
             exit 0
