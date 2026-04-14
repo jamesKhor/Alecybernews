@@ -36,7 +36,7 @@ jobs:
             pm2 stop zcybernews 2>/dev/null || true
 
             echo "🧹 Cleaning old build cache..."
-            rm -rf .next 2>/dev/null || true
+            sudo rm -rf /home/zcybernews/zcybernews/.next
 
             echo "🔨 Building (commit: $(git rev-parse --short HEAD))..."
             export NODE_OPTIONS="--max-old-space-size=1536"
