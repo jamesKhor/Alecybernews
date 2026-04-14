@@ -1,0 +1,49 @@
+---
+title: FortiSandbox 严重漏洞使远程命令执行和认证绕过成为可能
+slug: 2026-04-14-critical-fortisandbox-flaws-remote-command-execution-auth-bypass
+date: '2026-04-14'
+excerpt: Fortinet 披露了 FortiSandbox 中的两个关键漏洞（CVSS 9.1），使未经认证的攻击者能够执行任意命令并绕过认证。补丁已可用。
+category: vulnerabilities
+tags:
+  - fortinet
+  - fortisandbox
+  - command-injection
+  - authentication-bypass
+  - critical-vulnerability
+language: zh
+source_urls:
+  - 'https://cybersecuritynews.com/fortisandbox-vulnerability-command-execution/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-critical-fortisandbox-flaws-remote-command-execution-auth-bypass
+severity: critical
+cvss_score: 9.1
+---
+## 执行摘要
+Fortinet披露了其FortiSandbox设备中的两个关键安全漏洞，每个漏洞的CVSSv3基础得分为9.1。根据供应商的咨询，这些漏洞可能允许未经身份验证的远程攻击者在底层操作系统上执行任意命令，并完全绕过身份验证机制。这些漏洞于2026年4月14日公开披露，现在已有补丁可用。使用FortiSandbox进行高级威胁检测和沙箱的组织应立即应用更新，因为利用这些漏洞可能导致系统完全被攻陷。
+
+## 技术分析
+这些漏洞存在于FortiSandbox的Web界面及其底层组件中。第一个漏洞是操作系统命令注入漏洞。攻击者可以构建一个恶意的HTTP请求到一个特定的、未公开的端点，注入任意命令，系统将以提升的权限执行这些命令。这为攻击者提供了直接访问设备上的root或系统级shell的路径。
+
+第二个关键漏洞是身份验证绕过。漏洞存在于验证用户会话或权限的逻辑中。通过操纵请求参数或访问特定的URL，攻击者可以在不提供有效凭证的情况下访问管理功能或敏感数据。这种绕过有效地使管理界面的主要安全控制失效。
+
+两个问题都可以在没有任何事先身份验证的情况下远程利用，大大降低了攻击者的进入门槛。Fortinet没有公开发布确切的技术细节，包括易受攻击的端点和参数，以防止立即武器化。CVSS 9.1得分反映了高影响（机密性、完整性和可用性的妥协）和低攻击复杂性。
+
+## 入侵指标
+目前没有识别出任何入侵指标。Fortinet的咨询没有提供特定的IOC，如文件哈希值、IP地址或与利用相关的恶意流量模式。网络防御者应监控FortiSandbox设备异常的出站连接、系统上意外运行的进程，或Web界面日志中异常的登录尝试和配置更改。
+
+## 战术、技术与程序
+根据漏洞的性质，成功的利用可能会遵循一个简单的模式。攻击者首先扫描暴露在互联网上的FortiSandbox管理界面（T1595.001：主动扫描）。在确定目标后，他们会利用身份验证绕过（T1556：削弱防御；子技术T1556.005：降级攻击）来获得对管理面板的未经授权的访问。随后，他们会利用操作系统命令注入漏洞（T1203：利用客户端执行，和T1059：命令和脚本解释器）来建立持久的立足点，可能部署额外的有效载荷或横向移动到连接的网络中。
+
+## 威胁行为者背景
+在撰写本文时，这些漏洞没有特定的威胁行为者归因。然而，像FortiSandbox这样的边界安全设备中的关键漏洞是广泛恶意行为者的高价值目标。高级持续性威胁（APT）组织可能会寻求利用它们作为进入企业网络的初始访问点，而勒索软件运营商可能会利用它们在部署加密有效载荷之前禁用安全控制。犯罪僵尸网络牧者也经常会扫描并利用此类漏洞，将设备纳入分布式拒绝服务（DDoS）群或加密货币挖矿操作。
+
+## 缓解措施与建议
+最主要的和最关键的缓解措施是应用Fortinet提供的安全补丁。管理员应查阅Fortinet安全咨询，确定其特定FortiSandbox型号和固件分支的固定版本，并立即安排更新。
+
+作为一般安全实践，像FortiSandbox这样的安全设备的管理界面永远不应直接暴露在互联网上。应通过VPN或专用管理网络段限制访问，采用严格的防火墙规则和网络访问控制列表（ACL）。组织还应为设备实施强大的日志记录和监控，对任何成功的管理登录或执行不寻常的系统命令进行警报。
+
+如果无法立即修补，作为临时解决方案，管理员应考虑在更新可以应用之前完全禁用外部管理访问。
+
+## 参考资料
+* Fortinet安全咨询：FortiSandbox中的关键操作系统命令注入和身份验证绕过（2026年4月14日）。[https://cybersecuritynews.com/fortisandbox-vulnerability-command-execution/](https://cybersecuritynews.com/fortisandbox-vulnerability-command-execution/)
