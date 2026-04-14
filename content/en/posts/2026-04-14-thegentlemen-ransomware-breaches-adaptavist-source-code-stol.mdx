@@ -1,0 +1,43 @@
+---
+title: "TheGentlemen Ransomware Breaches Adaptavist, Source Code Stolen"
+slug: "2026-04-14-thegentlemen-ransomware-breaches-adaptavist-source-code-stol"
+date: "2026-04-14"
+excerpt: "TheGentlemen ransomware group claims a total infrastructure breach of Atlassian partner Adaptavist, stealing source code and customer data from clients like NASA and Visa."
+category: "malware"
+tags:
+  - thegentlemen
+  - adaptavist
+  - ransomware
+  - scriptrunner
+  - atlassian
+  - supply-chain
+  - data-breach
+language: "en"
+locale_pair: "2026-04-14-thegentlemen-ransomware-breaches-adaptavist-source-code-stol"
+author: "ZCyberNews"
+draft: false
+---
+
+The ransomware group **TheGentlemen** has claimed a comprehensive breach of UK-based enterprise software developer **Adaptavist Group LTD**, a platinum Atlassian partner. In a leak post published on April 8, 2026, the threat actors allege a total infrastructure compromise resulting in the theft of proprietary source code, massive volumes of customer data, and sensitive internal documentation. The attack, which reportedly exposed data from major clients including NASA and Visa, represents a significant supply chain risk given Adaptavist’s role as a developer of critical plugins like ScriptRunner for Jira and Confluence.
+
+## Anatomy of a Total Infrastructure Compromise
+According to the detailed claims from **TheGentlemen**, the attackers achieved deep, persistent access across Adaptavist’s development and operational environments. The breach was not confined to a single system but allegedly spanned the entire software stack. The primary loot, as touted by the ransomware group, is the complete source code for Adaptavist’s flagship products. This includes ScriptRunner—a powerful automation tool for Atlassian ecosystems—and the company’s Salable licensing platform. The compromise of this licensing system is particularly severe, as the actors claim it enables product cloning, which could lead to unauthorized software distribution and license bypasses.
+
+The exfiltration effort described was vast. The group claims to have siphoned over 3TB of data from Nexus repositories, a central component in development pipelines. This haul reportedly includes production secrets, Docker images, and Helm charts—artifacts that could be repurposed for further attacks or to poison software builds. Furthermore, the attackers assert they accessed Kubernetes configurations, OAuth credentials, a Snowflake data warehouse, and the company’s entire Confluence instance, containing over 24,000 pages and 100GB of internal documentation. This level of access suggests a failure to segment development, staging, and production networks adequately, allowing lateral movement from initial entry points to crown-jewel assets.
+
+## Scope of Data Exposure and Regulatory Impact
+The data breach component of this incident carries substantial legal and regulatory weight. **TheGentlemen** specifically claim to have exfiltrated 484,220 customer records from Adaptavist’s HubSpot CRM instance. The inclusion of customer data belonging to global enterprises and government bodies triggers immediate concerns under regulations like the GDPR, potentially exposing Adaptavist to significant fines and legal challenges. The leak of such a large, centralized customer database is a prime example of the [data breach] risks facing software vendors who aggregate client information.
+
+Beyond customer data, the theft of internal legal and contractual documents amplifies the breach's severity. The actors reference accessing more than 20,000 legal tickets containing approximately 33,000 documents, including 2,000 non-disclosure agreements (NDAs) and contracts. This type of corporate intelligence is highly valuable to competitors and could be leveraged for extortion against the companies named within those agreements. The additional compromise of production databases rounds out a picture of an intrusion that captured both the intellectual property that powers Adaptavist’s business and the sensitive data that defines its relationships with clients and partners.
+
+## Detection and Incident Response Priorities
+While specific initial access vectors and **Indicators of Compromise (IOCs)** were not detailed in the public leak, the described attack chain provides a blueprint for detection. Security teams, especially those using Atlassian products with Adaptavist plugins, should treat this as a supply chain warning. Defenders should immediately scrutinize their environments for anomalous activity related to ScriptRunner or other Adaptavist tools, though no malicious implants have been confirmed at this stage.
+
+Based on the tactics described, several investigative actions are critical. Organizations should conduct a thorough compromise assessment focusing on development and CI/CD pipelines, looking for unexpected data transfers or unauthorized access to repository systems like Nexus. Monitoring for the use of stolen OAuth tokens or unexpected queries to data warehouse platforms is also essential. As **TheGentlemen** are a ransomware group, the absence of a stated ransom demand in the leak suggests a possible double-extortion tactic, where data is both stolen and encrypted. Therefore, validating the integrity and isolation of [immutable backups] is a paramount defensive step.
+
+## Key Takeaways
+*   **Treat as a Supply Chain Event:** Organizations using Adaptavist’s products, particularly ScriptRunner, should monitor for unusual plugin behavior and consider temporary risk assessments, as stolen source code could be weaponized in future [supply chain attacks].
+*   **Audit Development and Cloud Environments:** The breach underscores the critical need to enforce strict segmentation between development, build, and production systems. Review access controls for repository managers (Nexus, Artifactory), container registries, and orchestration tools like Kubernetes.
+*   **Assume Customer Data was Exposed:** Affected enterprises and Adaptavist’s other clients should operate under the assumption that their information was part of the exfiltrated CRM data and prepare for potential notification obligations.
+*   **Prioritize Credential and Secret Security:** The theft of OAuth credentials and production secrets highlights the necessity of regularly rotating secrets, implementing privileged access management, and using secure vaults instead of hardcoded credentials in repositories.
+*   **Prepare for Extortion and Leak Threats:** As no ransomware deployment was mentioned, the primary immediate threat may be data extortion. Organizations should monitor dark web channels for the sale or leak of their data and avoid engaging directly with threat actors without professional incident response counsel.
