@@ -1,0 +1,54 @@
+---
+title: PHP Composer 严重漏洞允许通过 Perforce 驱动远程命令执行
+slug: 2026-04-14-php-composer-perforce-driver-command-injection-flaws
+date: '2026-04-14'
+excerpt: >-
+  PHP Composer 的 Perforce
+  驱动中存在两个高严重性的命令注入漏洞（CVE-2026-40176，CVE-2026-40177），在包操作期间允许在开发者系统上执行任意命令。
+category: vulnerabilities
+tags:
+  - php
+  - composer
+  - supply-chain
+  - command-injection
+  - perforce
+language: zh
+source_urls:
+  - >-
+    https://thehackernews.com/2026/04/new-php-composer-flaws-enable-arbitrary.html
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-php-composer-perforce-driver-command-injection-flaws
+severity: high
+cve_ids:
+  - CVE-2026-40176
+  - CVE-2026-40177
+---
+## 执行摘要
+PHP Composer包管理器的Perforce驱动程序中存在两个高严重性的命令注入漏洞，允许在开发者系统上执行任意命令。这些漏洞被跟踪为**CVE-2026-40176**和**CVE-2026-40177**，它们存在于处理Perforce版本控制系统（VCS）的代码中。成功利用这些漏洞需要攻击者控制一个恶意的Perforce仓库，开发者使用Composer与之交互。维护者已在Composer版本2.8.2和2.9.2中发布了补丁；所有用户都被敦促立即更新。
+
+## 技术分析
+这些漏洞是Composer的`PerforceDriver`类中的命令注入缺陷，该类管理与Perforce仓库的交互。根据披露，这些缺陷源于传递给`p4`命令行客户端的参数没有足够的清理。具体的技术向量涉及从远程Perforce服务器获取的仓库元数据和分支名称的不安全处理。
+
+**CVE-2026-40176**在Composer从Perforce仓库检索元数据时触发`init`或`info`操作。控制仓库的攻击者可以通过精心制作的元数据字段注入shell命令。
+
+**CVE-2026-40177**在Composer处理远程仓库的分支名称时可被利用，例如在`composer update`或`install`操作期间。包含shell元字符的恶意分支名称可以导致在运行Composer的用户上下文中执行命令。
+
+攻击取决于开发者使用Composer与被破坏或恶意的Perforce仓库交互。这使得针对使用内部Perforce服务器的组织的定向攻击成为一个可能的场景，尽管由于对Perforce的特定依赖，与PHP生态系统中更常见的Git相比，广泛利用的可能性较小。
+
+## 入侵指标
+目前没有识别出任何入侵指标。利用不会留下除了Composer或`p4`可执行文件之外的意外shell命令或进程之外的明显取证工件。组织应监控开发系统在包管理操作期间的异常命令行活动。
+
+## 战术、技术与程序
+主要技术是**T1204: 用户执行**，特别是利用开发者信任的工具（Composer）来执行恶意代码。攻击者必须首先破坏Perforce服务器或创建恶意仓库，这表明可能针对版本控制系统的先兆活动（**T1199: 信任关系**）。注入本身与**T1059: 命令和脚本解释器**一致，利用缺乏输入清理来突破预期的命令参数。
+
+## 威胁行为者背景
+在撰写本文时，没有特定的威胁行为者被公开与利用这些漏洞有关。这些缺陷为针对软件开发团队的定向攻击提供了一个有吸引力的向量，特别是那些在组织内部使用Perforce进行包托管的团队。拥有对开发网络初始访问权限的行为者可以利用这一点来提升权限或从被破坏的Perforce服务器横向移动到开发人员工作站。
+
+## 缓解措施与建议
+最主要的和最关键的缓解措施是更新Composer到修补过的版本。使用Composer 2.x的用户应该升级到**版本2.8.2**或**2.9.2**，其中包含修复程序。维护者已将补丁回传到这两个最新的次要版本分支。
+
+使用Perforce的组织应该审计并限制对其Perforce仓库的访问，将其视为关键基础设施。应该警告开发者不要使用Composer与不受信任的Perforce仓库。作为一般安全实践，以最少必要的权限运行Composer和其他包管理器可以限制潜在命令执行的影响。
+
+## 参考资料
+- https://thehackernews.com/2026/04/new-php-composer-flaws-enable-arbitrary.html

@@ -1,0 +1,51 @@
+---
+title: Fake Ledger Live App on Apple App Store Steals $9.5M in Cryptocurrency
+slug: 2026-04-14-fake-ledger-live-app-apple-app-store-crypto-theft
+date: '2026-04-14'
+excerpt: >-
+  A malicious Ledger Live app distributed via Apple's official App Store for
+  macOS stole approximately $9.5 million from 50 victims by harvesting recovery
+  phrases.
+category: malware
+tags:
+  - macos
+  - cryptocurrency
+  - supply-chain
+  - app-store
+  - phishing
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/fake-ledger-live-app-on-apples-app-store-stole-95m-in-crypto/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-fake-ledger-live-app-apple-app-store-crypto-theft
+severity: high
+affected_sectors:
+  - cryptocurrency
+---
+## Executive Summary
+A fraudulent application posing as the legitimate Ledger Live cryptocurrency wallet management software was available for download on Apple's official macOS App Store, leading to the theft of approximately $9.5 million. The malicious app, which remained listed for several days, functioned by tricking users into entering their 24-word secret recovery phrase, which attackers then used to drain victims' wallets. This incident highlights a significant software supply chain compromise via a trusted distribution platform.
+
+## Technical Analysis
+The malicious application, named "Ledger Live Web3" and published by a developer profile "Ledger Ltd.", was a near-perfect replica of the authentic Ledger Live interface. According to analysis reported by BleepingComputer, the app's core malicious functionality was straightforward: it prompted users to enter their 24-word recovery seed phrase under the guise of synchronizing or recovering their wallet. Once entered, this sensitive data was exfiltrated to a command-and-control (C2) server controlled by the attackers. With the recovery phrase, the threat actors gained full, irreversible control over the associated cryptocurrency wallets and assets. The app did not exploit a software vulnerability in the macOS operating system or the legitimate Ledger software; instead, it relied entirely on social engineering within a maliciously crafted application. The exact method by which the fake app passed Apple's App Review process remains unclear.
+
+## Indicators of Compromise
+None identified at this time. Public reporting has not yet disclosed specific file hashes, network indicators, or the C2 server infrastructure associated with this campaign. The primary IOCs were the fraudulent app's name ("Ledger Live Web3") and its publisher name ("Ledger Ltd.") on the Apple App Store, which have since been removed.
+
+## Tactics, Techniques & Procedures
+The threat actors employed a multi-stage approach focused on deception and credential harvesting. Their primary technique was **Masquerading (T1036)**, creating a fraudulent application that mimicked the branding, name, and user interface of a trusted vendor, Ledger. The attack leveraged a trusted distribution mechanism, the Apple App Store, constituting a form of **Supply Chain Compromise (T1195.002)**. The core objective was **Credential Harvesting (T1539)**, specifically targeting the cryptographic seed phrases that act as the master key for cryptocurrency wallets. The operational tempo was rapid, with funds stolen from victims within days or even hours of app installation.
+
+## Threat Actor Context
+The identity and origin of the threat actor behind this campaign are currently unknown. The operation required sufficient technical skill to clone a complex application's UI and navigate the Apple Developer program submission process, but the attack itself was not technically sophisticated. The primary motivation is unequivocally financial gain, placing this activity within the realm of cybercrime. It is unclear if this is a standalone group or part of a larger ecosystem targeting cryptocurrency users through similar software supply chain attacks.
+
+## Mitigations & Recommendations
+Cryptocurrency users and organizations should adopt the following mitigations:
+*   **Verify Download Sources:** Only download wallet software directly from the official vendor's website. For Ledger, the authentic Ledger Live application is *only* available via `ledger.com/ledger-live/download`. Treat apps on centralized marketplaces with heightened skepticism.
+*   **Never Enter Seed Phrases:** A legitimate wallet application will never ask for your 24-word recovery phrase after initial setup. Any prompt to enter a seed phrase is a definitive indicator of a scam.
+*   **Use Hardware Wallet Security Features:** Leverage the physical security of a hardware wallet. Always verify transaction details on the device's secure screen, not just on the connected computer's application.
+*   **Monitor for Anomalies:** Apple macOS users should remain vigilant for applications using similar names to trusted financial or crypto software. Report suspicious apps directly to Apple and the impersonated vendor.
+*   **Platform Vigilance:** This incident serves as a reminder to all platform operators, including Apple, to enhance review processes for applications handling high-value financial assets, particularly those mimicking well-known brands.
+
+## References
+*   https://www.bleepingcomputer.com/news/security/fake-ledger-live-app-on-apples-app-store-stole-95m-in-crypto/

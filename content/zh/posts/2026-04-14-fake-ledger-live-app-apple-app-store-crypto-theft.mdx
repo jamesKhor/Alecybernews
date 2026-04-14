@@ -1,0 +1,48 @@
+---
+title: 苹果应用商店上的假冒Ledger Live应用窃取了价值950万美元的加密货币
+slug: 2026-04-14-fake-ledger-live-app-apple-app-store-crypto-theft
+date: '2026-04-14'
+excerpt: 一个通过苹果官方App Store分发的恶意Ledger Live应用通过收集恢复短语，从50名受害者那里窃取了大约950万美元。
+category: malware
+tags:
+  - macos
+  - cryptocurrency
+  - supply-chain
+  - app-store
+  - phishing
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/fake-ledger-live-app-on-apples-app-store-stole-95m-in-crypto/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-fake-ledger-live-app-apple-app-store-crypto-theft
+severity: high
+affected_sectors:
+  - cryptocurrency
+---
+## 执行摘要
+一款冒充合法Ledger Live加密货币钱包管理软件的欺诈应用程序在苹果官方macOS App Store上可供下载，导致大约950万美元的失窃。这款恶意应用程序在列表上停留了数天，其功能是通过诱骗用户输入他们的24个单词的秘密恢复短语，然后攻击者使用这些短语来清空受害者的钱包。此事件突出了一个通过受信任的分发平台的重大软件供应链破坏。
+
+## 技术分析
+这款名为“Ledger Live Web3”的恶意应用程序由开发者资料“Ledger Ltd.”发布，几乎是真实Ledger Live界面的完美复制品。根据BleepingComputer报告的分析，该应用程序的核心恶意功能很简单：它提示用户输入他们的24个单词恢复种子短语，表面上是同步或恢复他们的钱包。一旦输入，这些敏感数据就被泄露到攻击者控制的命令和控制（C2）服务器。有了恢复短语，威胁行为者就获得了对相关加密货币钱包和资产的完全、不可逆转的控制。该应用程序没有利用macOS操作系统或合法Ledger软件的软件漏洞；相反，它完全依赖于恶意制作的应用程序中的社交工程。假冒应用程序如何通过苹果的App Review流程的确切方法仍然不清楚。
+
+## 入侵指标
+目前没有识别出任何指标。公开报告尚未披露与此活动相关的特定文件哈希、网络指标或C2服务器基础设施。主要的IOC是欺诈应用程序的名称（“Ledger Live Web3”）及其在苹果App Store上的发布者名称（“Ledger Ltd.”），这些已被移除。
+
+## 战术、技术与程序
+威胁行为者采用了一个多阶段的方法，专注于欺骗和凭据收集。他们的主要技术是**伪装（T1036）**，创建一个模仿受信任供应商Ledger的品牌、名称和用户界面的欺诈应用程序。攻击利用了受信任的分发机制，即苹果App Store，构成了一种**供应链破坏（T1195.002）**。核心目标是**凭据收集（T1539）**，特别是针对作为加密货币钱包主密钥的加密种子短语。操作节奏迅速，资金在应用程序安装后几天甚至几小时内就从受害者那里被盗。
+
+## 威胁行为者背景
+目前尚不清楚此次活动背后的威胁行为者的身份和来源。该操作需要足够的技术技能来克隆复杂应用程序的UI并导航苹果开发者计划提交流程，但攻击本身在技术上并不复杂。主要动机无疑是财务收益，将此活动置于网络犯罪领域。目前尚不清楚这是一个独立的团体还是通过类似软件供应链攻击针对加密货币用户的更大生态系统的一部分。
+
+## 缓解措施与建议
+加密货币用户和组织应采取以下缓解措施：
+*   **验证下载来源：** 仅从官方供应商的网站直接下载钱包软件。对于Ledger，真实的Ledger Live应用程序*仅*可通过`ledger.com/ledger-live/download`获得。对集中式市场上的应用程序持高度怀疑态度。
+*   **永不输入种子短语：** 合法的钱包应用程序在初始设置后永远不会要求您的24个单词恢复短语。任何提示输入种子短语的行为都是骗局的明确指标。
+*   **使用硬件钱包安全功能：** 利用硬件钱包的物理安全性。始终在设备的安全屏幕上验证交易详情，而不仅仅是在连接的计算机的应用程序上。
+*   **监控异常：** 苹果macOS用户应保持警惕，注意使用与受信任的金融或加密软件类似名称的应用程序。直接向苹果和被冒充的供应商报告可疑应用程序。
+*   **平台警惕：** 此事件提醒所有平台运营商，包括苹果，加强对处理高价值金融资产的应用程序的审查流程，特别是那些模仿知名品牌的应用程序。
+
+## 参考资料
+*   [https://www.bleepingcomputer.com/news/security/fake-ledger-live-app-on-apples-app-store-stole-95m-in-crypto/](https://www.bleepingcomputer.com/news/security/fake-ledger-live-app-on-apples-app-store-stole-95m-in-crypto/)

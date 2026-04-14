@@ -1,0 +1,55 @@
+---
+title: Critical PHP Composer Flaws Allow Remote Command Execution via Perforce Driver
+slug: 2026-04-14-php-composer-perforce-driver-command-injection-flaws
+date: '2026-04-14'
+excerpt: >-
+  Two high-severity command injection vulnerabilities (CVE-2026-40176,
+  CVE-2026-40177) in PHP Composer's Perforce driver enable arbitrary command
+  execution on developer systems during package operations.
+category: vulnerabilities
+tags:
+  - php
+  - composer
+  - supply-chain
+  - command-injection
+  - perforce
+language: en
+source_urls:
+  - >-
+    https://thehackernews.com/2026/04/new-php-composer-flaws-enable-arbitrary.html
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-php-composer-perforce-driver-command-injection-flaws
+severity: high
+cve_ids:
+  - CVE-2026-40176
+  - CVE-2026-40177
+---
+## Executive Summary
+Two high-severity command injection vulnerabilities in the PHP Composer package manager's Perforce driver enable arbitrary command execution on developer systems. Tracked as **CVE-2026-40176** and **CVE-2026-40177**, these flaws reside in the code handling the Perforce version control system (VCS). Successful exploitation requires an attacker to control a malicious Perforce repository that a developer interacts with using Composer. The maintainers have released patches in Composer versions 2.8.2 and 2.9.2; all users are urged to update immediately.
+
+## Technical Analysis
+The vulnerabilities are command injection flaws within Composer's `PerforceDriver` class, which manages interactions with Perforce depots. According to the disclosure, the flaws stem from insufficient sanitization of arguments passed to the `p4` command-line client. The specific technical vectors involve the insecure handling of repository metadata and branch names fetched from a remote Perforce server.
+
+**CVE-2026-40176** is triggered during the `init` or `info` operations when Composer retrieves metadata from a Perforce depot. An attacker controlling the depot can inject shell commands via crafted metadata fields.
+
+**CVE-2026-40177** is exploitable during operations like `composer update` or `install` when Composer processes branch names from the remote repository. A malicious branch name containing shell metacharacters can lead to command execution in the context of the user running Composer.
+
+The attack is contingent on a developer using Composer to interact with a compromised or malicious Perforce repository. This makes targeted attacks against organizations using internal Perforce servers a plausible scenario, though widespread exploitation is less likely due to the specific dependency on Perforce, a less common VCS compared to Git in the PHP ecosystem.
+
+## Indicators of Compromise
+None identified at this time. Exploitation would not leave distinct forensic artifacts beyond unexpected shell commands or processes originating from the Composer or `p4` executable. Organizations should monitor for anomalous command-line activity from development systems during package management operations.
+
+## Tactics, Techniques & Procedures
+The primary technique is **T1204: User Execution**, specifically leveraging a developer's trusted tool (Composer) to execute malicious code. The attacker must first compromise a Perforce server or create a malicious repository, indicating potential precursor activity targeting version control systems (**T1199: Trusted Relationship**). The injection itself aligns with **T1059: Command and Scripting Interpreter**, exploiting lack of input sanitization to break out of intended command arguments.
+
+## Threat Actor Context
+No specific threat actor has been publicly associated with exploiting these vulnerabilities at the time of writing. The flaws present an attractive vector for targeted attacks against software development teams, particularly those in organizations using Perforce for internal package hosting. Actors with initial access to a development network could use this to escalate privileges or move laterally from a compromised Perforce server to developer workstations.
+
+## Mitigations & Recommendations
+The primary and most critical mitigation is to update Composer to a patched version. Users of Composer 2.x should upgrade to **version 2.8.2** or **2.9.2**, which contain the fixes. The maintainers have backported the patches to these two most recent minor version branches.
+
+Organizations using Perforce should audit and restrict access to their Perforce depots, treating them as critical infrastructure. Developers should be cautioned against using Composer with untrusted Perforce repositories. As a general security practice, running Composer and other package managers with the least necessary privileges can limit the impact of potential command execution.
+
+## References
+- https://thehackernews.com/2026/04/new-php-composer-flaws-enable-arbitrary.html

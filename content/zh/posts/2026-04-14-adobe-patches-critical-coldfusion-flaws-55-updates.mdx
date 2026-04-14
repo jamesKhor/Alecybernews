@@ -1,0 +1,40 @@
+---
+title: Adobe 修补 ColdFusion 中的关键漏洞和其他 55 个安全更新
+slug: 2026-04-14-adobe-patches-critical-coldfusion-flaws-55-updates
+date: '2026-04-14'
+excerpt: Adobe 修补了 11 个产品中的 55 个漏洞，警告 ColdFusion 中的关键漏洞在攻击中具有最高的被利用风险。
+category: vulnerabilities
+tags:
+  - adobe
+  - coldfusion
+  - patch-tuesday
+  - vulnerability-management
+language: zh
+source_urls:
+  - >-
+    https://www.securityweek.com/adobe-patches-55-vulnerabilities-across-11-products/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-adobe-patches-critical-coldfusion-flaws-55-updates
+severity: high
+---
+## 执行摘要
+Adobe 发布了安全更新，解决了其 11 个软件产品中的 55 个漏洞。公司明确指出，其 ColdFusion 应用程序服务器中的关键漏洞在现实世界攻击中被利用的风险最大。这些补丁是 Adobe 计划于 2024 年 4 月进行的安全更新的一部分，其中还包括 Adobe Commerce、Experience Manager 等广泛部署的企业应用程序的修复。
+
+## 技术分析
+安全更新涵盖了 Adobe 的多种产品，包括 Adobe Commerce、Experience Manager (AEM)、ColdFusion、Substance 3D Painter、FrameMaker Publishing Server、Media Encoder、Premiere Pro、InDesign、InCopy、Audition 和 Bridge。尽管 Adobe 没有公开披露每个漏洞的具体技术细节以防止帮助攻击者，但公司的咨询表明，这些漏洞在类型和影响上各不相同。ColdFusion 中存在的最严重问题被归类为关键问题，可能允许任意代码执行。对于其他产品，修补的漏洞包括一系列关键和重要严重性问题，例如安全功能绕过、权限提升、内存泄漏和拒绝服务条件。在报告时，源材料中没有提供这些漏洞的确切 Common Vulnerabilities and Exposures (CVE) 标识符。
+
+## 入侵指标
+目前没有识别出任何入侵指标。
+
+## 战术、技术与程序
+没有公开披露具体的 CVE 细节或观察到的利用情况，与这些漏洞相关的确切战术、技术和程序 (TTPs) 仍然不清楚。然而，根据 Adobe 对 ColdFusion 漏洞被利用风险高的警告，可以合理推断威胁行为者可能会尝试利用这些漏洞进行初始访问 (TA0001) 对互联网面向的服务器。成功的利用可能导致执行命令和脚本解释器执行 (T1059) 等技术，在被破坏的系统上运行任意代码。其他修补漏洞的性质——包括权限提升和安全功能绕过——表明它们可能在攻击链的后期阶段被用来加深网络内的访问。
+
+## 威胁行为者背景
+没有特定的威胁行为者或活动被公开归因于尝试利用这些新修补的 Adobe 漏洞。Adobe 的咨询是一个主动的、常规的安全更新。然而，公司关于 ColdFusion 补丁高可利用风险的明确声明表明，这些漏洞可能会吸引包括网络犯罪团伙和国家支持的高级持续性威胁 (APTs) 在内的广泛恶意行为者的注意。从历史上看，像 ColdFusion 这样的广泛部署的服务器软件中的关键漏洞在补丁发布后很快就被武器化，这使得及时应用这些更新成为防御者的高优先级。
+
+## 缓解措施与建议
+最主要的和最关键的缓解措施是立即应用 Adobe 提供的相关安全更新。系统管理员应优先修补 ColdFusion 实例，因为明确指出的风险更高。组织应咨询 Adobe 的官方安全公告 (APSBs) 以确定每个产品的具体修复版本并实施它们。作为标准安全实践，组织应确保 ColdFusion 和其他应用程序服务器不必要地暴露于公共互联网，并置于强大的网络安全控制之后。还建议对托管 Adobe 产品的系统进行持续监控，特别是与 Web 应用程序和服务器软件相关的异常活动，以检测潜在的利用尝试。
+
+## 参考资料
+- https://www.securityweek.com/adobe-patches-55-vulnerabilities-across-11-products/
