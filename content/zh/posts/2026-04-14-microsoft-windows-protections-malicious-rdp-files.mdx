@@ -1,0 +1,51 @@
+---
+title: 微软加强Windows防御措施以抵御恶意RDP文件攻击
+slug: 2026-04-14-microsoft-windows-protections-malicious-rdp-files
+date: '2026-04-14'
+excerpt: 微软在Windows中增加了新的安全警告和默认限制，以对抗利用远程桌面协议（.rdp）文件进行的网络钓鱼活动，这些活动旨在窃取凭证。
+category: vulnerabilities
+tags:
+  - Microsoft
+  - Windows
+  - Phishing
+  - RDP
+  - Credential Theft
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/microsoft/microsoft-adds-windows-protections-for-malicious-remote-desktop-files/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-microsoft-windows-protections-malicious-rdp-files
+severity: medium
+---
+## 执行摘要
+Microsoft 在 Windows 中实施了新的安全特性，以减轻滥用远程桌面协议（RDP）连接文件的持续钓鱼技术。更新在最近的 Microsoft 安全博客文章中详细说明，引入了明确的用户警告，并默认禁用了打开来自不受信任来源的 `.rdp` 文件时的风险资源共享选项。这一变化直接针对威胁行为者分发恶意 RDP 文件以收集凭证或建立对受害者系统的初始访问权限的活动。
+
+## 技术分析
+威胁的核心涉及将合法的 `.rdp` 文件格式武器化，该格式存储用于建立远程桌面连接的配置数据。根据 Microsoft 的说法，攻击者制作这些文件以包含自动连接到恶意远程服务器的指令，或者更常见的是，启用与远程主机共享本地客户端资源（如驱动器和打印机）。当用户打开恶意 `.rdp` 文件时，Windows 以前会启用这些资源共享设置来建立连接，可能会允许攻击者直接将恶意软件部署到用户共享的驱动器上或访问敏感文件。
+
+随着最近的 Windows 更新开始推出的新保护措施，以两种关键方式改变了这种行为。首先，当从不受信任的来源（如电子邮件附件或从互联网下载）打开 `.rdp` 文件时，Windows 现在会显示一个清晰的安全警告对话框。此警告明确说明文件的来源以及连接到未知远程计算机的风险。其次，更重要的是，系统现在默认禁用与远程计算机共享本地客户端驱动器、打印机和剪贴板的连接，这些连接是从这些不受信任的文件启动的。如果需要，用户必须通过警告对话框手动重新启用这些功能，从而创建了一个有意识的安全决策点。
+
+## 入侵指标
+目前没有识别出任何入侵指标。
+
+## 战术、技术与程序
+观察到的主要技术是 **钓鱼（T1566）**，特别是使用恶意 `.rdp` 文件作为有效载荷。相关的程序包括：
+*   **武器化文档投递：** 通过电子邮件或其他社交工程诱饵分发 `.rdp` 文件，通常伪装成合法的商务文件或发票。
+*   **资源共享滥用：** 使用 `drivestoredirect:s:*` 和 `redirectprinters:i:1` 参数配置 `.rdp` 文件，以启用受害者的本地驱动器和打印机与攻击者控制的 RDP 服务器共享。
+*   **凭证收集：** 依赖于在 RDP 连接尝试期间出现的 Windows 凭证提示，以捕获用户登录远程系统或通过重用，他们的企业网络凭证。
+*   **初始访问：** 使用建立的 RDP 会话和共享资源路径在受害者网络上获得立足点，以进行进一步的利用。
+
+## 威胁行为者背景
+Microsoft 在其公开咨询中没有将这种特定的攻击向量归因于特定的威胁行为者或团体。这种技术被认为是一种工具不可知的、商品化的方法，可能被从低技能的钓鱼操作员到更高级的勒索软件关联者广泛使用，因为它的简单性和有效性。滥用受信任的、本地的 Windows 功能（如 RDP 文件）使这些活动对传统检测方法特别隐蔽，这些方法侧重于可执行恶意软件。
+
+## 缓解措施与建议
+主要的缓解措施是应用 Microsoft 的最新 Windows 更新，这些更新默认启用新的保护行为。组织应确保这些更新在他们的环境部署。其他防御措施包括：
+*   **用户培训：** 教育员工了解打开意外的 `.rdp` 文件或任何来自不受信任来源的文件类型的风险，即使它们看起来是非可执行文档。
+*   **应用程序控制：** 使用 Windows Defender 应用程序控制或类似的策略，限制 `mstsc.exe`（远程桌面客户端）的执行，仅限于授权用户和系统中严格需要的业务功能。
+*   **网络分割：** 限制标准用户工作站到互联网的出站 RDP 流量（TCP 端口 3389），限制连接到外部恶意 RDP 服务器的能力。
+*   **增强监控：** 审核 Windows 事件日志中的事件 ID 1149，这是在显示新的 `.rdp` 文件安全警告时生成的，以识别潜在的攻击尝试。
+
+## 参考资料
+*   Microsoft 安全博客文章：[https://www.bleepingcomputer.com/news/microsoft/microsoft-adds-windows-protections-for-malicious-remote-desktop-files/](https://www.bleepingcomputer.com/news/microsoft/microsoft-adds-windows-protections-for-malicious-remote-desktop-files/)

@@ -1,0 +1,54 @@
+---
+title: CPUID.com 水坑攻击将官方下载重定向到恶意软件
+slug: 2026-04-14-cpuid-watering-hole-attack-redirected-official-downloads
+date: '2026-04-14'
+excerpt: >-
+  威胁行为者在2026年4月9日破坏了CPUID的域名API，悄无声息地将合法软件下载重定向到恶意软件长达19小时。SentinelOne的AI
+  EDR自动检测并阻止了供应链攻击。
+category: threat-intel
+tags:
+  - supply-chain
+  - watering-hole
+  - malware
+  - cpu-z
+  - sentinelone
+language: zh
+source_urls:
+  - >-
+    https://www.sentinelone.com/blog/securing-the-software-supply-chain-how-sentinelones-ai-edr-autonomously-blocked-the-cpu-z-watering-hole-cyber-attack/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-cpuid-watering-hole-attack-redirected-official-downloads
+severity: high
+affected_sectors:
+  - software
+  - technology
+---
+## CPUID.com 水坑攻击将官方下载重定向至恶意软件
+
+## 执行摘要
+2026年4月9日，广泛使用的系统信息工具CPU-Z的官方网站遭到破坏，变成了一个水坑攻击。威胁行为者操纵了该域名的API，悄无声息地将软件的合法下载请求重定向至攻击者控制的基础设施，提供恶意软件而不是真正的安装程序。该活动在被缓解前大约活跃了19个小时。攻击被SentinelOne的AI驱动的终端检测和响应（EDR）平台自动检测并阻止，该平台观察到客户终端上的恶意活动。
+
+## 技术分析
+这次破坏针对的是`cpuid.com`的API层面，特别是处理下载请求的机制。根据SentinelOne的分析，当用户在网站上点击官方下载按钮时，他们的请求被拦截并重定向。重定向不涉及破坏网站或更改其可见的HTML；网站的前端保持合法。相反，后端API调用获取下载链接被操纵以返回恶意URL。
+
+这种技术在用户体验上造成了明显的分歧。直接导航到CPU-Z安装程序的特定已知URL的用户收到了合法文件。然而，依赖于首页上的交互式下载按钮的用户则从名为`files.cpuid[.]com`的域名接收了一个恶意可执行文件。尽管这个域名模仿了合法的`cpuid.com`，但它是由攻击者注册的，并托管在法国的基础设施上，与CPUID的合法服务不同。恶意文件是一个Windows可执行文件，执行后尝试部署额外的有效载荷。
+
+## 入侵指标
+目前没有识别出任何指标。
+
+## 战术、技术与程序
+攻击者通过被破坏的网站实施了软件供应链攻击，被归类为**水坑**。他们的主要技术是**域名基础设施操纵**，改变受信任域名的API行为以重定向流量。使用相似子域名（`files.cpuid[.]com`）展示了**域名伪装**。攻击依赖于用户对官方供应商下载页面的高度信任，这是一种**信任滥用**。破坏的隐蔽性，保持主网站视觉上的完整性，表明了一种集中的努力，以最大化影响同时最小化早期发现的机会。
+
+## 威胁行为者背景
+这次攻击背后的特定威胁行为者在可用的源材料中没有被识别。攻击的复杂性——在没有完全接管网站的情况下破坏域名的API——表明了一个有能力的对手，对大规模恶意软件分发感兴趣。选择CPU-Z，一个受IT专业人士、游戏玩家和超频爱好者欢迎的工具，表明了一个潜在有价值的目标丰富的受害者池，可能对凭证盗窃、加密挖掘或作为进一步入侵的初始访问经纪人有价值。行为者的起源和动机仍然不清楚。
+
+## 缓解措施与建议
+组织和个人应该非常重视来自终端安全软件的意外警报，即使在下载看似合法的来源时也是如此。主要建议包括：
+*   **验证文件哈希值：**始终将下载的安装程序的SHA-256哈希值与供应商在其他受信任渠道（例如，经过验证的社交媒体账户或支持论坛）上发布的哈希值进行比较。
+*   **谨慎直接下载：**对通过交互式网站按钮或脚本启动的下载保持警惕。尽可能使用经过审查和收藏的直接、静态链接到安装文件。
+*   **部署行为AI EDR：**能够基于进程行为检测恶意行为的安全解决方案，而不是仅依赖已知签名，对于阻止新型供应链攻击至关重要。
+*   **供应商警觉性：**软件供应商必须严格保护其网络基础设施，特别是API端点和内容分发网络，并为关键下载功能实施完整性监控。
+
+## 参考资料
+*   [https://www.sentinelone.com/blog/securing-the-software-supply-chain-how-sentinelones-ai-edr-autonomously-blocked-the-cpu-z-watering-hole-cyber-attack/](https://www.sentinelone.com/blog/securing-the-software-supply-chain-how-sentinelones-ai-edr-autonomously-blocked-the-cpu-z-watering-hole-cyber-attack/)

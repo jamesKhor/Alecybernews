@@ -1,0 +1,54 @@
+---
+title: CPUID.com Watering Hole Attack Redirected Official Downloads to Malware
+slug: 2026-04-14-cpuid-watering-hole-attack-redirected-official-downloads
+date: '2026-04-14'
+excerpt: >-
+  Threat actors compromised CPUID's domain API on April 9, 2026, silently
+  redirecting legitimate software downloads to malware for 19 hours.
+  SentinelOne's AI EDR autonomously detected and blocked the supply chain
+  attack.
+category: threat-intel
+tags:
+  - supply-chain
+  - watering-hole
+  - malware
+  - cpu-z
+  - sentinelone
+language: en
+source_urls:
+  - >-
+    https://www.sentinelone.com/blog/securing-the-software-supply-chain-how-sentinelones-ai-edr-autonomously-blocked-the-cpu-z-watering-hole-cyber-attack/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-cpuid-watering-hole-attack-redirected-official-downloads
+severity: high
+affected_sectors:
+  - software
+  - technology
+---
+## Executive Summary
+On April 9, 2026, the official website for CPU-Z, a widely used system information utility, was compromised and transformed into a watering hole attack. Threat actors manipulated the domain's API to silently redirect legitimate download requests for the software to attacker-controlled infrastructure, serving malware instead of the genuine installer. The campaign was active for approximately 19 hours before being mitigated. The attack was autonomously detected and blocked by SentinelOne's AI-powered Endpoint Detection and Response (EDR) platform, which observed the malicious activity on a customer's endpoint.
+
+## Technical Analysis
+The compromise targeted `cpuid.com` at the API level, specifically the mechanism handling download requests. According to SentinelOne's analysis, when a user clicked the official download button on the site, their request was intercepted and redirected. The redirection did not involve defacing the website or altering its visible HTML; the site's front-end remained legitimate. Instead, the backend API call that fetches the download link was manipulated to return a malicious URL.
+
+This technique created a stark divergence in user experience. Users who navigated directly to a specific, known URL for the CPU-Z installer received the legitimate file. However, users who relied on the interactive download button on the homepage were served a malicious executable from a domain named `files.cpuid[.]com`. This domain, while mimicking the legitimate `cpuid.com`, was registered by the attackers and hosted on infrastructure in France, distinct from CPUID's legitimate services. The malicious file was a Windows executable that, upon execution, attempted to deploy additional payloads.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+The attackers employed a software supply chain attack via a compromised website, classified as a **watering hole**. Their primary technique was **Domain Infrastructure Manipulation**, altering the API behavior of a trusted domain to redirect traffic. The use of a lookalike subdomain (`files.cpuid[.]com`) demonstrates **Domain Impersonation**. The attack relied on the high trust users place in official vendor download pages, a form of **Abuse of Trust**. The stealth of the compromise, leaving the main website visually intact, indicates a focused effort to maximize impact while minimizing the chance of early discovery.
+
+## Threat Actor Context
+The specific threat actor behind this attack is not identified in the available source material. The sophistication of the attack—compromising a domain's API without a full site takeover—suggests a capable adversary with an interest in mass malware distribution. The choice of CPU-Z, a tool popular with IT professionals, gamers, and overclockers, indicates a target-rich victim pool potentially valuable for credential theft, crypto-mining, or as an initial access broker for further intrusions. The origin and motivation of the actor remain unclear.
+
+## Mitigations & Recommendations
+Organizations and individuals should treat unexpected alerts from endpoint security software with high seriousness, even when downloading from ostensibly legitimate sources. Key recommendations include:
+*   **Verify File Hashes:** Always compare the SHA-256 hash of a downloaded installer with the hash published by the vendor on an alternative, trusted channel (e.g., a verified social media account or support forum).
+*   **Exercise Caution with Direct Downloads:** Be wary of downloads initiated through interactive website buttons or scripts. Where possible, use direct, static links to installer files that have been vetted and bookmarked.
+*   **Deploy Behavioral AI EDR:** Security solutions capable of detecting malicious behavior based on process actions, rather than relying solely on known signatures, are critical for blocking novel supply chain attacks.
+*   **Vendor Vigilance:** Software vendors must rigorously secure their web infrastructure, particularly API endpoints and content delivery networks, and implement integrity monitoring for critical download functions.
+
+## References
+*   https://www.sentinelone.com/blog/securing-the-software-supply-chain-how-sentinelones-ai-edr-autonomously-blocked-the-cpu-z-watering-hole-cyber-attack/
