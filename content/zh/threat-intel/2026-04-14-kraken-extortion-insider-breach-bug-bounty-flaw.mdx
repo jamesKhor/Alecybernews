@@ -1,0 +1,53 @@
+---
+title: Kraken 面临勒索，内部人员泄露漏洞暴露赏金计划缺陷
+slug: 2026-04-14-kraken-extortion-insider-breach-bug-bounty-flaw
+date: '2026-04-14'
+excerpt: Kraken 的安全团队发现一起内部人员泄露事件，其中一名研究人员利用零日漏洞窃取了价值300万美元的加密货币，随后要求支付漏洞赏金。
+category: threat-intel
+tags:
+  - insider-threat
+  - cryptocurrency
+  - extortion
+  - bug-bounty
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/crypto-exchange-kraken-extorted-by-hackers-after-insider-breach/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-14-kraken-extortion-insider-breach-bug-bounty-flaw
+severity: high
+affected_sectors:
+  - cryptocurrency
+---
+## 执行摘要
+Kraken的首席安全官Nick Percoco透露，一名安全研究员作为有组织团体的一部分，利用Kraken资金系统中的一个关键漏洞，欺诈性地提取了大约300万美元的加密货币。这起事件起初是一份合法的错误报告，但当研究员拒绝归还资金并要求赏金支付时，事件升级为勒索。这个漏洞允许人为增加账户余额，仅在几小时内就被修补，但在未经授权的提款发生之前。
+
+## 技术分析
+根据Percoco的详细说明，核心漏洞存在于Kraken资金系统最近部署的一个功能中。这个漏洞是一个**零日漏洞**——在事件发生之前Kraken并不知情——它允许用户在存款完全清算之前启动存款交易并在其账户中接收资金。这创造了一个窗口，攻击者可以在不实际转移任何资产的情况下人为增加他们的账户余额。
+
+攻击者自称是安全研究员，他们利用了这个漏洞。他们能够在Kraken账户中“打印”资产，Percoco将这一过程描述为模仿一个**“漏洞赏金奖励。”** 关键的是，他们随后将这些欺诈性生成的资金转移到Kraken平台之外。交易所的内部调查追踪了区块链上的交易，确认漏洞仅活跃了几个小时，大约有300万美元的加密货币从Kraken的金库中被取走。漏洞的具体技术机制没有披露，但已经被修补。
+
+## 入侵指标
+目前没有识别出任何指标。Kraken没有公开发布与这起内部人员驱动的欺诈相关的具体网络或主机基础指标。
+
+## 战术、技术与程序
+威胁行为者采用了多阶段方法，将合法的安全研究与犯罪欺诈混合。他们的**战术、技术和程序（TTPs）**包括：
+1.  **侦察：**识别一个高价值金融系统中新部署的、易受攻击的功能。
+2.  **初始访问和利用：**使用合法用户账户触发零日漏洞，人为增加余额。
+3.  **权限提升：**利用增加的余额执行通常需要合法资本的操作（提款）。
+4.  **外泄：**系统地将欺诈性获得的加密货币转移到他们控制的外部钱包。
+5.  **伪装和勒索：**以负责任披露的名义联系Kraken的漏洞赏金计划，然后拒绝归还资金，并要求赏金支付作为讨论漏洞细节的条件。
+
+## 威胁行为者背景
+涉案人员自称是安全研究员。然而，Kraken的调查得出结论，他们是有组织团体的一部分，并非出于善意行事。他们的行为从漏洞发现转变为盗窃，最终转变为**勒索**，这种模式与道德安全研究不一致。要求赏金支付以换取他们已经利用以获得财务收益的漏洞信息，这与典型的错误报告不同。该团体的确切隶属关系或身份仍然未知。
+
+## 缓解措施与建议
+Kraken已经修补了潜在的漏洞。对于其他组织，特别是在金融科技和加密货币领域，这起事件突出了关键的操作安全教训：
+*   **漏洞赏金计划审查：**建立并执行明确的交战规则，明确禁止研究员通过提取实际资金来测试漏洞。服务条款必须定义利用限制，并强制归还任何意外获取的资产。
+*   **金融交易异常检测：**实施实时监控，以检测表明余额操纵的交易模式，例如快速存款后立即提取不同资产类型的资金，特别是针对新部署的代码。
+*   **职责分离和金库控制：**确保对从公司金库转移资产的强大控制和多重签名要求，即使技术漏洞被利用，也使大规模欺诈性提款更加困难。
+*   **勒索事件响应：**为处理跨入勒索的研究员制定协议。正如Percoco所说，这应该涉及将他们视为罪犯并涉及执法部门，而不是谈判支付。
+
+## 参考资料
+*   [https://www.bleepingcomputer.com/news/security/crypto-exchange-kraken-extorted-by-hackers-after-insider-breach/](https://www.bleepingcomputer.com/news/security/crypto-exchange-kraken-extorted-by-hackers-after-insider-breach/)
