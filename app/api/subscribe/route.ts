@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import {
+  resend,
+  getAudienceId,
+  isResendConfigured,
+  type Locale,
+} from "@/lib/resend";
 
 const SUBSCRIBERS_FILE = path.join(process.cwd(), "data", "subscribers.json");
 
@@ -8,11 +14,11 @@ interface Subscriber {
   email: string;
   subscribedAt: string;
   locale: string;
+  resendContactId?: string;
 }
 
-// Simple in-memory rate limiter: IP -> timestamps
 const rateLimitMap = new Map<string, number[]>();
-const RATE_LIMIT_WINDOW = 60_000; // 1 minute
+const RATE_LIMIT_WINDOW = 60_000;
 const RATE_LIMIT_MAX = 3;
 
 function isRateLimited(ip: string): boolean {
@@ -36,6 +42,7 @@ function readSubscribers(): Subscriber[] {
 }
 
 function writeSubscribers(subscribers: Subscriber[]): void {
+  fs.mkdirSync(path.dirname(SUBSCRIBERS_FILE), { recursive: true });
   fs.writeFileSync(
     SUBSCRIBERS_FILE,
     JSON.stringify(subscribers, null, 2) + "\n",
@@ -63,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const email = (body.email ?? "").trim().toLowerCase();
-    const locale = body.locale ?? "en";
+    const locale: Locale = body.locale === "zh" ? "zh" : "en";
 
     if (!email || !EMAIL_REGEX.test(email)) {
       return NextResponse.json(
@@ -88,10 +95,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let resendContactId: string | undefined;
+
+    if (isResendConfigured() && resend) {
+      const audienceId = getAudienceId(locale);
+      if (audienceId) {
+        try {
+          const created = await resend.contacts.create({
+            email,
+            audienceId,
+            unsubscribed: false,
+          });
+          resendContactId = created.data?.id;
+        } catch (err) {
+          console.error("[subscribe] Resend contact create failed:", err);
+        }
+      } else {
+        console.warn(
+          `[subscribe] No RESEND_AUDIENCE_ID_${locale.toUpperCase()} configured`,
+        );
+      }
+    }
+
     subscribers.push({
       email,
       subscribedAt: new Date().toISOString(),
       locale,
+      resendContactId,
     });
 
     writeSubscribers(subscribers);
@@ -100,7 +130,8 @@ export async function POST(request: NextRequest) {
       { success: true, message: "Successfully subscribed!" },
       { status: 201 },
     );
-  } catch {
+  } catch (err) {
+    console.error("[subscribe] Error:", err);
     return NextResponse.json(
       {
         error: "server_error",
@@ -134,6 +165,23 @@ export async function DELETE(request: NextRequest) {
         { error: "not_found", message: "This email is not subscribed." },
         { status: 404 },
       );
+    }
+
+    const sub = subscribers[idx];
+
+    if (isResendConfigured() && resend && sub.resendContactId) {
+      const locale: Locale = sub.locale === "zh" ? "zh" : "en";
+      const audienceId = getAudienceId(locale);
+      if (audienceId) {
+        try {
+          await resend.contacts.remove({
+            id: sub.resendContactId,
+            audienceId,
+          });
+        } catch (err) {
+          console.error("[unsubscribe] Resend contact remove failed:", err);
+        }
+      }
     }
 
     subscribers.splice(idx, 1);

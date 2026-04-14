@@ -1,0 +1,74 @@
+name: Email Digest
+
+on:
+  schedule:
+    # 9:30 AM SGT (UTC+8) = 01:30 UTC — APAC morning
+    - cron: "30 1 * * *"
+    # 10:30 PM SGT (UTC+8) = 14:30 UTC — catches NA coming online
+    - cron: "30 14 * * *"
+  workflow_dispatch:
+    inputs:
+      window_hours:
+        description: "Lookback window in hours (default 13)"
+        required: false
+        default: "13"
+      dry_run:
+        description: "Dry run — build digest but do not send"
+        required: false
+        type: boolean
+        default: false
+      locale:
+        description: "Locale filter (en, zh, or both)"
+        required: false
+        default: "both"
+        type: choice
+        options:
+          - both
+          - en
+          - zh
+
+concurrency:
+  group: email-digest
+  cancel-in-progress: false
+
+jobs:
+  send:
+    name: Send Digest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: 0
+
+      - name: Send digest
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_AUDIENCE_ID_EN: ${{ secrets.RESEND_AUDIENCE_ID_EN }}
+          RESEND_AUDIENCE_ID_ZH: ${{ secrets.RESEND_AUDIENCE_ID_ZH }}
+          RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
+          RESEND_REPLY_TO: ${{ secrets.RESEND_REPLY_TO }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://zcybernews.com' }}
+          WINDOW_HOURS: ${{ inputs.window_hours || '13' }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          LOCALE: ${{ inputs.locale || 'both' }}
+        run: |
+          ARGS="--window-hours=$WINDOW_HOURS"
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ "$LOCALE" = "en" ] || [ "$LOCALE" = "zh" ]; then
+            ARGS="$ARGS --locale=$LOCALE"
+          fi
+          npx tsx scripts/send-digest.ts $ARGS

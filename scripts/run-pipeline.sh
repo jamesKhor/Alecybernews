@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 # ZCyberNews — Automated AI content pipeline
-# Runs on VPS via cron. Generates EN articles, rebuilds site, commits to GitHub.
+#
+# PRIMARY runner: .github/workflows/ai-content-pipeline.yml (hourly, on GitHub Actions)
+# This script is kept as a LOCAL BACKUP only — run manually if you need to
+# generate articles from the VPS (e.g. when GitHub Actions is down).
+#
+# Responsibilities:
+#   - pull latest code
+#   - run the AI pipeline (generate + translate + write MDX)
+#   - commit and push new content
+#   - send a Telegram notification
+#
+# NOT responsible for:
+#   - rebuilding Next.js  (handled by deploy-vps.yml on push)
+#   - restarting PM2      (handled by deploy-vps.yml on push)
 #
 # Usage: bash scripts/run-pipeline.sh [--max-articles=N]
 # Default: 3 articles per run
@@ -26,13 +39,9 @@ exec >> "$LOG_FILE" 2>&1
 # ── Load env vars (for API keys + Telegram config) ─────────────────────────
 if [ -f "$REPO_DIR/.env.local" ]; then
   set -a
-  # Use env parsing that handles $ in values (e.g. bcrypt hashes like $2b$12$...)
   while IFS='=' read -r key value; do
-    # Skip comments and blank lines
     [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
-    # Trim whitespace from key
     key="${key//[[:space:]]/}"
-    # Only export valid variable names
     [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
     export "$key=$value"
   done < "$REPO_DIR/.env.local"
@@ -44,10 +53,10 @@ notify() {
   local message="$1"
   if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
     curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-      -d chat_id="${TELEGRAM_CHAT_ID}" \
-      -d parse_mode="HTML" \
-      -d text="${message}" \
-      -d disable_web_page_preview=true \
+      --data-urlencode chat_id="${TELEGRAM_CHAT_ID}" \
+      --data-urlencode parse_mode="HTML" \
+      --data-urlencode disable_web_page_preview="true" \
+      --data-urlencode text="${message}" \
       > /dev/null 2>&1 || true
   fi
 }
@@ -59,8 +68,6 @@ echo "=============================================="
 
 # 1. Pull latest code from GitHub
 echo "[deploy] Syncing to latest remote main..."
-# fetch + rebase: keeps any unpushed local commits on top of remote changes
-# Falls back to hard-reset if rebase fails (e.g. conflicting history)
 git fetch origin main || echo "[deploy] ⚠️  git fetch failed — continuing with current code."
 LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse origin/main)
@@ -72,8 +79,7 @@ if [ "$LOCAL" != "$REMOTE" ]; then
   }
 fi
 
-# 2. Run the AI pipeline (disable errexit — partial failures are expected when
-#    some articles fail schema validation; we still want to publish the rest)
+# 2. Run the AI pipeline (partial failures OK — publish whatever succeeded)
 echo "[pipeline] Starting — max articles: $MAX_ARTICLES"
 set +e
 npx tsx --env-file=.env.local scripts/pipeline/index.ts --max-articles="$MAX_ARTICLES"
@@ -82,45 +88,35 @@ set -e
 
 if [ $PIPELINE_EXIT -ne 0 ]; then
   echo "[pipeline] ⚠️  Pipeline exited with code $PIPELINE_EXIT (some articles may have failed)"
-  # Don't exit — continue to commit/push any articles that DID succeed
 fi
 
 # 3. Check if any new content was written
 NEW_FILES=$(git status --short content/ 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$NEW_FILES" -eq 0 ]; then
-  echo "[pipeline] No new articles written (all stories already processed). Skipping rebuild."
+  echo "[pipeline] No new articles written (all stories already processed). Done."
   exit 0
 fi
 
-echo "[pipeline] $NEW_FILES new file(s) detected. Rebuilding site..."
+echo "[pipeline] $NEW_FILES new file(s) detected — committing."
 
-# 4. Rebuild Next.js (clean first to avoid stale SSG cache from prior deploys)
-rm -rf .next
-NODE_OPTIONS="--max-old-space-size=512" HUSKY=0 npm run build
-
-# 5. Restart PM2
-pm2 restart zcybernews
-echo "[deploy] ✅ PM2 restarted"
-
-# 6. Commit new content to GitHub (keeps git in sync)
-echo "[git] Committing new articles..."
+# 4. Commit new content to GitHub (deploy-vps.yml will rebuild + restart on push)
 git config user.name "zcybernews-bot"
 git config user.email "bot@zcybernews.com"
-git add content/ .pipeline-cache/ data/ 2>/dev/null || true
-git diff --staged --quiet || git commit -m "chore: ai pipeline $(TZ='Asia/Singapore' date +%Y-%m-%dT%H:%M:%S+08:00) [skip ci]"
+git add content/ .pipeline-cache/ data/ public/images/articles/ 2>/dev/null || true
+git diff --staged --quiet || git commit -m "chore: ai pipeline $(TZ='Asia/Singapore' date +%Y-%m-%dT%H:%M:%S+08:00)"
 echo "[git] Pushing to origin main..."
 git push origin main 2>&1 || echo "[git] ⚠️  Push failed — will retry on next run"
 
-# 7. Collect article titles for notification
-ARTICLE_TITLES=$(git log -1 --name-only --pretty=format: -- content/en/ 2>/dev/null | \
-  xargs -I{} basename {} .mdx 2>/dev/null | \
-  head -5 | \
-  sed 's/-/ /g; s/\b\(.\)/\u\1/g' | \
-  sed 's/^/• /' || echo "")
+# 5. Collect article titles for notification
+ARTICLE_TITLES=$(git log -1 --name-only --pretty=format: -- content/en/ 2>/dev/null \
+  | awk 'NF' \
+  | xargs -I{} basename {} .mdx 2>/dev/null \
+  | head -5 \
+  | sed 's/-/ /g' \
+  | sed 's/^/• /' || echo "")
 
-ARTICLE_COUNT=$((NEW_FILES / 2))  # rough: EN + ZH pairs or just EN files
-[ "$ARTICLE_COUNT" -lt 1 ] && ARTICLE_COUNT=$NEW_FILES
+ARTICLE_COUNT=$(echo "$ARTICLE_TITLES" | grep -c '^•' || echo 0)
 
 notify "✅ <b>ZCyberNews Published ${ARTICLE_COUNT} article(s)</b>
 Time: $(TZ='Asia/Singapore' date '+%H:%M SGT')
