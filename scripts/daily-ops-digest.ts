@@ -60,6 +60,7 @@ type PipelineCompleteEvent = {
   articles_written: number;
   duplicates_blocked: number;
   off_topic_rejected: number;
+  fact_check_rejected?: number; // Added 2026-04-15 — older events don't have this
   translation_warnings: number;
   failed: number;
 };
@@ -77,6 +78,7 @@ type Digest = {
     articlesWritten: number;
     duplicatesBlocked: number;
     offTopicRejected: number;
+    factCheckRejected: number;
     translationWarnings: number;
     failed: number;
   };
@@ -252,6 +254,7 @@ function buildDigest(windowHours: number): Digest {
   let articlesWritten = 0;
   let duplicatesBlocked = 0;
   let offTopicRejected = 0;
+  let factCheckRejected = 0;
   let translationWarnings = 0;
   let failedArticlesInRuns = 0;
 
@@ -266,6 +269,7 @@ function buildDigest(windowHours: number): Digest {
     articlesWritten += event.articles_written ?? 0;
     duplicatesBlocked += event.duplicates_blocked ?? 0;
     offTopicRejected += event.off_topic_rejected ?? 0;
+    factCheckRejected += event.fact_check_rejected ?? 0;
     translationWarnings += event.translation_warnings ?? 0;
     failedArticlesInRuns += event.failed ?? 0;
   }
@@ -296,6 +300,7 @@ function buildDigest(windowHours: number): Digest {
       articlesWritten,
       duplicatesBlocked,
       offTopicRejected,
+      factCheckRejected,
       translationWarnings,
       failed: failedArticlesInRuns,
     },
@@ -342,6 +347,7 @@ function renderMessage(d: Digest): string {
   lines.push(`<b>Safety filters</b>`);
   lines.push(`• Duplicates blocked: ${d.counters.duplicatesBlocked}`);
   lines.push(`• Off-topic rejected: ${d.counters.offTopicRejected}`);
+  lines.push(`• Fact-check rejected: ${d.counters.factCheckRejected}`);
   lines.push(`• Translation warnings: ${d.counters.translationWarnings}`);
   if (d.counters.failed > 0) {
     lines.push(`• Per-article failures: ${d.counters.failed}`);

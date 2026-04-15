@@ -15,6 +15,8 @@ import { ingestFeeds } from "./ingest-rss.js";
 import { generateArticle } from "./generate-article.js";
 import { translateArticle } from "./translate-article.js";
 import { writeArticlePair, DuplicateArticleError } from "./write-mdx.js";
+import { postProcessArticle } from "./post-process.js";
+import { factCheckArticle, formatFactCheckLog } from "./fact-check.js";
 import { markProcessedBatch } from "../utils/cache.js";
 import { limit } from "../utils/rate-limit.js";
 
@@ -190,6 +192,7 @@ async function main() {
   // 3. Generate + translate + write — p-limit(3) concurrency
   let skippedOffTopic = 0;
   let skippedDuplicate = 0;
+  let skippedFactCheck = 0;
   let translationWarnings = 0;
 
   // Load titles published in the last 48h to pass as context to the AI prompt.
@@ -230,6 +233,27 @@ async function main() {
           );
           skippedOffTopic++;
           markProcessedBatch(storyUrls); // Still mark as processed to avoid retrying
+          return null;
+        }
+
+        // Post-process — script overrides LLM output for structured fields
+        // (slug, date, cve_ids, iocs). Script-derived = deterministic = no
+        // hallucination possible on these fields. "LLM writes prose, script
+        // extracts structured data."
+        postProcessArticle(article, batch);
+
+        // Fact-check — regex-based cross-validation of claims against source
+        // material. HIGH severity issues block publish. MEDIUM/LOW logged
+        // but allowed through. Runs after post-process because post-process
+        // may have fixed some issues by filtering invented CVEs.
+        const fc = await factCheckArticle(article, batch);
+        console.log(`[pipeline] ${formatFactCheckLog(fc)}`);
+        if (!fc.passed) {
+          console.warn(
+            `[pipeline] ❌ Fact-check rejected "${article.title}" — ${fc.issues.filter((i) => i.severity === "high").length} high-severity issues`,
+          );
+          skippedFactCheck++;
+          markProcessedBatch(storyUrls);
           return null;
         }
 
@@ -313,10 +337,14 @@ async function main() {
     (r) => r.status === "fulfilled" && r.value,
   ).length;
   const failed =
-    results.length - succeeded - skippedOffTopic - skippedDuplicate;
+    results.length -
+    succeeded -
+    skippedOffTopic -
+    skippedDuplicate -
+    skippedFactCheck;
 
   console.log(
-    `\n📊 Pipeline complete: ${succeeded} written, ${skippedDuplicate} duplicates blocked, ${skippedOffTopic} off-topic rejected, ${translationWarnings} translation warnings, ${failed} failed\n`,
+    `\n📊 Pipeline complete: ${succeeded} written, ${skippedDuplicate} duplicates blocked, ${skippedOffTopic} off-topic rejected, ${skippedFactCheck} fact-check rejected, ${translationWarnings} translation warnings, ${failed} failed\n`,
   );
 
   // Write run summary as JSON
@@ -329,6 +357,7 @@ async function main() {
       articles_written: succeeded,
       duplicates_blocked: skippedDuplicate,
       off_topic_rejected: skippedOffTopic,
+      fact_check_rejected: skippedFactCheck,
       translation_warnings: translationWarnings,
       failed,
     }),

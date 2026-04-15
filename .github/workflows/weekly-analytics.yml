@@ -1,0 +1,110 @@
+name: Weekly Analytics + Budget Snapshot
+
+on:
+  schedule:
+    # Every Sunday at 01:00 UTC = 09:00 SGT. Off-minute chosen to avoid
+    # fleet-wide spike on :00 / :30. Analytics are read-only so timing
+    # is not sensitive — pick early morning SGT for a weekend review.
+    - cron: "7 1 * * 0"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print output without writing data/ or sending Telegram"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: weekly-analytics
+  cancel-in-progress: false
+
+jobs:
+  run:
+    name: Analytics + Budget snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: write # to commit data/ snapshots
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: 0
+
+      - name: Analytics daily
+        id: analytics
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          ARGS=""
+          [ "${{ inputs.dry_run }}" = "true" ] && ARGS="--dry-run"
+          npx tsx scripts/analytics-daily.ts $ARGS
+
+      - name: Budget daily
+        id: budget
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MONTHLY_BUDGET_USD: ${{ vars.MONTHLY_BUDGET_USD }}
+        run: |
+          ARGS=""
+          [ "${{ inputs.dry_run }}" = "true" ] && ARGS="--dry-run"
+          npx tsx scripts/budget-daily.ts $ARGS
+
+      - name: Agent KPI tracker
+        id: kpi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=""
+          [ "${{ inputs.dry_run }}" = "true" ] && ARGS="--dry-run"
+          npx tsx scripts/agent-kpi-tracker.ts $ARGS
+
+      - name: Commit snapshots
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "zcybernews-bot"
+          git config user.email "bot@zcybernews.com"
+          git add data/analytics-daily.json data/budget-daily.json data/agent-kpi-weekly.json 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "::notice::No snapshot changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(ops): weekly analytics + budget + KPI snapshot"
+          # Push with retry on non-fast-forward (pipeline may have landed commits)
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash origin main; then
+              if git push origin main; then
+                echo "✅ Snapshots pushed on attempt $attempt"
+                exit 0
+              fi
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((3 * attempt))
+          done
+          echo "::warning::Could not push snapshot commits after 3 attempts — next run will include them"
+          exit 0
+
+      - name: Notify Telegram — workflow failure
+        if: ${{ failure() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          [ -z "$TELEGRAM_BOT_TOKEN" ] && exit 0
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          MESSAGE="❌ <b>Weekly analytics workflow failed</b>"$'\n\n'"Run: ${RUN_URL}"
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode parse_mode="HTML" \
+            --data-urlencode text="$MESSAGE" > /dev/null || true
