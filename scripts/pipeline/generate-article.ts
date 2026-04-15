@@ -7,11 +7,19 @@ import {
 import { withRetry } from "../utils/rate-limit.js";
 import type { Story } from "../utils/dedup.js";
 
-/** Generate a single article from 1-5 source stories. */
+/**
+ * Generate a single article from 1-5 source stories.
+ *
+ * Returns:
+ *   GeneratedArticle — success
+ *   "reject"         — AI determined the story is off-topic or already covered
+ *   null             — generation or parse failure
+ */
 export async function generateArticle(
   stories: Story[],
-): Promise<GeneratedArticle | null> {
-  const prompt = buildArticlePrompt(stories);
+  recentTitles: string[] = [],
+): Promise<GeneratedArticle | "reject" | null> {
+  const prompt = buildArticlePrompt(stories, recentTitles);
 
   const { text, modelUsed, paid } = await withRetry(() =>
     generateArticleText(prompt, {
@@ -39,6 +47,17 @@ export async function generateArticle(
       text.slice(0, 500),
     );
     return null;
+  }
+
+  // Handle AI-level reject signal — off-topic or already-covered story
+  if (
+    typeof parsed === "object" &&
+    parsed !== null &&
+    (parsed as Record<string, unknown>).reject === true
+  ) {
+    const reason = (parsed as Record<string, unknown>).reason ?? "unspecified";
+    console.log(`[generate] AI rejected story: ${reason}`);
+    return "reject";
   }
 
   const result = GeneratedArticleSchema.safeParse(parsed);

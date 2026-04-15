@@ -8,12 +8,53 @@
  *   KIMI_API_KEY      — Chinese translation
  */
 
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
 import { ingestFeeds } from "./ingest-rss.js";
 import { generateArticle } from "./generate-article.js";
 import { translateArticle } from "./translate-article.js";
 import { writeArticlePair, DuplicateArticleError } from "./write-mdx.js";
 import { markProcessedBatch } from "../utils/cache.js";
 import { limit } from "../utils/rate-limit.js";
+
+// ── Recent titles loader (for prompt dedup context) ────────────────────────
+
+/**
+ * Return the titles of all EN articles published in the last `windowHours`.
+ * Passed to the AI prompt so it can detect already-covered stories before
+ * spending tokens on a full generation.
+ *
+ * Uses the same end-of-day UTC trick as daily-ops-digest to avoid the
+ * midnight-parsing edge case where YYYY-MM-DD strings fall just outside the
+ * cutoff window due to GitHub scheduling lag.
+ */
+function getRecentPublishedTitles(windowHours = 48): string[] {
+  const cutoff = Date.now() - windowHours * 60 * 60 * 1000;
+  const dirs = ["content/en/posts", "content/en/threat-intel"];
+  const titles: string[] = [];
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir).filter((x) => x.endsWith(".mdx"))) {
+      try {
+        const raw = fs.readFileSync(path.join(dir, f), "utf-8");
+        const { data } = matter(raw);
+        const iso = String(data.date ?? "");
+        const effective = /^\d{4}-\d{2}-\d{2}$/.test(iso)
+          ? iso + "T23:59:59Z"
+          : iso;
+        const t = new Date(effective).getTime();
+        if (Number.isFinite(t) && t >= cutoff) {
+          const title = String(data.title ?? "");
+          if (title) titles.push(title);
+        }
+      } catch {
+        // skip unreadable files
+      }
+    }
+  }
+  return titles;
+}
 
 // ── Content relevance filter ────────────────────────────────────────────────
 
@@ -151,6 +192,14 @@ async function main() {
   let skippedDuplicate = 0;
   let translationWarnings = 0;
 
+  // Load titles published in the last 48h to pass as context to the AI prompt.
+  // The AI uses this list to self-reject stories it has already covered (e.g.
+  // the same Patch Tuesday event from a different RSS source).
+  const recentTitles = getRecentPublishedTitles(48);
+  console.log(
+    `[pipeline] Loaded ${recentTitles.length} recent titles for prompt dedup context`,
+  );
+
   const results = await Promise.allSettled(
     batches.map((batch) =>
       limit(async () => {
@@ -158,14 +207,23 @@ async function main() {
         const startTime = Date.now();
         console.log(`[pipeline] Generating: "${batch[0]?.title}"…`);
 
-        // Generate EN article
-        const article = await generateArticle(batch);
-        if (!article) {
+        // Generate EN article — pass recent titles so the AI can self-reject
+        // stories that are off-topic or already covered (prompt-level guard).
+        const result = await generateArticle(batch, recentTitles);
+        if (result === null) {
           console.warn("[pipeline] ⚠️  Generation failed, skipping.");
           return null;
         }
+        if (result === "reject") {
+          // AI determined off-topic or already covered — counts as off-topic
+          skippedOffTopic++;
+          markProcessedBatch(storyUrls);
+          return null;
+        }
+        const article = result;
 
-        // Content relevance filter — reject off-topic articles
+        // Post-generation content relevance filter — belt-and-suspenders check
+        // in case the AI didn't reject but still produced off-topic output.
         if (!isCyberSecurityRelevant(article.title, article.category)) {
           console.warn(
             `[pipeline] ⚠️  Off-topic article rejected: "${article.title}" (category: ${article.category})`,
