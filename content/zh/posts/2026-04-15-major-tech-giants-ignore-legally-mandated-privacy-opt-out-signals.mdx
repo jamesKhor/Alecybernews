@@ -1,0 +1,49 @@
+---
+title: 科技巨头忽视法律要求的隐私退出信号
+slug: 2026-04-15-major-tech-giants-ignore-legally-mandated-privacy-opt-out-signals
+date: '2026-04-15'
+excerpt: >-
+  一项法医审计发现 Google、Microsoft 和 Meta 系统性地忽视全球隐私控制信号，在用户选择退出后设置跟踪
+  cookie，违反了加利福尼亚州隐私法。
+category: industry
+tags:
+  - privacy
+  - tracking
+  - regulation
+  - advertising
+language: zh
+source_urls:
+  - >-
+    https://cybersecuritynews.com/google-microsoft-meta-tracking-even-you-opt-out/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-15-major-tech-giants-ignore-legally-mandated-privacy-opt-out-signals
+severity: high
+affected_sectors:
+  - Technology
+  - Advertising
+affected_regions:
+  - Global
+---
+## 执行摘要
+对加州消费者隐私法案（CCPA）合规情况的法证审计发现，包括Google、Microsoft和Meta在内的主要技术和广告公司，正在系统性地忽视法律认可的全球隐私控制（GPC）信号。这项由webXray在2026年3月进行的研究分析了194个在线广告服务，并发现它们即使在收到GPC明确的用户退出请求后，也经常设置跟踪cookie，这可能违反了加州法律。
+
+## 技术分析
+这次审计被称为CCPA的首次同类审计，专注于GPC信号的技术实施——这是一个浏览器或扩展设置，用于广播用户希望退出数据销售和共享的愿望。根据研究，审计过程涉及对网络流量的法证检查，以确定在GPC信号传输时设置跟踪cookie的情况。
+
+核心发现是普遍未能尊重这一信号。报告指出，尽管收到了GPC退出请求，但仍观察到194个不同的广告服务设置了第三方跟踪cookie。这表明尊重GPC的技术基础设施要么没有实施，要么被在线广告生态系统的一个重要部分故意绕过。公司绕过信号的具体技术机制在可用的源材料中没有详细说明，但这种行为表明了CCPA下的法律要求与其技术执行之间的脱节。
+
+## 入侵指标
+目前未识别出任何指标。
+
+## 战术、技术与程序
+观察到的主要技术是不符合法律授权的技术标准（GPC）。涉及的广告服务继续进行标准的跟踪cookie放置和数据收集工作流程，就好像没有收到退出信号一样。这代表了将隐私设计原则整合到实时竞价和广告技术数据管道中的系统性失败。
+
+## 威胁行为者背景
+这不是传统意义上恶意威胁行为者的行为，而是数字广告行业中合法公司不合规的模式。被牵连的实体是广告技术的提供者和依赖它获得收入的平台。审计表明这种不合规是普遍的，尽管源摘要中没有提供194个具体服务的完整列表。
+
+## 缓解措施与建议
+对于消费者来说，技术变通方法仍然有限，因为旨在保护他们的核心协议被忽视了。使用强大的基于浏览器的跟踪保护（例如，全面的广告拦截器或注重隐私的浏览器）可能比仅仅依赖退出信号更有效。对于监管机构来说，审计为CCPA及其他法规（如也认可GPC的科罗拉多隐私法案）下的执法行动提供了法证证据。涉及广告供应链的公司应立即进行技术审计，以确保其系统正确解析并遵守GPC HTTP头或`navigator.globalPrivacyControl` DOM属性。
+
+## 参考资料
+- https://cybersecuritynews.com/google-microsoft-meta-tracking-even-you-opt-out/
