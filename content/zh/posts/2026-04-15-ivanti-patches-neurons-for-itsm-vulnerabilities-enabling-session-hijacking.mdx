@@ -1,0 +1,52 @@
+---
+title: Ivanti 修补 Neurons for ITSM 漏洞以启用会话劫持
+slug: >-
+  2026-04-15-ivanti-patches-neurons-for-itsm-vulnerabilities-enabling-session-hijacking
+date: '2026-04-15'
+excerpt: >-
+  Ivanti 修补了其 Neurons for ITSM
+  平台中的两个中等严重性的漏洞，这些漏洞可能允许经过身份验证的攻击者劫持用户会话或保留对系统的未授权访问。
+category: vulnerabilities
+tags:
+  - ivanti
+  - itsm
+  - session-hijacking
+  - patch
+language: zh
+source_urls:
+  - 'https://cybersecuritynews.com/ivanti-neurons-itsm-vulnerabilities/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-15-ivanti-patches-neurons-for-itsm-vulnerabilities-enabling-session-hijacking
+severity: medium
+---
+## 执行摘要
+Ivanti发布了针对其本地Ivanti Neurons for ITSM (N-ITSM)平台上两个漏洞的安全更新，这些漏洞可能允许经过身份验证的攻击者劫持用户会话。这些漏洞尚未分配CVE标识符，它们使攻击者能够在密码重置后保留未经授权的访问权限，或从其他用户那里收集会话数据。尽管Ivanti表示它不知道有活跃的利用行为，但在IT服务管理系统内进行会话劫持的潜力对凭证盗窃和横向移动构成了重大风险。
+
+## 技术分析
+这些漏洞存在于Ivanti Neurons for ITSM平台中，该平台以前称为Ivanti Service Manager。根据Ivanti的安全咨询，第一个漏洞（内部跟踪为a zero-day vulnerability，待分配）是一个“会话过期不足”的缺陷。具有现有经过身份验证访问权限的远程攻击者可以利用此缺陷来维持他们的会话和相关权限，即使管理员重置了他们的帐户密码。这绕过了旨在在妥协响应期间撤销访问的标准安全控制。
+
+第二个漏洞（也待分配CVE ID）被描述为“会话数据泄露”问题。经过身份验证的攻击者可以利用这个漏洞来收集属于系统上其他用户的会话标识符和其他敏感会话数据。有了有效的会话令牌，攻击者可以冒充受害者用户，如果受害者在ITSM平台上拥有管理权限，攻击者甚至可能提升权限。Ivanti将这两个漏洞都评为中等严重性。该公司没有披露有关攻击向量或底层代码缺陷的具体技术细节，这是一种常见的做法，以防止在补丁广泛应用之前武器化。
+
+## 入侵指标
+目前没有识别出任何入侵指标。组织应监控异常用户会话，特别是凭证更改后持续存在的会话，或从已知用户帐户对敏感ITSM功能的未经授权访问。
+
+## 战术、技术与程序
+如果这些漏洞被利用，它们将与几个MITRE ATT&CK技术一致。主要技术是**会话劫持（T1563）**，特别是**会话盗窃**。攻击者首先需要通过**有效帐户（T1078）**建立初始立足点，以对N-ITSM平台进行身份验证。在利用会话数据泄露缺陷后，他们可以执行**横向移动（TA0008）**，通过使用被盗的会话来冒充其他用户。会话过期不足的缺陷支持**持久性（TA0003）**，允许攻击者即使在采取防御性的帐户维护行动后也能保持访问权限。
+
+## 威胁行为者背景
+没有公开的归因将这些漏洞与特定的威胁行为者或活动联系起来。Ivanti的咨询明确指出，公司“不知道任何漏洞的活跃利用”。然而，近年来，Ivanti企业软件一直是网络犯罪分子和国家对齐团体的频繁目标。使会话持久性和劫持成为可能的漏洞对于寻求在网络中保持长期、隐蔽访问的攻击者来说很有价值，因为它们减少了对嘈杂重复身份验证尝试的依赖。缺乏活跃利用很可能是一个时间性的评估，随着公开披露，情况可能会改变。
+
+## 缓解措施与建议
+主要的缓解措施是应用Ivanti提供的安全更新。该公司已经发布了N-ITSM支持迭代的固定版本：2024.4.1、2024.3.2、2024.2.3和2023.4.4。管理员应立即将他们的安装升级到适当的修补版本。
+
+作为ITSM和类似管理系统的一般安全实践，组织应：
+*   为所有管理和用户帐户实施强大的多因素身份验证（MFA），以提高初始妥协的障碍。
+*   实施严格的网络访问控制，将对ITSM平台的访问限制在仅受信任的网络和用户。
+*   主动监控和审计用户会话活动，寻找异常情况，如来自地理位置不同的同时登录或会话持续时间异常长。
+*   建立并测试凭证和会话泄露的事件响应剧本，包括作为用户帐户重置程序的一部分，强制终止所有活动会话。
+
+## 参考资料
+*   Ivanti安全咨询：[https://forums.ivanti.com/s/article/Security-Advisory-Update-for-Ivanti-Neurons-for-ITSM](https://forums.ivanti.com/s/article/Security-Advisory-Update-for-Ivanti-Neurons-for-ITSM)
+*   网络安全新闻文章：[https://cybersecuritynews.com/ivanti-neurons-itsm-vulnerabilities/](https://cybersecuritynews.com/ivanti-neurons-itsm-vulnerabilities/)

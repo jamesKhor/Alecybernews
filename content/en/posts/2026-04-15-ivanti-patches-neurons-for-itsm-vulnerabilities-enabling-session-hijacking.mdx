@@ -1,0 +1,53 @@
+---
+title: Ivanti Patches Neurons for ITSM Vulnerabilities Enabling Session Hijacking
+slug: >-
+  2026-04-15-ivanti-patches-neurons-for-itsm-vulnerabilities-enabling-session-hijacking
+date: '2026-04-15'
+excerpt: >-
+  Ivanti patches two medium-severity flaws in its Neurons for ITSM platform that
+  could allow authenticated attackers to hijack user sessions or retain
+  unauthorized access to the system.
+category: vulnerabilities
+tags:
+  - ivanti
+  - itsm
+  - session-hijacking
+  - patch
+language: en
+source_urls:
+  - 'https://cybersecuritynews.com/ivanti-neurons-itsm-vulnerabilities/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-15-ivanti-patches-neurons-for-itsm-vulnerabilities-enabling-session-hijacking
+severity: medium
+---
+## Executive Summary
+Ivanti has released security updates for two vulnerabilities in its on-premise Ivanti Neurons for ITSM (N-ITSM) platform that could allow authenticated attackers to hijack user sessions. The flaws, which have not yet been assigned CVE identifiers, enable an attacker to either retain unauthorized access after a password reset or harvest session data from other users. While Ivanti states it is not aware of active exploitation, the potential for session hijacking within an IT service management system poses a significant risk for credential theft and lateral movement.
+
+## Technical Analysis
+The vulnerabilities reside in the Ivanti Neurons for ITSM platform, formerly known as Ivanti Service Manager. According to Ivanti's security advisory, the first vulnerability (tracked internally as a zero-day vulnerability, pending assignment) is an "Insufficient Session Expiration" flaw. A remote attacker with existing authenticated access could exploit this to maintain their session and associated privileges even after an administrator resets their account password. This bypasses a standard security control intended to revoke access during a compromise response.
+
+The second vulnerability (also pending a CVE ID) is described as a "Session Data Disclosure" issue. An authenticated attacker could leverage this flaw to harvest session identifiers and other sensitive session data belonging to other users on the system. With a valid session token, an attacker could impersonate a victim user, potentially escalating privileges if the victim holds administrative rights within the ITSM platform. Both vulnerabilities are rated at medium severity by Ivanti. The company has not disclosed specific technical details regarding the attack vectors or the underlying code defects, a common practice to prevent weaponization before patches are widely applied.
+
+## Indicators of Compromise
+None identified at this time. Organizations should monitor for anomalous user sessions, particularly sessions that persist after credential changes, or unauthorized access from known user accounts to sensitive ITSM functions.
+
+## Tactics, Techniques & Procedures
+If exploited, these vulnerabilities would align with several MITRE ATT&CK techniques. The primary technique is **Session Hijacking (T1563)**, specifically **Session Theft**. An attacker would first need to establish an initial foothold, likely through **Valid Accounts (T1078)**, to authenticate to the N-ITSM platform. After exploiting the session data disclosure flaw, they could then perform **Lateral Movement (TA0008)** by using stolen sessions to impersonate other users. The insufficient session expiration flaw supports **Persistence (TA0003)** by allowing an attacker to maintain access even after defensive account maintenance actions are taken.
+
+## Threat Actor Context
+There is no public attribution linking these vulnerabilities to a specific threat actor or campaign. Ivanti's advisory explicitly states the company "is not aware of any active exploitation of either vulnerability." However, Ivanti enterprise software has been a frequent target for both cybercriminal and state-aligned groups in recent years. Vulnerabilities enabling session persistence and hijacking are valuable for attackers seeking to maintain long-term, stealthy access to a network, as they reduce reliance on noisy repeated authentication attempts. The lack of active exploitation is likely a temporal assessment and may change following the public disclosure.
+
+## Mitigations & Recommendations
+The primary mitigation is to apply the security updates provided by Ivanti. The company has released fixed versions for supported iterations of Neurons for ITSM: 2024.4.1, 2024.3.2, 2024.2.3, and 2023.4.4. Administrators should upgrade their installations to the appropriate patched version immediately.
+
+As a general security practice for ITSM and similar administrative systems, organizations should:
+*   Implement strong, multi-factor authentication (MFA) for all administrative and user accounts to raise the barrier for initial compromise.
+*   Enforce strict network access controls, limiting access to the ITSM platform to trusted networks and users only.
+*   Proactively monitor and audit user session activity, looking for anomalies such as concurrent logins from geographically disparate locations or sessions with unusually long durations.
+*   Establish and test an incident response playbook for credential and session compromise, including the forced termination of all active sessions as part of a user account reset procedure.
+
+## References
+*   Ivanti Security Advisory: [https://forums.ivanti.com/s/article/Security-Advisory-Update-for-Ivanti-Neurons-for-ITSM](https://forums.ivanti.com/s/article/Security-Advisory-Update-for-Ivanti-Neurons-for-ITSM)
+*   CyberSecurity News Article: [https://cybersecuritynews.com/ivanti-neurons-itsm-vulnerabilities/](https://cybersecuritynews.com/ivanti-neurons-itsm-vulnerabilities/)
