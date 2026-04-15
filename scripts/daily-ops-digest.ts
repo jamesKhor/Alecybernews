@@ -143,8 +143,19 @@ function countArticlesInWindow(windowHours: number): number {
               ? dateRaw
               : null;
         if (!iso) continue;
-        // Interpret date-only strings (YYYY-MM-DD) as midnight UTC
-        const t = new Date(iso).getTime();
+        // Date-only strings (YYYY-MM-DD) must be treated as END-of-day UTC,
+        // not midnight. new Date('2026-04-14') = 2026-04-14T00:00:00Z.
+        // The digest cron fires at 00:00 UTC but typically runs at 00:10-00:15
+        // UTC (GitHub scheduling lag). The 24h cutoff therefore lands at
+        // ~2026-04-14T00:13Z, which is 13 minutes AFTER midnight — meaning
+        // every article from yesterday (all parsed as T00:00:00Z) falls outside
+        // the window and the count reads zero.  Fix: push date-only strings to
+        // the last second of that day (T23:59:59Z) so they're unambiguously
+        // inside a window that ends around the following midnight.
+        const effective = /^\d{4}-\d{2}-\d{2}$/.test(iso)
+          ? iso + "T23:59:59Z"
+          : iso;
+        const t = new Date(effective).getTime();
         if (!Number.isFinite(t)) continue;
         if (t >= cutoff) count++;
       } catch {

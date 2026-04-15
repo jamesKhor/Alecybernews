@@ -117,13 +117,28 @@ jobs:
           # English article (not the filename). Was previously using filenames
           # which produced garbled slug-style Telegram messages like
           # "• 2026 04 14 fake proxifier installer github clipbanker malware".
+          #
+          # Use gray-matter (already in node_modules) rather than awk.
+          # The awk approach produced "• >-" literally when the AI model
+          # generated a YAML block scalar title:
+          #   title: >-
+          #     Long Title That Wraps
+          # awk reads only the first line → outputs ">-". gray-matter parses
+          # all YAML scalar types (quoted, block folded >-, block literal |)
+          # and returns the resolved string value.
           set +e
           TITLES=""
           while IFS= read -r file; do
             [ -z "$file" ] && continue
             [ -f "$file" ] || continue
-            # Grab the first `title:` line, strip quotes, take the value
-            title=$(awk -F: '/^title:/ {sub(/^[[:space:]]*title:[[:space:]]*/,""); gsub(/^["'\'']|["'\'']$/,""); print; exit}' "$file")
+            title=$(TITLE_FILE="$file" node -e "
+              const m = require('gray-matter');
+              const fs = require('fs');
+              try {
+                const { data } = m(fs.readFileSync(process.env.TITLE_FILE, 'utf8'));
+                process.stdout.write(String(data.title || ''));
+              } catch(e) { process.exit(0); }
+            " 2>/dev/null)
             [ -n "$title" ] && TITLES="${TITLES}• ${title}"$'\n'
           done < <(git status --short content/en/ 2>/dev/null | awk '/\.mdx$/ {print $2}' | head -5)
           set -e

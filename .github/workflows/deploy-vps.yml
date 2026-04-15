@@ -139,7 +139,16 @@ jobs:
             echo "🔄 Triggering ISR revalidation..."
             SECRET=$(grep '^REVALIDATE_SECRET=' .env.local | cut -d= -f2-)
             if [ -z "$SECRET" ]; then
-              echo "::warning::REVALIDATE_SECRET not in .env.local — articles will appear at TTL expiry (up to 1h delay)"
+              echo "::error::[ACTION REQUIRED] REVALIDATE_SECRET is missing from .env.local on the VPS."
+              echo "::error::New MDX files were pulled to disk but the ISR cache was NOT cleared."
+              echo "::error::Articles will sit stale for up to 1h until ISR TTL expires."
+              echo "::error::Fix: SSH to VPS and add to /home/zcybernews/zcybernews/.env.local:"
+              echo "::error::  REVALIDATE_SECRET=<value matching the GitHub Actions REVALIDATE_SECRET secret>"
+              echo "::error::Then re-run this workflow (workflow_dispatch) or wait for the next pipeline push."
+              # Exit 1 so the failure Telegram fires — a content-sync that
+              # doesn't actually revalidate is functionally broken from the
+              # operator's perspective. Silent exit 0 hid this for hours.
+              exit 1
             else
               # Retry revalidate up to 3 times with backoff. PM2 cluster
               # reload, brief network blip, or worker mid-restart can all
