@@ -1,0 +1,48 @@
+---
+title: Signed Adware Tool Disables Antivirus with SYSTEM Privileges
+slug: 2026-04-15-signed-adware-tool-disables-antivirus-with-system-privileges
+date: '2026-04-15'
+excerpt: >-
+  A digitally signed adware tool, 'PC App Store', has been abused to deploy
+  scripts that disable antivirus software with SYSTEM privileges, impacting
+  thousands of endpoints in sectors like education and government.
+category: malware
+tags:
+  - adware
+  - endpoint-security
+  - privilege-escalation
+  - supply-chain
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/signed-software-abused-to-deploy-antivirus-killing-scripts/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-15-signed-adware-tool-disables-antivirus-with-system-privileges
+severity: high
+affected_sectors:
+  - education
+  - utilities
+  - government
+  - healthcare
+---
+## Executive Summary
+A digitally signed adware application, masquerading as a legitimate software store, has been weaponized to deploy scripts that disable antivirus and endpoint protection software on Windows systems. According to a report from BleepingComputer, the 'PC App Store' tool leverages its valid code-signing certificate and SYSTEM-level privileges to execute a batch file that terminates security processes and modifies Windows Defender settings. The campaign has impacted thousands of endpoints, with telemetry showing victims in the education, utilities, government, and healthcare sectors.
+
+## Technical Analysis
+The core of the attack is the 'PC App Store' application, a known adware tool signed with a valid digital certificate issued by Sectigo. Researchers at Sophos, who first documented the activity, reported that the installer downloads and executes a batch script named `win.bat`. This script runs with the highest SYSTEM privileges, a level of access inherited from the signed parent process. The batch file's primary function is to disable security software. It first attempts to terminate processes associated with a range of antivirus and endpoint detection and response (EDR) products using the `taskkill` command. Targeted software includes Windows Defender (`MsMpEng.exe`), CrowdStrike Falcon, SentinelOne, and others. Following the process kills, the script modifies Windows Registry keys to disable real-time monitoring (`DisableRealtimeMonitoring`) and tamper protection (`TamperProtection`) in Windows Defender. The final payload is an information stealer, though its specific capabilities were not detailed in the source report.
+
+## Indicators of Compromise
+None identified at this time. The source report did not provide specific file hashes, domains, or IP addresses associated with the campaign.
+
+## Tactics, Techniques & Procedures
+The threat actors behind this campaign employ several techniques to achieve execution and defense evasion. The initial access vector is not explicitly confirmed but likely involves bundling the 'PC App Store' with other software or deceptive download sites (Tactic: Initial Access, Technique: Drive-by Compromise). The abuse of a legitimately signed application to launch malicious scripts is a form of **Trusted Developer Utilities Proxy Execution (T1218)**. By running the malicious batch file as a child of a signed process, the attackers bypass application control mechanisms that trust signed code. The core technique is **Impair Defenses (T1562)**, specifically sub-technique **T1562.001 (Disable or Modify Tools)**. The batch script directly kills security software processes and modifies critical Windows Defender settings via the registry to prevent detection and remediation.
+
+## Threat Actor Context
+The specific threat actor responsible for this campaign is not identified in the source material. The activity is attributed to the operators of the 'PC App Store' adware, suggesting a financially motivated group rather than a state-sponsored advanced persistent threat (APT). The use of a signed binary and the targeting of a broad victim base across multiple sectors is consistent with adware and potentially information-stealer distribution campaigns. The report does not link this activity to any previously known threat group.
+
+## Mitigations & Recommendations
+Organizations should treat signed but non-essential software with heightened scrutiny. Security teams are advised to implement application allow-listing policies that go beyond simple code-signing validation, restricting execution to explicitly approved applications only. Monitoring for process creation events where child processes (like `cmd.exe` spawning from a signed binary) execute suspicious commands, such as `taskkill` targeting security executables, is critical. Registry changes to Windows Defender's `DisableRealtimeMonitoring` and `TamperProtection` keys should be flagged as high-severity events. End users should be trained to avoid downloading software from unofficial or unverified sources, as adware bundling remains a common infection vector.
+
+## References
+- https://www.bleepingcomputer.com/news/security/signed-software-abused-to-deploy-antivirus-killing-scripts/

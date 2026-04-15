@@ -1,0 +1,58 @@
+---
+title: Pushpaganda 活动使用 AI 生成的点击诱饵劫持浏览器通知
+slug: >-
+  2026-04-15-pushpaganda-campaign-uses-ai-generated-clickbait-to-hijack-browser-notifications
+date: '2026-04-15'
+excerpt: 一个被称为 Pushpaganda 的活动使用 AI 生成的点击诱饵欺骗用户启用恶意浏览器通知，直接将持续的诈骗和假警报流送到桌面。
+category: threat-intel
+tags:
+  - social-engineering
+  - malvertising
+  - browser-security
+  - ai-threats
+language: zh
+source_urls:
+  - >-
+    https://www.malwarebytes.com/blog/news/2026/04/ai-clickbait-can-turn-your-notifications-into-a-scam-feed
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-15-pushpaganda-campaign-uses-ai-generated-clickbait-to-hijack-browser-notifications
+severity: medium
+---
+## Pushpaganda Campaign Uses AI-Generated Clickbait to Hijack Browser Notifications
+
+## 执行摘要
+研究人员在Malwarebytes将一个持续的恶意广告活动称为“Pushpaganda”，该活动利用AI生成的点击诱饵文章欺骗用户启用恶意浏览器通知。一旦启用，这些通知就会将源源不断的诈骗、假病毒警告和钓鱼链接直接发送到受害者的桌面，创建一个难以移除的欺诈信息流。该活动代表了通知滥用策略的重大演变，从简单的技术支持诈骗发展到高度自动化、AI驱动的运营。
+
+## 技术分析
+Pushpaganda活动通过一个多阶段过程运作，始于被破坏或恶意网站。根据Malwarebytes的说法，这些网站托管AI生成的文章，标题耸人听闻，通常以名人为焦点，旨在最大化用户参与度。攻击的一个关键要素是一个欺骗性的权限提示，通常伪装成“验证码”或“年龄验证”检查，当用户与页面互动时出现。
+
+如果用户在此提示上点击“允许”，他们并不是在解决验证码，而是授予网站发送浏览器通知的权限。这个权限在浏览器级别（例如，在Chrome、Edge或Firefox中）授予，并在浏览会话中持续存在。威胁行为者随后使用此权限推送大量通知，这些通知似乎来自用户的操作系统。这些通知包含指向技术支持诈骗、假赠品调查、钓鱼页面和恶意软件下载网站的链接。使用AI可以快速生成引人注目、语法正确的诱饵，使活动比以往的手动努力更具适应性和广泛性。
+
+## 入侵指标
+目前没有识别出特定的。该活动的特点在于使用短暂的、快速变化的域名托管点击诱饵和通知推送器。源材料中没有提供具体、持久的IOC。
+
+## 战术、技术与程序
+威胁行为者采用一致的TTP链：
+1. **初始访问 (T1583.008)：** 获取或破坏网站以托管恶意内容。
+2. **资源开发 (T1588.002)：** 使用AI工具生成大量令人信服的点击诱饵文章文本和标题。
+3. **初始互动 (T1589.002)：** 利用恶意广告或搜索引擎优化将用户流量引导至这些着陆页面。
+4. **欺骗 (T1656)：** 呈现一个伪装成验证码或年龄验证检查的伪造浏览器对话框，以欺骗用户启用通知。
+5. **持久性 (T1624)：** 在受害者的网络浏览器中建立持久的通知权限。
+6. **执行 (T1566.002)：** 提供包含社会工程诱饵的连续恶意通知流。
+7. **影响 (T1665)：** 将用户引导至诈骗网站，通过诈骗或联盟计划获得经济利益。
+
+## 威胁行为者背景
+Malwarebytes没有识别出Pushpaganda活动背后的特定威胁行为者或团体。该操作具有财务动机的网络犯罪企业的特征，可能利用现成的AI文本生成工具和现有的恶意广告基础设施。滥用浏览器通知进行诈骗的技术已经确立，但将AI整合用于内容创建标志着诱饵的效率和可信度的显著升级。
+
+## 缓解措施与建议
+用户和组织应采取以下步骤来减轻这一威胁：
+* **审查和撤销通知权限：** 定期审计并移除浏览器设置中不必要的通知权限。主要浏览器的说明可从其官方支持渠道获得。
+* **对权限提示保持极度谨慎：** 在浏览不熟悉的网站时，永远不要点击“允许”或“接受”任何对话框，特别是那些以验证码为幌子请求通知权限的对话框。
+* **使用广告拦截器和安全扩展：** 部署信誉良好的广告拦截器和浏览器安全扩展，可以阻止已知的恶意域名和可疑的通知提示。
+* **实施网络级过滤：** 企业网络应考虑过滤或阻止与通知滥用活动相关的域名，尽管这些域名变化频繁。
+* **用户意识培训：** 教育用户了解这种特定的社会工程策略，强调合法的验证码永远不会要求通知权限。
+
+## 参考资料
+* Malwarebytes Labs: [AI clickbait can turn your notifications into a scam feed](https://www.malwarebytes.com/blog/news/2026/04/ai-clickbait-can-turn-your-notifications-into-a-scam-feed)
