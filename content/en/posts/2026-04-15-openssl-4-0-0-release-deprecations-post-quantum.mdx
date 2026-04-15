@@ -1,0 +1,54 @@
+---
+title: >-
+  OpenSSL 4.0.0 Released: Major Update Drops Legacy Protocols, Adds Post-Quantum
+  Crypto
+slug: 2026-04-15-openssl-4-0-0-release-deprecations-post-quantum
+date: '2026-04-15'
+excerpt: >-
+  The OpenSSL Project released version 4.0.0, a major update that permanently
+  removes deprecated SSL protocols and introduces support for post-quantum
+  cryptography and Encrypted Client Hello.
+category: vulnerabilities
+tags:
+  - openssl
+  - cryptography
+  - post-quantum
+  - tls
+  - deprecation
+language: en
+source_urls:
+  - 'https://www.helpnetsecurity.com/2026/04/14/openssl-4-0-0-released/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-15-openssl-4-0-0-release-deprecations-post-quantum
+severity: medium
+---
+## Executive Summary
+The OpenSSL Project has released version 4.0.0, a major update that enforces the final removal of several long-deprecated and insecure cryptographic protocols and features, including SSLv3. According to the project's announcement, this release represents a significant breaking change; applications linked against older OpenSSL libraries will require code updates and recompilation to function with the new version. The update also introduces support for post-quantum cryptography and Encrypted Client Hello (ECH), marking a foundational shift towards quantum-resistant and more private TLS connections.
+
+## Technical Analysis
+OpenSSL 4.0.0 is a structural release focused on eliminating technical debt and integrating next-generation cryptographic standards. The most impactful changes are the removal of deprecated components. Support for the SSLv3 protocol has been completely excised. SSLv3 was formally deprecated by the Internet Engineering Task Force (IETF) in 2015, and OpenSSL had disabled it by default since version 1.1.0 in 2016. Its removal eliminates a potential attack vector for legacy downgrade attacks.
+
+Furthermore, support for the "SSLv2 Client Hello" handshake method and the "engines" interface has been removed. The engines API, which allowed external cryptographic hardware modules to be integrated, has been superseded by the Provider API introduced in OpenSSL 3.0. These removals necessitate that any application still relying on these features must be refactored.
+
+On the additive side, the release incorporates support for post-quantum cryptography, specifically the Kyber key encapsulation mechanism, as defined in the recently finalized NIST FIPS 203 standard. This provides a pathway for developers to begin experimenting with and implementing quantum-resistant key exchange in TLS. Additionally, support for Encrypted Client Hello (ECH), an IETF standard (RFC 8879), is now included. ECH enhances privacy by encrypting the initial ClientHello message during the TLS handshake, preventing network observers from seeing the server name (SNI) a client is attempting to connect to.
+
+## Indicators of Compromise
+None identified at this time. This is a planned software update, not a reaction to an active exploit campaign.
+
+## Tactics, Techniques & Procedures
+None identified at this time. The release is a proactive security and modernization effort by the OpenSSL development team.
+
+## Threat Actor Context
+This update does not directly attribute actions to a specific threat actor. Instead, it is a defensive measure against a broad class of threats that exploit deprecated and weak cryptographic protocols. The removal of SSLv3 mitigates risks associated with legacy protocol downgrade attacks, such as POODLE. The introduction of post-quantum cryptography is a long-term defensive posture against the future threat of cryptographically relevant quantum computers (CRQCs), which could break current public-key cryptography.
+
+## Mitigations & Recommendations
+System administrators and software developers must treat OpenSSL 4.0.0 as a breaking change. The primary mitigation is thorough testing and planned migration.
+
+1.  **Inventory and Test:** Identify all applications and services that dynamically link against OpenSSL libraries. Test these applications in a non-production environment with OpenSSL 4.0.0 to identify compilation errors or runtime failures caused by the removed APIs and protocols.
+2.  **Update Application Code:** Modify application source code to remove any calls to deprecated functions (e.g., engines API) and ensure compatibility with the current Provider model. Recompile all affected software.
+3.  **Plan a Staged Deployment:** Due to the breaking changes, a direct in-place upgrade of the system OpenSSL library could cause widespread service failures. Coordinate updates with application teams and consider staged rollouts.
+4.  **Evaluate New Features:** For forward-looking projects, begin evaluating the use of post-quantum Kyber and Encrypted Client Hello to enhance security and privacy posture.
+
+## References
+- https://www.helpnetsecurity.com/2026/04/14/openssl-4-0-0-released/

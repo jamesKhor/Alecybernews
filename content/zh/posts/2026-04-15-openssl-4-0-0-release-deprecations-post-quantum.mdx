@@ -1,0 +1,53 @@
+---
+title: OpenSSL 4.0.0 发布：重大更新淘汰旧版协议，增加后量子密码学
+slug: 2026-04-15-openssl-4-0-0-release-deprecations-post-quantum
+date: '2026-04-15'
+excerpt: >-
+  OpenSSL 项目发布了版本 4.0.0，这是一个重大更新，永久移除了已弃用的 SSL 协议，并引入了对后量子密码学和 Encrypted Client
+  Hello 的支持。
+category: vulnerabilities
+tags:
+  - openssl
+  - cryptography
+  - post-quantum
+  - tls
+  - deprecation
+language: zh
+source_urls:
+  - 'https://www.helpnetsecurity.com/2026/04/14/openssl-4-0-0-released/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-15-openssl-4-0-0-release-deprecations-post-quantum
+severity: medium
+---
+## OpenSSL 4.0.0 发布：重大更新弃用旧协议，增加后量子密码学
+
+## 执行摘要
+OpenSSL 项目发布了 4.0.0 版本，这是一个重大更新，强制最终移除了几个长期弃用且不安全的加密协议和功能，包括 SSLv3。根据项目公告，此版本代表了一个重大的破坏性变更；与旧版 OpenSSL 库链接的应用程序将需要代码更新和重新编译才能与新版本一起工作。更新还引入了对后量子密码学和 Encrypted Client Hello (ECH) 的支持，标志着向量子抗性和更私密的 TLS 连接的基础转变。
+
+## 技术分析
+OpenSSL 4.0.0 是一个结构性发布，专注于消除技术债务并整合下一代加密标准。最具影响的变化是弃用组件的移除。对 SSLv3 协议的支持已被完全移除。SSLv3 于 2015 年被互联网工程任务组 (IETF) 正式弃用，OpenSSL 自 2016 年版本 1.1.0 起默认禁用它。移除它消除了旧降级攻击的潜在攻击向量。
+
+此外，对 "SSLv2 Client Hello" 握手方法和 "engines" 接口的支持已被移除。允许外部加密硬件模块集成的 engines API 已被 OpenSSL 3.0 中引入的 Provider API 取代。这些移除要求任何仍依赖这些功能的应用程序必须重构。
+
+在增加方面，发布包含了对后量子密码学的支持，特别是 Kyber 密钥封装机制，如最近最终确定的 NIST FIPS 203 标准中定义的。这为开发人员提供了开始尝试和实现 TLS 中量子抗性密钥交换的途径。此外，现在包括对 Encrypted Client Hello (ECH) 的支持，这是 IETF 标准 (RFC 8879)。ECH 通过在 TLS 握手期间加密初始的 ClientHello 消息来增强隐私，防止网络观察者看到客户端尝试连接的服务器名称 (SNI)。
+
+## 入侵指标
+目前没有识别出任何指标。这是一个计划中的软件更新，不是对活跃漏洞活动的反应。
+
+## 战术、技术与程序
+目前没有识别出任何指标。这个发布是 OpenSSL 开发团队主动的安全和现代化努力。
+
+## 威胁行为者背景
+此更新没有直接将行动归因于特定的威胁行为者。相反，它是针对利用弃用和弱加密协议的广泛威胁类别的防御措施。移除 SSLv3 减轻了与旧协议降级攻击相关的风险，例如 POODLE。引入后量子密码学是对加密相关的量子计算机 (CRQCs) 未来威胁的长期防御姿态，这些计算机可能会破坏当前的公钥密码学。
+
+## 缓解措施与建议
+系统管理员和软件开发人员必须将 OpenSSL 4.0.0 视为破坏性变更。主要的缓解措施是彻底测试和计划迁移。
+
+1.  **库存和测试：** 识别所有动态链接到 OpenSSL 库的应用程序和服务。在非生产环境中用 OpenSSL 4.0.0 测试这些应用程序，以识别由于移除的 API 和协议引起的编译错误或运行时失败。
+2.  **更新应用程序代码：** 修改应用程序源代码，移除对弃用函数的任何调用（例如，engines API），并确保与当前的 Provider 模型兼容。重新编译所有受影响的软件。
+3.  **计划分阶段部署：** 由于破坏性变更，直接在系统 OpenSSL 库中进行升级可能会导致广泛的服务故障。与应用程序团队协调更新，并考虑分阶段推出。
+4.  **评估新功能：** 对于前瞻性项目，开始评估使用后量子 Kyber 和 Encrypted Client Hello 以增强安全和隐私姿态。
+
+## 参考资料
+- https://www.helpnetsecurity.com/2026/04/14/openssl-4-0-0-released/
