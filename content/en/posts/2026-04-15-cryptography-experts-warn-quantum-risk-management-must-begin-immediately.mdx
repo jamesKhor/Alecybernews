@@ -1,0 +1,55 @@
+---
+title: Cryptography Experts Warn Quantum Risk Management Must Begin Immediately
+slug: >-
+  2026-04-15-cryptography-experts-warn-quantum-risk-management-must-begin-immediately
+date: '2026-04-15'
+excerpt: >-
+  Cryptography experts warn that migrating to post-quantum cryptography will
+  take years, urging organizations to begin quantum risk management now to
+  protect encrypted data from future 'Q-Day' harvest-now, decrypt-later attacks.
+category: industry
+tags:
+  - post-quantum-cryptography
+  - encryption
+  - risk-management
+  - cryptography
+language: en
+source_urls:
+  - >-
+    https://www.darkreading.com/cyber-risk/preparing-q-day-quantum-risk-management
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-15-cryptography-experts-warn-quantum-risk-management-must-begin-immediately
+severity: high
+affected_sectors:
+  - all
+affected_regions:
+  - global
+---
+## Executive Summary
+Leading cryptographers are issuing urgent warnings that the transition to quantum-resistant systems is a multi-year endeavor, and organizations must begin comprehensive quantum risk management immediately. The core threat is the 'harvest now, decrypt later' attack, where adversaries collect encrypted data today to decrypt it once cryptographically relevant quantum computers (CRQCs) are operational—an event known as 'Q-Day.' According to experts cited by Dark Reading, the complexity of migrating legacy systems and cryptographic inventory means delaying action could leave critical data and infrastructure permanently exposed.
+
+## Technical Analysis
+The quantum computing threat targets public-key cryptography algorithms like RSA and Elliptic Curve Cryptography (ECC), which underpin TLS, digital signatures, and secure communications. A sufficiently powerful CRQC could break these algorithms using Shor's algorithm, rendering current encryption obsolete. The timeline for such a machine is uncertain, but the risk is present today due to data longevity. The U.S. National Institute of Standards and Technology (NIST) has selected initial post-quantum cryptographic (PQC) algorithms, but standardization and implementation are ongoing. The technical challenge is not merely adopting new algorithms but managing a sprawling 'cryptographic inventory'—identifying every use of cryptography in hardware, software, protocols, and stored data across an enterprise. This inventory is a prerequisite for a phased migration, which experts state will take years to complete for most large organizations.
+
+## Indicators of Compromise
+None identified at this time. The threat is prospective, centered on future decryption of currently harvested data.
+
+## Tactics, Techniques & Procedures
+The primary technique employed by threat actors is the 'harvest now, decrypt later' (HNDL) attack. Adversaries, including nation-states, are likely intercepting and storing encrypted data traffic (e.g., TLS sessions, VPN tunnels) and encrypted data-at-rest (e.g., stolen databases) with the expectation of decrypting it post-Q-Day. This long-term espionage strategy requires no immediate exploitation of a vulnerability, making it difficult to detect through conventional security monitoring.
+
+## Threat Actor Context
+While no specific threat actor is named in the source material, cybersecurity agencies globally, including the NSA and CISA, have consistently warned that sophisticated advanced persistent threat (APT) groups, particularly those affiliated with nation-states with quantum research programs, are the most likely to be engaging in HNDL collection. The goal is strategic intelligence gathering for long-term geopolitical or economic advantage.
+
+## Mitigations & Recommendations
+Experts recommend organizations begin a formal quantum risk management program immediately. Key steps include:
+1.  **Cryptographic Inventory:** Catalog all uses of cryptography, focusing on public-key algorithms for key exchange and digital signatures.
+2.  **Prioritization:** Identify 'crown jewel' data and systems with long-term sensitivity (e.g., state secrets, intellectual property, health records, financial data) that are most at risk from HNDL attacks.
+3.  **Engage Vendors:** Pressure software, hardware, and service providers for clear PQC migration roadmaps.
+4.  **Develop Migration Plans:** Create a phased transition plan aligned with final NIST standards and industry best practices.
+5.  **Adopt Crypto-Agility:** Design systems to allow for easier future cryptographic algorithm swaps.
+6.  **Monitor Guidance:** Follow updates from NIST, CISA, and other regulatory bodies. As stated in the source, the process will "take years to be fully quantum-safe, if ever," underscoring the need for immediate action.
+
+## References
+- https://www.darkreading.com/cyber-risk/preparing-q-day-quantum-risk-management
