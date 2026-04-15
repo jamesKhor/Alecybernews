@@ -57,6 +57,14 @@
     "invalid": "Please enter a valid email address.",
     "error": "Something went wrong. Please try again."
   },
+  "community": {
+    "title": "Join the community",
+    "description": "Talk with other defenders, get early access to threat analysis, and discuss CVEs as they drop.",
+    "discord": "Discord",
+    "wechat": "WeChat Group",
+    "joinDiscord": "Join our Discord",
+    "joinWeChat": "Join WeChat group"
+  },
   "footer": {
     "description": "Professional cybersecurity intelligence for enterprise defenders.",
     "rights": "All rights reserved.",

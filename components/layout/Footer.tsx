@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Shield, Rss } from "lucide-react";
 import { SubscribeForm } from "@/components/newsletter/SubscribeForm";
+import { CommunityCTA } from "@/components/community/CommunityCTA";
 
 interface Props {
   locale: string;
@@ -53,6 +54,14 @@ export function Footer({ locale }: Props) {
 
           {/* Newsletter */}
           <SubscribeForm compact />
+
+          {/* Community (Discord + WeChat) — renders null until env vars set */}
+          <div>
+            <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
+              Community
+            </h3>
+            <CommunityCTA variant="compact" locale={locale} />
+          </div>
 
           {/* Feeds */}
           <div>

@@ -17,6 +17,7 @@ import { translateArticle } from "./translate-article.js";
 import { writeArticlePair, DuplicateArticleError } from "./write-mdx.js";
 import { postProcessArticle } from "./post-process.js";
 import { factCheckArticle, formatFactCheckLog } from "./fact-check.js";
+import { notifyDiscord } from "./notify-discord.js";
 import { markProcessedBatch } from "../utils/cache.js";
 import { limit } from "../utils/rate-limit.js";
 
@@ -323,6 +324,27 @@ async function main() {
 
         console.log(`[pipeline] ✅  Written: ${paths.en} (${duration}s)`);
         if (paths.zh) console.log(`[pipeline] ✅  Written: ${paths.zh}`);
+
+        // Discord notification — fire-and-forget. Posts to #en-news-feed
+        // (and #zh-news-feed if ZH translation shipped). Silent skip if
+        // DISCORD_WEBHOOK_{EN,ZH} env vars aren't set. Never blocks or
+        // fails the pipeline on Discord errors.
+        const section: "posts" | "threat-intel" =
+          article.category === "threat-intel" ? "threat-intel" : "posts";
+        notifyDiscord(article, "en", section).catch((e) =>
+          console.warn("[discord] en unexpected error:", e),
+        );
+        if (zhMeta && paths.zh) {
+          // Build a ZH-titled version for the ZH channel
+          const zhArticle = {
+            ...article,
+            title: zhMeta.title || article.title,
+            excerpt: zhMeta.excerpt || article.excerpt,
+          };
+          notifyDiscord(zhArticle, "zh", section).catch((e) =>
+            console.warn("[discord] zh unexpected error:", e),
+          );
+        }
 
         // Mark source URLs as processed
         markProcessedBatch(storyUrls);

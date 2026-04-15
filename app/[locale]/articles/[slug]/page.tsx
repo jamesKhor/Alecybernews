@@ -7,6 +7,7 @@ import { IOCTable } from "@/components/threat-intel/IOCTable";
 import { MitreMatrix } from "@/components/threat-intel/MitreMatrix";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { NewsArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { CommunityCTA } from "@/components/community/CommunityCTA";
 import { CATEGORY_DEFAULT_IMAGES, type Category } from "@/lib/types";
 import { useTranslations } from "next-intl";
 import { stripMarkdown } from "@/lib/utils";
@@ -237,6 +238,9 @@ function ArticlePageContent({
 
           {/* In-article ad */}
           <InArticleAd className="my-8" />
+
+          {/* Community CTA — renders null until Discord/WeChat env vars set */}
+          <CommunityCTA variant="full" locale={locale} />
 
           {/* Tags */}
           {frontmatter.tags.length > 0 && (

@@ -57,6 +57,14 @@
     "invalid": "请输入有效的邮箱地址。",
     "error": "出了点问题，请重试。"
   },
+  "community": {
+    "title": "加入社区",
+    "description": "与其他安全防御者交流，抢先了解威胁分析，实时讨论最新漏洞。",
+    "discord": "Discord",
+    "wechat": "微信群",
+    "joinDiscord": "加入 Discord",
+    "joinWeChat": "加入微信群"
+  },
   "footer": {
     "description": "面向企业防御者的专业网络安全情报平台。",
     "rights": "版权所有。",
