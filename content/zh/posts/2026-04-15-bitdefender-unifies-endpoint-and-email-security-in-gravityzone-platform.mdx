@@ -1,0 +1,52 @@
+---
+title: Bitdefender 在 GravityZone 平台统一终端和电子邮件安全
+slug: >-
+  2026-04-15-bitdefender-unifies-endpoint-and-email-security-in-gravityzone-platform
+date: '2026-04-15'
+excerpt: >-
+  Bitdefender 已将持续的电子邮件威胁保护集成到其 GravityZone
+  平台中，结合终端检测和响应（EDR）与电子邮件安全，以对抗网络钓鱼、BEC 和勒索软件。
+category: industry
+tags:
+  - email-security
+  - endpoint-security
+  - bitdefender
+  - platform-integration
+language: zh
+source_urls:
+  - >-
+    https://www.helpnetsecurity.com/2026/04/15/bitdefender-gravityzone-extended-email-security/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-15-bitdefender-unifies-endpoint-and-email-security-in-gravityzone-platform
+severity: informational
+---
+## 执行摘要
+Bitdefender 发布了 GravityZone Extended Email Security，这是一个新模块，将连续的电子邮件威胁保护直接集成到其现有的终端安全平台中。这一举措于 2026 年 4 月 15 日宣布，旨在统一管理和分析电子邮件和终端向量中的威胁，这些威胁通常被隔离。根据 Bitdefender，集成的目标是提高对复杂攻击的检测和响应时间，如商业电子邮件泄露（BEC）、凭证网络钓鱼和经常通过电子邮件发起的勒索软件。
+
+## 技术分析
+新的 GravityZone Extended Email Security 模块采用了 Bitdefender 所称的集成云电子邮件安全（ICES）方法。它旨在通过实时分析电子邮件流量提供持续保护，无论是在交付前还是交付后。系统扫描入站、出站和内部电子邮件，以查找包括恶意链接、附件和社会工程内容在内的威胁。一个关键的技术特性是电子邮件安全层与 Bitdefender 的终端检测和响应（EDR）能力之间的双向集成。这允许平台将基于电子邮件的指标（例如恶意发件人或附件哈希）与终端活动相关联，可能识别出表现出感染后行为的受感染机器。该平台作为云服务提供，并通过现有的 GravityZone 控制台进行管理，目标是企业和托管服务提供商（MSP）。
+
+## 入侵指标
+目前没有识别出任何入侵指标。
+
+## 战术、技术与程序
+该平台旨在对抗与电子邮件发起的攻击相关的常见对手 TTP。这些包括：
+- **网络钓鱼 (T1566)：** 检测旨在窃取凭证或传递恶意软件的欺骗性电子邮件。
+- **用户执行 (T1204)：** 阻止依赖用户点击以执行有效载荷的恶意附件和链接。
+- **商业电子邮件泄露 (T1657)：** 识别冒充尝试和表明金融欺诈的异常通信模式。
+- **初始访问 (T1078)：** 防止使用被盗的有效账户从受信任域内发送恶意电子邮件。
+通过跨电子邮件和终端遥测相关联数据，该平台旨在检测电子邮件是初始向量，终端泄露是目标的多阶段攻击。
+
+## 威胁行为者背景
+产品公告没有将其开发归因于特定的威胁行为者或活动。相反，它是对更广泛的、持久的威胁格局的回应，其中电子邮件仍然是从金融驱动的网络犯罪分子到国家支持的高级持续威胁（APT）等各种行为者的主要初始攻击向量。集成特别解决了当电子邮件安全和终端安全工具独立运行时出现的运营差距，这个差距经常被对手利用以维持持久性和在成功的网络钓鱼尝试后进行横向移动。
+
+## 缓解措施与建议
+Bitdefender 的发布代表了特定于供应商的缓解策略。对于使用或考虑 GravityZone 平台的组织，主要建议是评估并启用 Extended Email Security 模块以整合可见性。更广泛地说，安全团队应该评估他们的电子邮件和终端安全解决方案之间的集成水平。最佳实践包括：
+- 确保安全信息和事件管理（SIEM）或扩展检测和响应（XDR）平台从电子邮件和终端系统摄取日志以进行相关联。
+- 实施强大的入站和出站电子邮件过滤，以捕获内部威胁和受感染的账户。
+- 定期进行用户意识培训，重点关注识别复杂的网络钓鱼和 BEC 尝试，因为技术控制并非万无一失。
+
+## 参考资料
+- [Bitdefender extends GravityZone with continuous email threat protection](https://www.helpnetsecurity.com/2026/04/15/bitdefender-gravityzone-extended-email-security/)

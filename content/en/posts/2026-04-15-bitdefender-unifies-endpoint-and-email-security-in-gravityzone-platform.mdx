@@ -1,0 +1,53 @@
+---
+title: Bitdefender Unifies Endpoint and Email Security in GravityZone Platform
+slug: >-
+  2026-04-15-bitdefender-unifies-endpoint-and-email-security-in-gravityzone-platform
+date: '2026-04-15'
+excerpt: >-
+  Bitdefender has integrated continuous email threat protection into its
+  GravityZone platform, combining endpoint detection and response (EDR) with
+  email security to combat phishing, BEC, and ransomware.
+category: industry
+tags:
+  - email-security
+  - endpoint-security
+  - bitdefender
+  - platform-integration
+language: en
+source_urls:
+  - >-
+    https://www.helpnetsecurity.com/2026/04/15/bitdefender-gravityzone-extended-email-security/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-15-bitdefender-unifies-endpoint-and-email-security-in-gravityzone-platform
+severity: informational
+---
+## Executive Summary
+Bitdefender has launched GravityZone Extended Email Security, a new module that integrates continuous email threat protection directly into its existing endpoint security platform. The move, announced on April 15, 2026, is designed to unify the management and analysis of threats across email and endpoint vectors, which are often siloed. According to Bitdefender, the integration aims to improve detection and response times against sophisticated attacks like business email compromise (BEC), credential phishing, and ransomware that frequently originate via email.
+
+## Technical Analysis
+The new GravityZone Extended Email Security module employs what Bitdefender terms an Integrated Cloud Email Security (ICES) approach. It is built to provide continuous protection by analyzing email traffic in real-time, both pre- and post-delivery. The system scans inbound, outbound, and internal email for threats including malicious links, attachments, and social engineering content. A key technical feature is the bidirectional integration between the email security layer and Bitdefender's endpoint detection and response (EDR) capabilities. This allows the platform to correlate email-based indicators—such as a malicious sender or attachment hash—with endpoint activity, potentially identifying a compromised machine that is exhibiting post-infection behaviors. The platform is offered as a cloud service and is managed through the existing GravityZone console, targeting both enterprise organizations and managed service providers (MSPs).
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+The platform is designed to counter common adversary TTPs associated with email-initiated attacks. These include:
+- **Phishing (T1566):** Detection of deceptive emails designed to steal credentials or deliver malware.
+- **User Execution (T1204):** Blocking malicious attachments and links that rely on a user clicking to execute payloads.
+- **Business Email Compromise (T1657):** Identifying impersonation attempts and anomalous communication patterns indicative of financial fraud.
+- **Initial Access (T1078):** Preventing the use of stolen valid accounts to send malicious emails from within a trusted domain.
+By correlating data across email and endpoint telemetry, the platform aims to detect multi-stage attacks where email is the initial vector and endpoint compromise is the objective.
+
+## Threat Actor Context
+The product announcement does not attribute its development to a specific threat actor or campaign. Instead, it is a response to the broader, persistent threat landscape where email remains the primary initial attack vector for a wide range of actors, from financially motivated cybercriminals to state-sponsored advanced persistent threats (APTs). The integration specifically addresses the operational gap that arises when email security and endpoint security tools operate independently, a gap often exploited by adversaries to maintain persistence and move laterally after a successful phishing attempt.
+
+## Mitigations & Recommendations
+Bitdefender's release represents a vendor-specific mitigation strategy. For organizations using or considering the GravityZone platform, the primary recommendation is to evaluate and enable the Extended Email Security module to consolidate visibility. More broadly, security teams should assess the integration level between their email and endpoint security solutions. Best practices include:
+- Ensuring security information and event management (SIEM) or extended detection and response (XDR) platforms ingest logs from both email and endpoint systems for correlation.
+- Implementing robust filtering for both inbound and outbound email to catch internal threats and compromised accounts.
+- Conducting regular user awareness training focused on identifying sophisticated phishing and BEC attempts, as technical controls are not infallible.
+
+## References
+- [Bitdefender extends GravityZone with continuous email threat protection](https://www.helpnetsecurity.com/2026/04/15/bitdefender-gravityzone-extended-email-security/)
