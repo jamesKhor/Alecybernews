@@ -19,7 +19,6 @@ const T = {
     unsubscribe: "Unsubscribe",
     viewOnline: "Browse all",
     viewOnlineSuffix: "articles",
-    severityLabel: "Severity",
     noArticles: "No new articles in this cycle.",
     moreArticles: "more article",
     moreArticlesPlural: "more articles",
@@ -28,6 +27,8 @@ const T = {
     topStory: "TOP STORY",
     todaysBriefing: "TODAY'S BRIEFING",
     communityTitle: "Join the conversation",
+    replyCta: "💬 Hit reply — we read every response.",
+    minRead: "min read",
   },
   zh: {
     greeting: "ZCyberNews 最新资讯",
@@ -38,7 +39,6 @@ const T = {
     unsubscribe: "取消订阅",
     viewOnline: "浏览全部",
     viewOnlineSuffix: "篇文章",
-    severityLabel: "严重程度",
     noArticles: "本时段暂无新文章。",
     moreArticles: "篇更多文章",
     moreArticlesPlural: "篇更多文章",
@@ -47,6 +47,8 @@ const T = {
     topStory: "头条",
     todaysBriefing: "今日简报",
     communityTitle: "加入讨论",
+    replyCta: "💬 直接回复此邮件，我们会认真阅读每一条反馈。",
+    minRead: "分钟阅读",
   },
 } as const;
 
@@ -66,9 +68,28 @@ const SEVERITY_RANK: Record<string, number> = {
   informational: 1,
 };
 
+// ── v3: Category-specific pill colors ─────────────────────────────────────
+// Each category gets its own tinted background + text color for instant
+// visual differentiation. On light bg (secondary cards).
+
+const CATEGORY_PILL: Record<
+  string,
+  { bg: string; color: string; border: string }
+> = {
+  "threat-intel": { bg: "#fef2f2", color: "#b91c1c", border: "#fecaca" },
+  vulnerabilities: { bg: "#fffbeb", color: "#92400e", border: "#fde68a" },
+  malware: { bg: "#fdf2f8", color: "#9d174d", border: "#fbcfe8" },
+  industry: { bg: "#f0f9ff", color: "#0369a1", border: "#bae6fd" },
+  tools: { bg: "#f0fdf4", color: "#15803d", border: "#bbf7d0" },
+  ai: { bg: "#faf5ff", color: "#7c3aed", border: "#e9d5ff" },
+};
+
+const DEFAULT_PILL = { bg: "#f5f5f5", color: "#525252", border: "#e5e5e5" };
+
+// Category pills on dark hero bg — all use the same dark tinted style
+const HERO_PILL = { bg: "#1e2a3a", color: "#22d3ee", border: "#2a3a4e" };
+
 // ── Design tokens ─────────────────────────────────────────────────────────
-// Centralized palette inspired by Perplexity (clean cards), Google Dev
-// (dark hero banner), and Claude Code (warm off-white, rounded cards).
 
 const C = {
   bodyBg: "#f5f5f0",
@@ -82,12 +103,9 @@ const C = {
   brandAccent: "#ef4444",
   heroGradient:
     "linear-gradient(135deg, #0c1222 0%, #1a1a2e 50%, #0f172a 100%)",
-  heroBadgeBg: "#1e2a3a",
   discord: "#5865F2",
   divider: "#e5e5e5",
   footerBg: "#eeedea",
-  pillBg: "#f0f9ff",
-  pillBorder: "#e0e7ef",
 } as const;
 
 const FONT =
@@ -100,6 +118,14 @@ function escapeHtml(s: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+/** Estimate reading time from word count (same logic as lib/content.ts) */
+function estimateReadingTime(article: Article): number {
+  // articles have readingTime from content.ts; use it if available, else estimate
+  return (
+    article.readingTime ?? Math.ceil(article.content.split(/\s+/).length / 200)
+  );
 }
 
 // ── Content strategy ──────────────────────────────────────────────────────
@@ -152,8 +178,6 @@ export function buildDigestSubject(
     { month: "short", day: "numeric" },
   );
 
-  // Maya's improvement: include top story title in subject line for higher
-  // open rates. "SAP Critical SQLi (CVSS 9.9) + 13 more" beats "14 new articles".
   const { hero } = selectArticles(articles);
   const heroTitle = hero
     ? hero.frontmatter.title.length > 50
@@ -192,7 +216,6 @@ export function buildDigestHtml({
     ? escapeHtml(hero.frontmatter.title)
     : escapeHtml(t.preheaderFallback);
 
-  // Date badge for header — "Wed, Apr 16" or "4月16日 周三"
   const dateBadge = new Date().toLocaleDateString(
     locale === "zh" ? "zh-CN" : "en-US",
     { weekday: "short", month: "short", day: "numeric" },
@@ -215,7 +238,7 @@ export function buildDigestHtml({
         </tr>`
       : "";
 
-  // Community card — Discord + forward CTA merged into one bordered card
+  // Community card — Discord + forward CTA + reply CTA
   const communityInner = `
     <p style="margin:0 0 14px;font-size:15px;font-weight:600;color:${C.textPrimary};font-family:${FONT};">${escapeHtml(t.communityTitle)}</p>
     ${discordUrl ? `<a href="${escapeHtml(discordUrl)}" style="display:inline-block;padding:10px 20px;background:${C.discord};color:#ffffff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600;font-family:${FONT};">${escapeHtml(t.discordCta)} →</a>` : ""}
@@ -252,17 +275,17 @@ export function buildDigestHtml({
                     <p style="margin:6px 0 0;color:${C.textMuted};font-size:12px;text-transform:uppercase;letter-spacing:0.1em;font-family:${FONT};">${escapeHtml(t.todaysBriefing)}</p>
                   </td>
                   <td style="text-align:right;vertical-align:top;">
-                    <span style="display:inline-block;padding:6px 14px;background:${C.pillBg};border:1px solid ${C.pillBorder};border-radius:20px;font-size:12px;font-weight:600;color:${C.textSecondary};font-family:${FONT};">${escapeHtml(dateBadge)}</span>
+                    <span style="display:inline-block;padding:6px 14px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:20px;font-size:12px;font-weight:600;color:${C.brandPrimary};font-family:${FONT};">${escapeHtml(dateBadge)}</span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Hero article (dark banner — the ONE dark section) -->
+          <!-- Hero article (dark banner) -->
           ${heroBlock}
 
-          <!-- Secondary articles (white cards) -->
+          <!-- Secondary articles (white cards with severity accent) -->
           <tr>
             <td style="padding:20px 24px 8px;">
               ${secondaryBlocks || `<p style="color:${C.textMuted};font-size:14px;font-family:${FONT};">${escapeHtml(t.noArticles)}</p>`}
@@ -299,6 +322,13 @@ export function buildDigestHtml({
             </td>
           </tr>
 
+          <!-- Reply CTA -->
+          <tr>
+            <td style="padding:0 32px 20px;text-align:center;">
+              <p style="margin:0;color:${C.textSecondary};font-size:13px;font-family:${FONT};">${t.replyCta}</p>
+            </td>
+          </tr>
+
           <!-- Footer -->
           <tr>
             <td style="padding:20px 32px;background:${C.footerBg};border-top:1px solid ${C.divider};">
@@ -330,12 +360,24 @@ function renderHeroBlock(
   const fm = a.frontmatter;
   const url = `${siteUrl}/${locale}/${fm.category === "threat-intel" ? "threat-intel" : "articles"}/${fm.slug}`;
   const severity = fm.severity;
+  const readTime = estimateReadingTime(a);
+
   const severityBadge = severity
     ? `<span style="display:inline-block;padding:4px 10px;background:${SEVERITY_COLOR[severity] ?? "#6b7280"};color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;border-radius:6px;letter-spacing:0.04em;font-family:${FONT};">${escapeHtml(severity)}</span>`
     : "";
-  const categoryBadge = `<span style="display:inline-block;padding:4px 10px;background:${C.heroBadgeBg};color:#22d3ee;font-size:11px;font-weight:600;text-transform:uppercase;border-radius:6px;letter-spacing:0.04em;border:1px solid #2a3a4e;font-family:${FONT};">${escapeHtml(fm.category)}</span>`;
+  const categoryBadge = `<span style="display:inline-block;padding:4px 10px;background:${HERO_PILL.bg};color:${HERO_PILL.color};font-size:11px;font-weight:600;text-transform:uppercase;border-radius:6px;letter-spacing:0.04em;border:1px solid ${HERO_PILL.border};font-family:${FONT};">${escapeHtml(fm.category)}</span>`;
+  const readTimeBadge = `<span style="display:inline-block;padding:4px 10px;background:rgba(255,255,255,0.08);color:#a1a1aa;font-size:11px;font-weight:500;border-radius:6px;font-family:${FONT};">⏱ ${readTime} ${escapeHtml(t.minRead)}</span>`;
+
+  const heroExcerpt =
+    fm.excerpt.length > 160 ? fm.excerpt.slice(0, 157) + "..." : fm.excerpt;
 
   return `<tr>
+    <td style="padding:0;">
+      <!-- Accent bar -->
+      <div style="height:4px;background:linear-gradient(90deg, ${C.brandAccent} 0%, ${C.brandPrimary} 100%);"></div>
+    </td>
+  </tr>
+  <tr>
     <td style="padding:28px 32px 24px;background:${C.heroGradient};">
       <!--[if gte mso 9]>
       <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;">
@@ -343,11 +385,11 @@ function renderHeroBlock(
         <v:textbox style="mso-fit-shape-to-text:true" inset="28px,28px,28px,24px">
       <![endif]-->
       <p style="margin:0 0 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:${C.brandAccent};font-family:${FONT};">▎${escapeHtml(t.topStory)}</p>
-      <div style="margin-bottom:12px;">${categoryBadge}&nbsp;&nbsp;${severityBadge}</div>
+      <div style="margin-bottom:14px;">${categoryBadge}&nbsp;&nbsp;${severityBadge}&nbsp;&nbsp;${readTimeBadge}</div>
       <a href="${url}" style="text-decoration:none;">
         <h2 style="margin:0 0 12px;color:#ffffff;font-size:22px;line-height:1.3;font-weight:700;font-family:${FONT};">${escapeHtml(fm.title)}</h2>
       </a>
-      <p style="margin:0 0 18px;color:#d4d4d8;font-size:15px;line-height:1.55;font-family:${FONT};">${escapeHtml(fm.excerpt.length > 160 ? fm.excerpt.slice(0, 157) + "..." : fm.excerpt)}</p>
+      <p style="margin:0 0 20px;color:#d4d4d8;font-size:15px;line-height:1.55;font-family:${FONT};">${escapeHtml(heroExcerpt)}</p>
       <a href="${url}" style="display:inline-block;padding:10px 22px;background:${C.brandPrimary};color:#ffffff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600;font-family:${FONT};">${escapeHtml(t.readHero)} →</a>
       <!--[if gte mso 9]>
         </v:textbox>
@@ -357,7 +399,7 @@ function renderHeroBlock(
   </tr>`;
 }
 
-// ── Secondary article card (WHITE bordered card) ──────────────────────────
+// ── Secondary article card (WHITE with severity left-border accent) ───────
 
 function renderSecondaryBlock(
   a: Article,
@@ -368,17 +410,25 @@ function renderSecondaryBlock(
   const fm = a.frontmatter;
   const url = `${siteUrl}/${locale}/${fm.category === "threat-intel" ? "threat-intel" : "articles"}/${fm.slug}`;
   const severity = fm.severity;
+  const readTime = estimateReadingTime(a);
+  const accentColor = SEVERITY_COLOR[severity ?? ""] ?? C.cardBorder;
+  const pill = CATEGORY_PILL[fm.category] ?? DEFAULT_PILL;
+
   const severityBadge = severity
     ? `<span style="display:inline-block;padding:3px 8px;background:${SEVERITY_COLOR[severity] ?? "#6b7280"};color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;border-radius:6px;letter-spacing:0.04em;font-family:${FONT};">${escapeHtml(severity)}</span>`
     : "";
-  const categoryBadge = `<span style="display:inline-block;padding:3px 8px;background:${C.pillBg};color:${C.brandPrimary};font-size:10px;font-weight:600;text-transform:uppercase;border-radius:6px;letter-spacing:0.04em;border:1px solid ${C.pillBorder};font-family:${FONT};">${escapeHtml(fm.category)}</span>`;
+  const categoryBadge = `<span style="display:inline-block;padding:3px 8px;background:${pill.bg};color:${pill.color};font-size:10px;font-weight:600;text-transform:uppercase;border-radius:6px;letter-spacing:0.04em;border:1px solid ${pill.border};font-family:${FONT};">${escapeHtml(fm.category)}</span>`;
+  const readTimeBadge = `<span style="color:${C.textMuted};font-size:11px;font-family:${FONT};">⏱ ${readTime} ${escapeHtml(t.minRead)}</span>`;
+
   const excerpt =
     fm.excerpt.length > 140 ? fm.excerpt.slice(0, 137) + "..." : fm.excerpt;
 
+  // Table-based card with left border accent colored by severity
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;border:1px solid ${C.cardBorder};border-radius:${C.cardRadius};overflow:hidden;">
   <tr>
+    <td style="width:4px;background:${accentColor};font-size:0;line-height:0;" width="4">&nbsp;</td>
     <td style="padding:16px 20px;background:${C.cardBg};">
-      <div style="margin-bottom:8px;">${categoryBadge}&nbsp;&nbsp;${severityBadge}</div>
+      <div style="margin-bottom:8px;">${categoryBadge}&nbsp;&nbsp;${severityBadge}&nbsp;&nbsp;${readTimeBadge}</div>
       <a href="${url}" style="text-decoration:none;">
         <h3 style="margin:0 0 6px;color:${C.textPrimary};font-size:15px;line-height:1.35;font-weight:600;font-family:${FONT};">${escapeHtml(fm.title)}</h3>
       </a>
