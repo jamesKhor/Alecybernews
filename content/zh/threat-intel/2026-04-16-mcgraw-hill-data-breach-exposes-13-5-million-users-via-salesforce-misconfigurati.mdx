@@ -1,0 +1,53 @@
+---
+title: McGraw-Hill 数据泄露通过 Salesforce 暴露 1350 万用户
+slug: >-
+  2026-04-16-mcgraw-hill-data-breach-exposes-13-5-million-users-via-salesforce-misconfigurati
+date: '2026-04-16'
+excerpt: >-
+  教育出版商 McGraw-Hill 确认数据泄露暴露了 1350 万用户的个人数据，与配置错误的 Salesforce 环境有关。超过 100GB
+  的被盗数据已在网上公开分发，此前曾有勒索企图。
+category: threat-intel
+tags:
+  - data-breach
+  - salesforce
+  - misconfiguration
+  - education
+  - extortion
+language: zh
+source_urls:
+  - 'https://cybersecuritynews.com/mcgraw-hill-confirms-data-breach/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-mcgraw-hill-data-breach-exposes-13-5-million-users-via-salesforce-misconfigurati
+severity: high
+affected_sectors:
+  - education
+  - publishing
+---
+## McGraw-Hill 数据泄露通过 Salesforce 暴露了 1350 万用户
+
+## 执行摘要
+教育出版巨头 McGraw-Hill 的 Salesforce 环境配置错误导致了数据泄露，大约 1350 万用户的个人信息被暴露。该公司在 2026 年 4 月确认了这一事件，此前威胁行为者试图勒索，随后公开分发了超过 100GB 的被盗数据。此次泄露凸显了企业环境中云服务配置错误所带来的持续风险。
+
+## 技术分析
+此次泄露源于 McGraw-Hill 的 Salesforce 实施中的安全配置错误，Salesforce 是一个广泛使用的客户关系管理（CRM）平台。虽然公共披露中没有详细说明配置错误的具体技术性质，但这类事件通常涉及数据存储不当保护、暴露的 API 或宽松的访问控制，允许未经授权的数据提取。根据公司的声明，暴露的数据包括个人信息。威胁行为者提取了这些数据，并在对 McGraw-Hill 的勒索尝试失败或未得到满足后，将其在线公开。100GB+ 数据集的公开分发显著增加了对受影响用户群体进行下游欺诈和凭证填充攻击的风险。
+
+## 入侵指标
+目前没有识别出任何入侵指标。被盗数据集的公开分发可能意味着数据本身是主要的入侵指标。建议组织监控使用与 McGraw-Hill 服务相关的电子邮件地址进行凭证填充攻击。
+
+## 战术、技术与程序
+威胁行为者的 TTP 遵循云中心数据盗窃和勒索的常见模式。最初的访问向量很可能是利用配置错误（T1589.001 - 收集受害者身份信息：凭证），而不是软件漏洞。这允许数据收集和外泄（TA0010 - 数据外泄）。随后的勒索尝试（T1657 - 金融盗窃）和公开数据转储（T1588.002 - 获取能力：工具）是双重勒索战术的标志，尽管最初的赎金要求细节尚不清楚。
+
+## 威胁行为者背景
+此次泄露背后的具体威胁行为者或团体尚未公开归因。这些战术——利用云配置错误、尝试勒索以及在要求未得到满足时公开泄露数据——与广泛的网络犯罪行为者一致，从勒索软件附属机构到专门的数据勒索团体。专注于教育部门的大型、数据丰富的目标表明这是一个以财务为动机的行动。
+
+## 缓解措施与建议
+使用 Salesforce 等云平台的组织必须实施严格的配置管理和持续的安全姿态监控。McGraw-Hill 表示正在审查其安全控制并与外部专家合作。对于受影响的个人，公司提供信用监控和身份保护服务。更广泛的建议包括：
+*   **实施云安全姿态管理（CSPM）：** 持续审计云环境，针对安全基准检查配置错误。
+*   **执行最小权限访问：** 在 CRM 和云存储系统中严格限制数据访问，仅限于需要这些数据以执行业务功能的实体。
+*   **监控数据泄露：** 部署数据丢失防护（DLP）工具，并监控地下论坛，寻找公司数据被出售或发布的迹象。
+*   **用户意识：** 受影响的用户应在所有账户上启用多因素认证，警惕引用泄露的网络钓鱼电子邮件，并考虑在其信用文件上放置欺诈警报。
+
+## 参考资料
+*   [McGraw Hill Confirms Data Breach Exposing 13.5 Million Users’ Personal Data](https://cybersecuritynews.com/mcgraw-hill-confirms-data-breach/)
