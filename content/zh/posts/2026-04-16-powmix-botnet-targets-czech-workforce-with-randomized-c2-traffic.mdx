@@ -1,0 +1,52 @@
+---
+title: PowMix Botnet 针对捷克劳动力使用随机化C2流量
+slug: 2026-04-16-powmix-botnet-targets-czech-workforce-with-randomized-c2-traffic
+date: '2026-04-16'
+excerpt: 思科Talos研究人员识别出自2025年12月以来活跃的PowMix僵尸网络，针对捷克工作人员使用随机化C2信标以规避检测并部署额外的有效载荷。
+category: malware
+tags:
+  - botnet
+  - evasion
+  - czech-republic
+  - command-and-control
+language: zh
+source_urls:
+  - 'https://thehackernews.com/2026/04/newly-discovered-powmix-botnet-hits.html'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-16-powmix-botnet-targets-czech-workforce-with-randomized-c2-traffic
+severity: high
+affected_sectors:
+  - multiple
+affected_regions:
+  - Czech Republic
+---
+ARTICLE TITLE: PowMix Botnet Targets Czech Workforce with Randomized C2 Traffic
+
+ARTICLE BODY:
+## 执行摘要
+自2025年12月以来，一个以前未被记录的名为PowMix的僵尸网络一直在积极针对捷克共和国的劳动力。根据Cisco Talos的研究人员称，该恶意软件的主要特点是其使用随机化的命令和控制（C2）信标间隔，这是一种旨在规避标准网络签名检测的技术。该活动背后的最终目标和威胁行为者的身份仍然不清楚。
+
+## 技术分析
+PowMix僵尸网络通过恶意电子邮件附件传播，尽管可用来源中没有详细说明确切的初始感染向量。一旦执行，恶意软件就会在被入侵的主机上建立持久性。其核心规避机制在于其C2通信协议。PowMix不是维持持久连接或使用固定时间间隔进行信标，而是生成C2检查之间的随机延迟。这使得其网络流量模式高度不规则，更难使用静态签名从合法的背景网络噪声中区分出来。
+
+该恶意软件能够接收并执行来自其操作者的命令。虽然源中没有列举这些命令的具体能力，但典型的僵尸网络功能包括下载和执行额外的有效载荷、进行分布式拒绝服务（DDoS）攻击、窃取信息或为进一步的横向移动提供立足点。Talos的分析表明，该活动已经持续了数月，表明这是一个持续的行动，而不是一次性攻击。
+
+## 入侵指标
+目前尚未识别。Cisco Talos的公开披露没有包括与PowMix活动相关的具体文件哈希值、域名或IP地址。
+
+## 战术、技术与程序
+观察到的主要战术、技术与程序是使用**随机化的C2信标间隔**（TA0010: Command and Control, T1071.001: Application Layer Protocol）。这属于**协议隧道（T1572）**技术，是**流量信号（T1205）**的一种形式，旨在将恶意通信与正常网络活动混合以规避检测。感染被认为始于**钓鱼（T1566）**，特别是恶意附件。恶意软件还采用了**持久性（TA0003）**机制，尽管没有具体说明方法（例如，注册表运行键，计划任务）。
+
+## 威胁行为者背景
+目前尚未识别出PowMix僵尸网络背后的威胁行为者或团体。目标似乎地理上集中在捷克共和国，但动机——无论是金融盗窃、间谍活动还是为未来的破坏性攻击做准备——仍然不确定。使用具有复杂规避策略的定制僵尸网络表明了一个足智多谋的行为者，但目前尚不清楚这是否是一个与国家对齐的团体还是一个有组织的网络犯罪行动。
+
+## 缓解措施与建议
+组织，特别是那些在捷克共和国有业务或劳动力的组织，应加强对不依赖于静态签名的异常网络流量模式的监控。防御者应：
+- 实施使用行为启发式和机器学习来检测不规则信标和数据泄露尝试的网络流量分析工具。
+- 强化电子邮件安全过滤，以阻止恶意附件和链接，这是怀疑的初始向量。
+- 应用最小权限原则并分割网络，以限制恶意软件感染后潜在的横向移动。
+- 确保部署并调整端点检测和响应（EDR）解决方案，以检测可疑进程的执行和持久性机制。
+
+## 参考资料
+- https://thehackernews.com/2026/04/newly-discovered-powmix-botnet-hits.html

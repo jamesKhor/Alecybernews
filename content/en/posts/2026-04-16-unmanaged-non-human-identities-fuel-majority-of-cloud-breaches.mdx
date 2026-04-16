@@ -1,0 +1,48 @@
+---
+title: Unmanaged Non-Human Identities Fuel Majority of Cloud Breaches
+slug: 2026-04-16-unmanaged-non-human-identities-fuel-majority-of-cloud-breaches
+date: '2026-04-16'
+excerpt: >-
+  A 2024 analysis reveals 68% of cloud breaches stem from compromised, orphaned
+  non-human identities like service accounts and API keys, not phishing or weak
+  passwords, highlighting a critical gap in automated credential lifecycle
+  management.
+category: industry
+tags:
+  - cloud-security
+  - identity-and-access-management
+  - risk-management
+language: en
+source_urls:
+  - >-
+    https://thehackernews.com/2026/04/webinar-find-and-eliminate-orphaned-non.html
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-16-unmanaged-non-human-identities-fuel-majority-of-cloud-breaches
+severity: high
+---
+## Executive Summary
+Compromised and forgotten non-human identities—such as service accounts, API keys, and OAuth grants—were the primary initial attack vector in 68% of cloud breaches in 2024, according to data cited in a recent industry webinar. This statistic, attributed to a 2024 analysis, underscores a systemic security failure where automated credentials proliferate without governance, often persisting long after projects end or personnel depart. For every human employee, organizations now manage an estimated 40 to 50 of these non-human identities, creating a vast, shadow attack surface that traditional security controls focused on human users frequently miss.
+
+## Technical Analysis
+The core technical challenge lies in the lifecycle management of machine credentials. Unlike human accounts, which are typically deprovisioned during offboarding, non-human identities are created programmatically for specific tasks—integrating applications, automating deployments, or enabling AI agent functions. These identities are granted permissions, often excessive, and then forgotten. Sources from the webinar indicate these "orphaned" identities lack monitoring, rotation, or decommissioning processes. Attackers, as noted in the cited 2024 breach data, increasingly target these static, long-lived tokens because they provide direct access to cloud resources and data without needing to compromise a human user first. The attack path is straightforward: discover an exposed or poorly secured API key, often left in public code repositories or configuration files, and leverage its permissions, which may not be logged or alert in the same way a human login would.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+The primary technique employed by threat actors, as inferred from the breach data, is credential harvesting and abuse of valid accounts (T1589.001, T1078). Attackers scan for exposed API keys and service account tokens in public sources like GitHub, or probe internal systems for poorly protected secrets. Once obtained, they use these credentials to authenticate directly to cloud services (T1550.002), often bypassing multi-factor authentication controls that only apply to human interactions. The permissions attached to these identities allow for lateral movement (TA0008), data exfiltration (TA0010), and resource manipulation. The lack of behavioral baselines for non-human identities makes detection of anomalous activity—such as a service account accessing resources at an unusual time or from a new geographic location—exceptionally difficult with conventional security tools.
+
+## Threat Actor Context
+The webinar materials do not attribute this trend to a specific threat actor group or campaign. Instead, it describes a pervasive opportunity exploited by a broad spectrum of malicious actors, from financially motivated cybercriminals to state-sponsored advanced persistent threats (APTs). The technique is low-cost, high-reward, and does not require sophisticated exploit development. The widespread adoption of cloud infrastructure and DevOps practices, which rely heavily on automation and thus non-human identities, has created a target-rich environment that all adversary types are actively leveraging.
+
+## Mitigations & Recommendations
+Organizations must implement a dedicated non-human identity management program. Key recommendations derived from the webinar include:
+*   **Inventory and Discovery:** Continuously scan all cloud environments, code repositories, and CI/CD pipelines to discover all service accounts, API keys, OAuth grants, and other machine identities. Assign ownership for each.
+*   **Enforce Least Privilege:** Rigorously apply the principle of least privilege to all non-human identities, reviewing and tightening permissions regularly. Avoid using long-lived, highly privileged service accounts.
+*   **Automate Lifecycle Management:** Integrate credential lifecycle management into project and employee offboarding processes. Automate the rotation and expiration of API keys and tokens. Implement just-in-time (JIT) access provisioning where possible.
+*   **Monitor and Alert:** Establish separate behavioral baselines and monitoring for non-human identity activity. Deploy security tools capable of detecting anomalous actions by service accounts, such as access to new resources or unusual API call volumes.
+*   **Secrets Management:** Mandate the use of secure, centralized secrets management solutions (e.g., HashiCorp Vault, AWS Secrets Manager) to prevent hardcoding of credentials in application code or configuration files.
+
+## References
+*   [Webinar: Find and Eliminate Orphaned Non-Human Identities in Your Environment](https://thehackernews.com/2026/04/webinar-find-and-eliminate-orphaned-non.html)
