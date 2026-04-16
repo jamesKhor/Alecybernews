@@ -151,8 +151,26 @@ export function buildDigestSubject(
     locale === "zh" ? "zh-CN" : "en-US",
     { month: "short", day: "numeric" },
   );
+
+  // Maya's improvement: include top story title in subject line for higher
+  // open rates. "SAP Critical SQLi (CVSS 9.9) + 13 more" beats "14 new articles".
+  const { hero } = selectArticles(articles);
+  const heroTitle = hero
+    ? hero.frontmatter.title.length > 50
+      ? hero.frontmatter.title.slice(0, 47) + "..."
+      : hero.frontmatter.title
+    : "";
+  const otherCount = count - 1;
+
   if (locale === "zh") {
+    if (heroTitle && otherCount > 0) {
+      return `${heroTitle} + ${otherCount}篇 · ${dateStr}`;
+    }
     return `ZCyberNews 摘要 · ${dateStr} · ${count} 篇新文章`;
+  }
+
+  if (heroTitle && otherCount > 0) {
+    return `${heroTitle} + ${otherCount} more · ${dateStr}`;
   }
   return `ZCyberNews Digest · ${dateStr} · ${count} new article${count === 1 ? "" : "s"}`;
 }
@@ -173,6 +191,12 @@ export function buildDigestHtml({
   const preheaderText = hero
     ? escapeHtml(hero.frontmatter.title)
     : escapeHtml(t.preheaderFallback);
+
+  // Date badge for header — "Wed, Apr 16" or "4月16日 周三"
+  const dateBadge = new Date().toLocaleDateString(
+    locale === "zh" ? "zh-CN" : "en-US",
+    { weekday: "short", month: "short", day: "numeric" },
+  );
 
   const heroBlock = hero ? renderHeroBlock(hero, locale, siteUrl, t) : "";
 
@@ -217,12 +241,21 @@ export function buildDigestHtml({
           <!-- Header -->
           <tr>
             <td style="padding:28px 32px 20px;">
-              <a href="${siteUrl}/${locale}" style="text-decoration:none;">
-                <span style="font-size:24px;font-weight:700;font-family:${FONT};letter-spacing:-0.02em;">
-                  <span style="color:${C.brandAccent};">Z</span><span style="color:${C.brandPrimary};">CyberNews</span>
-                </span>
-              </a>
-              <p style="margin:6px 0 0;color:${C.textMuted};font-size:12px;text-transform:uppercase;letter-spacing:0.1em;font-family:${FONT};">${escapeHtml(t.todaysBriefing)}</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td>
+                    <a href="${siteUrl}/${locale}" style="text-decoration:none;">
+                      <span style="font-size:24px;font-weight:700;font-family:${FONT};letter-spacing:-0.02em;">
+                        <span style="color:${C.brandAccent};">Z</span><span style="color:${C.brandPrimary};">CyberNews</span>
+                      </span>
+                    </a>
+                    <p style="margin:6px 0 0;color:${C.textMuted};font-size:12px;text-transform:uppercase;letter-spacing:0.1em;font-family:${FONT};">${escapeHtml(t.todaysBriefing)}</p>
+                  </td>
+                  <td style="text-align:right;vertical-align:top;">
+                    <span style="display:inline-block;padding:6px 14px;background:${C.pillBg};border:1px solid ${C.pillBorder};border-radius:20px;font-size:12px;font-weight:600;color:${C.textSecondary};font-family:${FONT};">${escapeHtml(dateBadge)}</span>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
@@ -314,7 +347,7 @@ function renderHeroBlock(
       <a href="${url}" style="text-decoration:none;">
         <h2 style="margin:0 0 12px;color:#ffffff;font-size:22px;line-height:1.3;font-weight:700;font-family:${FONT};">${escapeHtml(fm.title)}</h2>
       </a>
-      <p style="margin:0 0 18px;color:#d4d4d8;font-size:15px;line-height:1.55;font-family:${FONT};">${escapeHtml(fm.excerpt)}</p>
+      <p style="margin:0 0 18px;color:#d4d4d8;font-size:15px;line-height:1.55;font-family:${FONT};">${escapeHtml(fm.excerpt.length > 160 ? fm.excerpt.slice(0, 157) + "..." : fm.excerpt)}</p>
       <a href="${url}" style="display:inline-block;padding:10px 22px;background:${C.brandPrimary};color:#ffffff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600;font-family:${FONT};">${escapeHtml(t.readHero)} →</a>
       <!--[if gte mso 9]>
         </v:textbox>
