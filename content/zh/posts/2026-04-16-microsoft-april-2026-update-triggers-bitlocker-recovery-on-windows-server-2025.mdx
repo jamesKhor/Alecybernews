@@ -1,0 +1,55 @@
+---
+title: 微软2026年4月更新触发Windows Server 2025上的BitLocker恢复
+slug: >-
+  2026-04-16-microsoft-april-2026-update-triggers-bitlocker-recovery-on-windows-server-2025
+date: '2026-04-16'
+excerpt: >-
+  微软确认2026年4月KB5082063安全更新导致部分Windows Server
+  2025设备启动进入BitLocker恢复，需要恢复密钥才能重新获得访问权限。
+category: vulnerabilities
+tags:
+  - microsoft
+  - windows-server
+  - bitlocker
+  - patch-tuesday
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/microsoft/microsoft-some-windows-servers-ask-for-bitlocker-key-after-april-updates/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-microsoft-april-2026-update-triggers-bitlocker-recovery-on-windows-server-2025
+severity: medium
+---
+## 执行摘要
+微软已确认其2026年4月安全更新，特别是KB5082063，导致一部分Windows Server 2025安装在重启后进入BitLocker恢复模式。微软表示，这个问题仅限于“一小部分”设备，需要管理员输入48位的恢复密钥才能重新获得系统访问权限。公司正在调查根本原因，尚未提供修复时间表。
+
+## 技术分析
+有问题的更新，KB5082063，是Windows Server 2025的2026年4月累积安全补丁。根据微软的声明，更新在安装过程中触发了系统信任平台模块（TPM）测量或相关启动组件的意外变化。这个变化被统一可扩展固件接口（UEFI）固件和Windows错误地解释为潜在的篡改事件，激活了BitLocker设备加密恢复流程。
+
+这一事件突出了加密系统补丁部署链中的关键故障模式。BitLocker的安全模型旨在锁定驱动器，如果关键启动文件、TPM或UEFI固件在未经适当授权的情况下被更改。在这种情况下，微软官方更新本身是引发误报安全响应的催化剂。更新、TPM和受影响硬件配置上的UEFI固件之间的确切技术互动仍在微软的调查之中。公司尚未披露使系统易受攻击的具体硬件或固件先决条件。
+
+## 入侵指标
+目前尚未识别出任何入侵指标。这种行为是合法微软更新的记录副作用，而不是恶意活动。
+
+## 战术、技术与程序
+这不是对抗性的TTP。序列如下：
+1. **合法行为：**管理员在启用了BitLocker设备加密的Windows Server 2025系统上安装官方微软安全更新KB5082063。
+2. **系统触发：**在随后的重启后，系统的安全启动链验证失败，触发BitLocker恢复。
+3. **影响：**系统启动到BitLocker恢复控制台，要求提供48位数字恢复密钥以解密驱动器并继续启动过程。
+
+## 威胁行为者背景
+此事件中没有威胁行为者的参与。中断是由微软软件更新过程中的缺陷与特定配置上的安全硬件相互作用引起的。
+
+## 缓解措施与建议
+截至2026年4月16日，微软尚未发布官方补丁或自动化补救工具。恢复系统访问的唯一确认方法是使用BitLocker恢复密钥。建议管理员采取以下步骤：
+
+*   **受影响系统的即时行动：**在安装任何更新之前准备好BitLocker恢复密钥。如果系统已经卡在恢复中，唯一的前进路径是提供恢复密钥。
+*   **预防措施：**对于关键的Windows Server 2025系统，考虑延迟安装KB5082063，直到微软发布指导或修正更新。这个决定必须与补丁中包含的安全修复权衡。
+*   **密钥管理验证：**确保BitLocker恢复密钥安全存储且在可能受影响的系统之外可访问，例如在Azure Active Directory、Microsoft账户或打印的硬拷贝中。
+*   **备份：**作为一般最佳实践，在应用主要累积更新之前，确保完整的系统和数据备份是最新的。
+*   **监控：**关注Windows发布健康仪表板或通过微软安全响应中心（MSRC）发布的官方微软通信，以获得解决方案。
+
+## 参考资料
+*   [微软：一些Windows服务器在4月更新后要求BitLocker密钥](https://www.bleepingcomputer.com/news/microsoft/microsoft-some-windows-servers-ask-for-bitlocker-key-after-april-updates/)

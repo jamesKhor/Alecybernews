@@ -1,0 +1,56 @@
+---
+title: Microsoft April 2026 Update Triggers BitLocker Recovery on Windows Server 2025
+slug: >-
+  2026-04-16-microsoft-april-2026-update-triggers-bitlocker-recovery-on-windows-server-2025
+date: '2026-04-16'
+excerpt: >-
+  Microsoft confirms the April 2026 KB5082063 security update is causing some
+  Windows Server 2025 devices to boot into BitLocker recovery, requiring a
+  recovery key to regain access.
+category: vulnerabilities
+tags:
+  - microsoft
+  - windows-server
+  - bitlocker
+  - patch-tuesday
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/microsoft/microsoft-some-windows-servers-ask-for-bitlocker-key-after-april-updates/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-microsoft-april-2026-update-triggers-bitlocker-recovery-on-windows-server-2025
+severity: medium
+---
+## Executive Summary
+Microsoft has confirmed that its April 2026 security update, specifically KB5082063, is causing a subset of Windows Server 2025 installations to enter BitLocker recovery mode upon reboot. The issue, which Microsoft states is limited to a "small subset" of devices, requires administrators to input a 48-digit recovery key to regain access to the system. The company is investigating the root cause and has not yet provided a timeline for a fix.
+
+## Technical Analysis
+The problematic update, KB5082063, is the April 2026 cumulative security patch for Windows Server 2025. According to Microsoft's statement, the update triggers an unexpected change in the system's Trusted Platform Module (TPM) measurements or related boot components during the installation process. This change is incorrectly interpreted by the Unified Extensible Firmware Interface (UEFI) firmware and Windows as a potential tampering event, activating the BitLocker Device Encryption recovery flow.
+
+The incident highlights a critical failure mode in the patch deployment chain for encrypted systems. BitLocker's security model is designed to lock the drive if critical boot files, the TPM, or the UEFI firmware are altered without proper authorization. In this case, the authorized Microsoft update itself is the catalyst for the false-positive security response. The exact technical interaction between the update, the TPM, and the UEFI firmware on affected hardware configurations remains under investigation by Microsoft. The company has not disclosed specific hardware or firmware prerequisites that make a system susceptible.
+
+## Indicators of Compromise
+None identified at this time. The behavior is a documented side effect of a legitimate Microsoft update, not a malicious campaign.
+
+## Tactics, Techniques & Procedures
+This is not an adversarial TTP. The sequence is:
+1. **Legitimate Action:** Administrator installs the official Microsoft security update KB5082063 on a Windows Server 2025 system with BitLocker Device Encryption enabled.
+2. **System Trigger:** Upon the subsequent reboot, the system's secure boot chain validation fails, triggering BitLocker recovery.
+3. **Impact:** The system boots to the BitLocker recovery console, demanding the 48-digit numerical recovery key to decrypt the drive and continue the boot process.
+
+## Threat Actor Context
+There is no threat actor involvement in this incident. The disruption is caused by a defect in Microsoft's software update process interacting with security hardware on specific configurations.
+
+## Mitigations & Recommendations
+Microsoft has not released an official patch or automated remediation tool as of April 16, 2026. The only confirmed method to restore system access is to use the BitLocker recovery key. Administrators are advised to take the following steps:
+
+*   **Immediate Action for Affected Systems:** Have the BitLocker recovery key available before installing any updates. If a system is already stuck in recovery, the only path forward is to supply the recovery key.
+*   **Preventative Measure:** For critical Windows Server 2025 systems, consider delaying the installation of KB5082063 until Microsoft issues guidance or a corrective update. This decision must be weighed against the security fixes contained within the patch.
+*   **Key Management Verification:** Ensure BitLocker recovery keys are securely stored and accessible outside of the potentially affected system, such as in Azure Active Directory, a Microsoft account, or a printed hard copy.
+*   **Backup:** As a general best practice, ensure full system and data backups are current before applying major cumulative updates.
+*   **Monitoring:** Watch for official Microsoft communications on the Windows Release Health dashboard or through the Microsoft Security Response Center (MSRC) for a resolution.
+
+## References
+*   [Microsoft: Some Windows servers ask for BitLocker key after April updates](https://www.bleepingcomputer.com/news/microsoft/microsoft-some-windows-servers-ask-for-bitlocker-key-after-april-updates/)

@@ -1,0 +1,59 @@
+---
+title: 'Threat Actors Abuse Google Cloud Storage to Evade Filters, Deliver Remcos RAT'
+slug: >-
+  2026-04-16-threat-actors-abuse-google-cloud-storage-to-evade-filters-deliver-remcos-rat
+date: '2026-04-16'
+excerpt: >-
+  Cybercriminals are hosting phishing pages on Google Cloud Storage to bypass
+  email security and reputation checks, delivering the Remcos remote access
+  trojan in campaigns observed since early 2026.
+category: threat-intel
+tags:
+  - phishing
+  - malware-delivery
+  - cloud-security
+  - remcos
+language: en
+source_urls:
+  - >-
+    https://cybersecuritynews.com/hackers-using-google-cloud-storage-to-bypass-email-filters/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-threat-actors-abuse-google-cloud-storage-to-evade-filters-deliver-remcos-rat
+severity: high
+---
+## Executive Summary
+Threat actors are actively exploiting the inherent trust in Google Cloud Storage to host malicious phishing pages, effectively bypassing standard email security filters and delivering the Remcos remote access trojan. This technique, documented by researchers in early 2026, leverages Google's legitimate infrastructure to lend credibility to attack campaigns, complicating detection based on domain reputation alone. The primary infection vector is phishing emails containing links to these hosted pages, which then trick users into downloading malicious payloads.
+
+## Technical Analysis
+The campaign's core evasion technique involves uploading HTML phishing pages directly to Google Cloud Storage buckets. These pages are designed to mimic legitimate services, such as corporate login portals or document-sharing notifications. When a victim clicks a link in a phishing email, they are directed to a URL under the `storage.googleapis.com` domain—a domain typically whitelisted or highly trusted by email security gateways and corporate web filters due to its association with a major, legitimate cloud provider.
+
+The phishing page serves a deceptive download prompt, often disguised as a required document viewer or security update. The downloaded file is typically a Windows executable (`.exe`) or a compressed archive (`.zip`) containing the Remcos RAT installer. Remcos is a powerful, commercially available remote administration tool that has been repurposed by cybercriminals for years. It provides attackers with full backdoor capabilities, including keylogging, screen capture, credential theft, and remote command execution on compromised systems.
+
+By hosting the initial lure on Google's infrastructure, attackers bypass several common security checks: the email link does not point to a newly registered or low-reputation domain; the connection uses HTTPS with a valid certificate from Google; and the domain is unlikely to appear on blocklists. The malicious activity only begins when the secondary payload is downloaded and executed on the endpoint, shifting the detection burden away from network perimeter tools.
+
+## Indicators of Compromise
+None identified at this time. The source report did not provide specific hashes, URLs, or network indicators. The campaign is characterized by its method (use of `storage.googleapis.com` links in phishing emails) and payload (Remcos RAT).
+
+## Tactics, Techniques & Procedures
+The attackers' TTPs align with several MITRE ATT&CK techniques:
+- **T1566.002 (Phishing: Spearphishing Link):** Initial compromise is achieved via emails containing links to malicious pages hosted on Google Cloud Storage.
+- **T1583.001 (Acquire Infrastructure: Domains):** Abuse of legitimate, trusted cloud storage domains (`storage.googleapis.com`) for staging and delivery.
+- **T1608.001 (Stage Capabilities: Upload Malware):** Hosting the Remcos payload on the same or ancillary cloud storage or compromised web servers.
+- **T1204.002 (User Execution: Malicious File):** Social engineering users to execute the downloaded malicious file.
+- **T1219 (Remote Access Software):** Use of the legitimate Remcos application for unauthorized remote control.
+
+## Threat Actor Context
+The specific threat actor or group behind this campaign is not identified in the available source. The use of commodity malware like Remcos and the focus on broadly evasive delivery infrastructure suggests this is a tactic adopted by multiple cybercriminal groups, potentially including initial access brokers or ransomware affiliates. The technique reflects an ongoing trend of "living off trusted land," where attackers misuse reputable cloud services and software-as-a-service (SaaS) platforms to add a layer of legitimacy to their operations.
+
+## Mitigations & Recommendations
+Organizations should implement a defense-in-depth strategy to counter this abuse of trusted cloud domains:
+1.  **Email Security:** Move beyond domain reputation. Deploy email security solutions that can analyze the content of linked pages in real-time (time-of-click analysis) and inspect downloaded file types, regardless of the hosting domain.
+2.  **Web Filtering & Proxy Policies:** Configure secure web gateways and proxies to not automatically trust major cloud storage domains. Implement policies that scan content from `storage.googleapis.com` and similar domains for malicious activity, especially for executable downloads.
+3.  **Endpoint Detection and Response (EDR):** Ensure robust EDR coverage is in place to detect the behavioral signatures of Remcos and similar RATs, such as process injection, persistence mechanisms, and outbound C2 connections.
+4.  **User Awareness:** Train users to be suspicious of unsolicited download prompts, even when a link appears to come from a trusted company like Google. Emphasize verifying the source through alternative channels.
+5.  **Cloud Application Security:** For organizations using Google Cloud Platform, consider implementing logs and alerts for unusual public access patterns to Storage buckets, though this may not be feasible for detecting attacker-controlled buckets outside the organization's purview.
+
+## References
+- CyberSecurity News: [Hackers Using Google Cloud Storage to Bypass Email Filters and Deliver Remcos RAT](https://cybersecuritynews.com/hackers-using-google-cloud-storage-to-bypass-email-filters/)

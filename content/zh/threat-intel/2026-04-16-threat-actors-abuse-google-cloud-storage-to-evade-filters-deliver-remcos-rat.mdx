@@ -1,0 +1,56 @@
+---
+title: 威胁行为者滥用谷歌云存储以规避过滤器，投递Remcos RAT
+slug: >-
+  2026-04-16-threat-actors-abuse-google-cloud-storage-to-evade-filters-deliver-remcos-rat
+date: '2026-04-16'
+excerpt: 网络犯罪分子在谷歌云存储上托管钓鱼页面以绕过电子邮件安全和声誉检查，在自2026年初观察到的活动中投递Remcos远程访问木马。
+category: threat-intel
+tags:
+  - phishing
+  - malware-delivery
+  - cloud-security
+  - remcos
+language: zh
+source_urls:
+  - >-
+    https://cybersecuritynews.com/hackers-using-google-cloud-storage-to-bypass-email-filters/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-threat-actors-abuse-google-cloud-storage-to-evade-filters-deliver-remcos-rat
+severity: high
+---
+## 执行摘要
+威胁行为者正在积极利用对Google Cloud Storage的固有信任来托管恶意钓鱼页面，有效地绕过标准的电子邮件安全过滤器，并交付Remcos远程访问木马。这项技术在2026年初由研究人员记录，利用Google的合法基础设施为攻击活动增加可信度，仅基于域名声誉的检测变得更加复杂。主要感染途径是包含指向这些托管页面链接的钓鱼电子邮件，然后诱骗用户下载恶意负载。
+
+## 技术分析
+该活动的核心规避技术涉及将HTML钓鱼页面直接上传到Google Cloud Storage存储桶。这些页面旨在模仿合法服务，如企业登录门户或文档共享通知。当受害者点击钓鱼电子邮件中的链接时，他们被引导至`storage.googleapis.com`域下的URL——由于与主要合法云提供商的关联，该域通常被电子邮件安全网关和企业网络过滤器白名单或高度信任。
+
+钓鱼页面提供一个欺骗性的下载提示，通常伪装成必需的文档查看器或安全更新。下载的文件通常是Windows可执行文件(`.exe`)或包含Remcos RAT安装程序的压缩存档(`.zip`)。Remcos是一个功能强大的商业可用远程管理工具，多年来已被网络犯罪分子重新利用。它为攻击者提供了完整的后门功能，包括键盘记录、屏幕捕获、凭证盗窃和在被妥协系统上远程执行命令。
+
+通过在Google的基础设施上托管初始诱饵，攻击者绕过了几个常见的安全检查：电子邮件链接不指向新注册或声誉低的域名；连接使用Google的有效证书进行HTTPS；域名不太可能出现在阻止列表上。恶意活动仅在辅助负载在端点上下载并执行时开始，将检测负担从网络边界工具转移开。
+
+## 入侵指标
+目前没有识别出。源报告没有提供具体的哈希值、URL或网络指标。该活动的特点在于其方法（在钓鱼电子邮件中使用`storage.googleapis.com`链接）和负载（Remcos RAT）。
+
+## 战术、技术与程序
+攻击者的战术、技术与程序与多个MITRE ATT&CK技术一致：
+- **T1566.002（钓鱼：Spearphishing Link）：** 初始妥协是通过包含指向托管在Google Cloud Storage上的恶意页面的链接的电子邮件实现的。
+- **T1583.001（获取基础设施：域名）：** 滥用合法、受信任的云存储域名（`storage.googleapis.com`）进行部署和交付。
+- **T1608.001（部署能力：上传恶意软件）：** 在相同或辅助的云存储或被妥协的Web服务器上托管Remcos负载。
+- **T1204.002（用户执行：恶意文件）：** 社会工程用户执行下载的恶意文件。
+- **T1219（远程访问软件）：** 使用合法的Remcos应用程序进行未经授权的远程控制。
+
+## 威胁行为者背景
+在可用来源中没有识别出该活动背后的特定威胁行为者或团体。使用像Remcos这样的商品恶意软件和专注于广泛规避交付基础设施表明，这是多个网络犯罪团体采用的战术，可能包括初始访问经纪人或勒索软件分支机构。该技术反映了“生活在受信任的土地上”的持续趋势，攻击者滥用信誉良好的云服务和软件即服务（SaaS）平台，为其运营增加合法性层。
+
+## 缓解措施与建议
+组织应实施纵深防御策略，以应对对受信任云域的滥用：
+1.  **电子邮件安全：** 超越域名声誉。部署能够实时分析链接页面内容（点击时分析）并检查下载文件类型的电子邮件安全解决方案，无论托管域名如何。
+2.  **Web过滤和代理策略：** 配置安全的Web网关和代理，不要自动信任主要云存储域名。实施政策，扫描来自`storage.googleapis.com`和类似域名的内容，以查找恶意活动，特别是可执行文件下载。
+3.  **端点检测和响应（EDR）：** 确保有强有力的EDR覆盖，以检测Remcos和类似RAT的行为特征，如进程注入、持久性机制和出站C2连接。
+4.  **用户意识：** 培训用户对未经请求的下载提示保持怀疑，即使链接似乎来自Google等受信任的公司。强调通过其他渠道验证来源。
+5.  **云应用安全：** 对于使用Google Cloud Platform的组织，考虑实施日志和警报，以监测存储桶的不寻常公共访问模式，尽管这可能不适用于检测组织范围之外的攻击者控制的存储桶。
+
+## 参考资料
+- CyberSecurity News: [Hackers Using Google Cloud Storage to Bypass Email Filters and Deliver Remcos RAT](https://cybersecuritynews.com/hackers-using-google-cloud-storage-to-bypass-email-filters/)
