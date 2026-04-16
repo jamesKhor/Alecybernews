@@ -1,0 +1,65 @@
+---
+title: Wireless Broadband Alliance Publishes Wi-Fi Roaming Security Guidelines
+slug: >-
+  2026-04-16-wireless-broadband-alliance-publishes-wi-fi-roaming-security-guidelines
+date: '2026-04-16'
+excerpt: >-
+  The Wireless Broadband Alliance has released new security guidelines for
+  public Wi-Fi roaming networks, aiming to standardize authentication and
+  encryption practices to prevent credential theft and man-in-the-middle
+  attacks.
+category: industry
+tags:
+  - wi-fi
+  - authentication
+  - wireless
+  - standards
+language: en
+source_urls:
+  - 'https://www.helpnetsecurity.com/2026/04/16/wba-wi-fi-roaming-security/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-wireless-broadband-alliance-publishes-wi-fi-roaming-security-guidelines
+severity: informational
+affected_sectors:
+  - telecommunications
+  - hospitality
+  - transportation
+  - retail
+affected_regions:
+  - global
+---
+## Executive Summary
+The Wireless Broadband Alliance (WBA) has published a comprehensive set of security guidelines for public Wi-Fi roaming networks, addressing critical gaps in how authentication credentials are handled across disparate network operators. The guidelines target networks using Passpoint (Hotspot 2.0) and OpenRoaming technologies, where inconsistent security implementations can expose users to credential theft and man-in-the-middle attacks.
+
+## Technical Analysis
+The WBA's document, "Wi-Fi Roaming Security Practices for Access Network Providers and Identity Providers," focuses on the end-to-end security of the credential transfer process. When a user roams onto a partner network, their authentication credentials must traverse multiple administrative domains. The security properties of this transit depend heavily on the protocols and configurations chosen by each operator in the chain.
+
+The guidelines specify mandatory and recommended practices for three core areas: authentication, encryption, and credential handling. A primary concern is the use of unencrypted RADIUS, which can expose credentials in transit between network access points, controllers, and authentication servers. The WBA advocates for the use of RADIUS over TLS (RadSec) or IPsec to protect these communications. For credential validation, the document emphasizes the use of EAP-TLS, which provides mutual certificate-based authentication, as the most robust method. It also provides guidance on securing weaker but commonly deployed methods like EAP-TTLS/MSCHAPv2.
+
+Furthermore, the guidelines address the secure storage and transmission of credentials by Identity Providers (IdPs) and the need for robust access control and logging within the roaming federation infrastructure to detect and investigate anomalies.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+The potential attack vectors on insecure Wi-Fi roaming architectures align with several MITRE ATT&CK techniques. Adversaries could employ:
+- **Credential Access (T1555)**: Sniffing unencrypted RADIUS or EAP communication to harvest user credentials.
+- **Man-in-the-Middle (T1557)**: Intercepting and potentially modifying network traffic between the user and the authentication server, especially on networks using vulnerable EAP methods.
+- **Exploit Public-Facing Application (T1190)**: Targeting weaknesses in the roaming exchange or federation servers to gain unauthorized access to credential databases.
+The lack of standardized security allows these techniques to be executed with relatively low sophistication if a single operator in the roaming chain has weak controls.
+
+## Threat Actor Context
+While the guidelines are preventative and not tied to a specific active campaign, the threat model encompasses a broad range of actors. Opportunistic attackers can leverage automated tools to sniff credentials on poorly secured public networks. More advanced persistent threats (APTs) or organized cybercrime groups may target the roaming infrastructure of specific telecommunications or hospitality providers to harvest credentials at scale, facilitating further intelligence gathering or financial fraud. The inherent trust in roaming federations makes them a high-value target for supply-chain-style attacks.
+
+## Mitigations & Recommendations
+The WBA guidelines serve as the primary mitigation framework. Key recommendations for network operators and identity providers include:
+1.  **Mandate Encryption for RADIUS**: Deploy RadSec or IPsec for all RADIUS communications between network elements, especially across administrative boundaries.
+2.  **Prefer Strong EAP Methods**: Implement EAP-TLS with client certificates where feasible. For password-based methods, ensure EAP-TTLS or PEAP is configured with strong tunnel encryption and server certificate validation enforced on the client.
+3.  **Harden Federation Infrastructure**: Apply strict access controls, network segmentation, and comprehensive audit logging to all systems involved in the roaming credential exchange.
+4.  **Conduct Security Audits**: Regularly assess the end-to-end roaming path, including partners' infrastructure where possible, to verify compliance with security baselines.
+5.  **Plan for Post-Quantum Cryptography**: The guidelines note the future need to transition to quantum-resistant algorithms, suggesting operators should begin architectural planning.
+
+## References
+- [WBA Wi-Fi Roaming Security Guidelines Announcement](https://www.helpnetsecurity.com/2026/04/16/wba-wi-fi-roaming-security/)
