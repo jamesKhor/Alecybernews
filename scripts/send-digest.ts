@@ -65,6 +65,15 @@ async function sendForLocale(
     return;
   }
 
+  // Maya's content strategy: don't send thin digests — looks unprofessional
+  const { MIN_ARTICLES_TO_SEND } = await import("@/lib/email/digest-template");
+  if (articles.length < MIN_ARTICLES_TO_SEND) {
+    console.log(
+      `${tag} Only ${articles.length} article(s) — below minimum ${MIN_ARTICLES_TO_SEND}. Skipping.`,
+    );
+    return;
+  }
+
   const siteUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://zcybernews.com"
   ).replace(/\/$/, "");
