@@ -1,0 +1,56 @@
+---
+title: ImmuniWeb Platform Adds AI Asset Discovery and Post-Quantum Crypto Detection
+slug: >-
+  2026-04-16-immuniweb-platform-adds-ai-asset-discovery-and-post-quantum-crypto-detection
+date: '2026-04-16'
+excerpt: >-
+  ImmuniWeb's Q1 2026 platform update introduces advanced detection for exposed
+  AI assets and services, post-quantum cryptographic algorithms, and a new Cyber
+  Threat Intelligence dashboard.
+category: tools
+tags:
+  - attack-surface-management
+  - ai-security
+  - threat-intelligence
+  - post-quantum-cryptography
+language: en
+source_urls:
+  - 'https://www.helpnetsecurity.com/2026/04/17/immuniweb-updates-q1-2026/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-immuniweb-platform-adds-ai-asset-discovery-and-post-quantum-crypto-detection
+severity: informational
+---
+## Executive Summary
+ImmuniWeb has rolled out a suite of significant updates to its AI-powered platform, focusing on expanding visibility into emerging attack surfaces. The Q1 2026 enhancements, announced on April 17, are headlined by new capabilities to discover and classify exposed artificial intelligence assets and to detect the use of post-quantum cryptographic algorithms—a growing concern as organizations prepare for future threats. The update also introduces a dedicated Cyber Threat Intelligence (CTI) dashboard and refines existing phishing and Indicators of Compromise (IoC) detection models.
+
+## Technical Analysis
+The core technical upgrades span several of ImmuniWeb's product modules, with the most substantive changes appearing in its attack surface management and discovery tools. According to the announcement, the platform's asset discovery engine has been augmented to identify AI-related components exposed on the internet. This includes detection of AI model endpoints, training pipelines, and associated microservices that could be targeted for data poisoning, model theft, or prompt injection attacks. The specific methodologies or signatures used for this AI asset detection were not detailed in the source material.
+
+A second major technical addition is the detection of post-quantum cryptography (PQC) algorithms. As cryptographic standards evolve to resist future quantum computing attacks, identifying where and how these new algorithms are deployed becomes a critical inventory task for security teams. The platform now scans for the use of these algorithms, though the announcement did not specify which PQC standards (e.g., CRYSTALS-Kyber, CRYSTALS-Dilithium) are covered.
+
+Other improvements include a finetuned AI model for enhanced phishing website detection and faster IoC matching. The new CTI dashboard aggregates and correlates external threat data, though its data sources and integration capabilities were not specified.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+This platform update is a defensive tooling enhancement and does not describe novel attacker TTPs. The new features are designed to help defenders counter established techniques, including:
+- **T1589 - Gather Victim Identity Information** (via improved attack surface discovery).
+- **T1595 - Active Scanning** (mitigated by identifying exposed AI and PQC assets).
+- **T1588 - Obtain Capabilities** (countered by enhanced phishing kit detection).
+
+## Threat Actor Context
+The update does not attribute features to the actions of a specific threat actor or group. Instead, the enhancements appear to be proactive measures addressing broad trends: the rapid, often insecure, integration of AI components into enterprise environments and the long-term planning required for the post-quantum cryptographic transition. These are concerns for a wide range of actors, from financially motivated cybercriminals to state-sponsored advanced persistent threats (APTs).
+
+## Mitigations & Recommendations
+Organizations using or evaluating the ImmuniWeb platform should review the new features for integration into their security posture. Specifically:
+1.  Utilize the enhanced AI asset discovery to inventory all externally exposed AI models, APIs, and development tools. Ensure these assets are included in vulnerability management and access control programs.
+2.  Leverage the post-quantum cryptography detection to begin cataloging PQC algorithm usage, forming a baseline for future migration and compliance efforts as standards solidify.
+3.  Incorporate the CTI dashboard findings into existing threat intelligence workflows to contextualize internal alerts with external data.
+
+For organizations not using ImmuniWeb, the announcement underscores the critical need to manually account for AI/ML assets and track PQC adoption within their own attack surface management processes.
+
+## References
+- ImmuniWeb brings AI upgrades, post-quantum detection and more in Q1 2026. Help Net Security. https://www.helpnetsecurity.com/2026/04/17/immuniweb-updates-q1-2026/

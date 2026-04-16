@@ -1,0 +1,55 @@
+---
+title: ImmuniWeb平台增加AI资产发现和后量子密码检测
+slug: >-
+  2026-04-16-immuniweb-platform-adds-ai-asset-discovery-and-post-quantum-crypto-detection
+date: '2026-04-16'
+excerpt: >-
+  ImmuniWeb的2026年第一季度平台更新引入了对暴露的AI资产和服务、后量子密码算法以及新的Cyber Threat
+  Intelligence仪表板的高级检测。
+category: tools
+tags:
+  - attack-surface-management
+  - ai-security
+  - threat-intelligence
+  - post-quantum-cryptography
+language: zh
+source_urls:
+  - 'https://www.helpnetsecurity.com/2026/04/17/immuniweb-updates-q1-2026/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-immuniweb-platform-adds-ai-asset-discovery-and-post-quantum-crypto-detection
+severity: informational
+---
+## 执行摘要
+ImmuniWeb 为其 AI 驱动平台推出了一系列重大更新，专注于扩大对新兴攻击面的可见性。2026年第一季度的增强功能于4月17日宣布，以发现和分类暴露的人工智能资产以及检测后量子密码算法的使用为新功能——随着组织为未来威胁做准备，这成为一个日益增长的关注点。更新还包括引入专门的网络威胁情报（CTI）仪表板，并完善现有的钓鱼和入侵指标（IoC）检测模型。
+
+## 技术分析
+核心技术升级涵盖了 ImmuniWeb 的多个产品模块，最实质性的变化出现在其攻击面管理和发现工具中。根据公告，平台的资产发现引擎已增强，以识别在互联网上暴露的与 AI 相关的组件。这包括检测 AI 模型端点、训练管道和可能成为数据投毒、模型盗窃或即时注入攻击目标的关联微服务。源材料中没有详细说明用于此 AI 资产检测的具体方法或签名。
+
+第二项重大技术增加是检测后量子密码学（PQC）算法。随着密码学标准的发展以抵抗未来的量子计算攻击，识别这些新算法的部署位置和方式成为安全团队的关键库存任务。平台现在扫描这些算法的使用情况，尽管公告没有指定涵盖哪些 PQC 标准（例如，CRYSTALS-Kyber、CRYSTALS-Dilithium）。
+
+其他改进包括微调 AI 模型以增强钓鱼网站检测和更快的 IoC 匹配。新的 CTI 仪表板聚合并关联外部威胁数据，尽管其数据源和集成能力未指定。
+
+## 入侵指标
+目前未识别出任何入侵指标。
+
+## 战术、技术与程序
+此平台更新是一个防御工具增强，并未描述新的攻击者 TTP。新功能旨在帮助防御者对抗已建立的技术，包括：
+- **T1589 - 收集受害者身份信息**（通过改进的攻击面发现）。
+- **T1595 - 积极扫描**（通过识别暴露的 AI 和 PQC 资产来缓解）。
+- **T1588 - 获取能力**（通过增强的钓鱼工具包检测来对抗）。
+
+## 威胁行为者背景
+更新没有将功能归因于特定威胁行为者或团体的行动。相反，增强功能似乎是针对广泛趋势的预防措施：将 AI 组件快速、通常是不安全地集成到企业环境中，以及为后量子密码学过渡所需的长期规划。这些是广泛行为者的关注点，从以财务为动机的网络犯罪分子到国家支持的高级持续性威胁（APT）。
+
+## 缓解措施与建议
+使用或评估 ImmuniWeb 平台的组织应审查新功能，以集成到他们的安全姿态中。具体来说：
+1.  利用增强的 AI 资产发现来清点所有外部暴露的 AI 模型、API 和开发工具。确保这些资产被包括在漏洞管理和访问控制计划中。
+2.  利用后量子密码学检测开始编目 PQC 算法的使用情况，为未来的迁移和合规工作形成基线，随着标准的巩固。
+3.  将 CTI 仪表板的发现结果纳入现有的威胁情报工作流程中，以用外部数据为内部警报提供上下文。
+
+对于不使用 ImmuniWeb 的组织，公告强调了手动计算 AI/ML 资产和跟踪其攻击面管理流程中 PQC 采用情况的关键需求。
+
+## 参考资料
+- ImmuniWeb 在 2026 年第一季度带来 AI 升级、后量子检测等功能。Help Net Security. https://www.helpnetsecurity.com/2026/04/17/immuniweb-updates-q1-2026/
