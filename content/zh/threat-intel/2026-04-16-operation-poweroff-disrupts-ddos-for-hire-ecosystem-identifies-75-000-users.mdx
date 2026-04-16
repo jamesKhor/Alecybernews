@@ -1,0 +1,49 @@
+---
+title: 'Operation PowerOFF 破坏 DDoS-for-Hire 生态系统，识别 75,000 用户'
+slug: >-
+  2026-04-16-operation-poweroff-disrupts-ddos-for-hire-ecosystem-identifies-75-000-users
+date: '2026-04-16'
+excerpt: >-
+  在 Operation PowerOFF 中，执法部门查封了 53 个与 DDoS-for-hire 服务相关的域名，并识别了这些平台的超过 75,000
+  名用户，破坏了一个主要的网络犯罪即服务来源。
+category: threat-intel
+tags:
+  - ddos
+  - law-enforcement
+  - cybercrime
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/operation-poweroff-identifies-75k-ddos-users-takes-down-53-domains/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-operation-poweroff-disrupts-ddos-for-hire-ecosystem-identifies-75-000-users
+severity: high
+---
+## 执行摘要
+由欧洲刑警组织协调的21个国家的执法机构破坏了分布式拒绝服务（DDoS）出租生态系统的一个重要部分。最新阶段的Operation PowerOFF行动于2026年4月13日执行，导致53个用于出售或协助DDoS攻击服务的互联网域名被查封。更关键的是，调查人员识别了超过75,000名这些非法平台的用户，为购买或使用网络犯罪即服务工具的个人创建了大量情报库。
+
+## 技术分析
+该行动针对所谓的“启动器”或“压力器”服务的基础设施，这些服务将自己标榜为合法的网络测试工具，但主要用于收费发起破坏性的DDoS攻击。根据欧洲刑警组织的说法，被查封的域名对于这些服务的指挥与控制（C2）和支付基础设施至关重要。通过控制这些域名，当局切断了这些平台的公共访问点，阻止现有客户发起新的攻击并停止新注册。此次行动的技术机制是域名查封，将地址重定向到由执法机构控制的页面。识别75,000名用户可能是通过对先前行动阶段查封的后端服务器和数据库进行取证分析，或通过从域名注册商和托管提供商获得的订阅者记录来实现的。
+
+## 入侵指标
+目前没有识别出任何入侵指标。该行动侧重于基础设施查封，而不是发布与个别攻击相关的特定恶意软件哈希值或IP地址。
+
+## 战术、技术与程序
+DDoS出租服务遵循一致的商业模式。客户注册并支付费用，通常使用加密货币，订阅提供不同攻击持续时间、带宽和目标计数的等级。服务通常提供一个基于网络的界面或API，用户可以在其中输入目标的IP地址或URL。然后平台的后端，通常是被控制的设备或放大反射服务器网络的僵尸网络，执行攻击。这种模式被称为DDoS即服务（DaaS），极大地降低了网络犯罪的进入门槛，使技术技能有限的个人也能发起能够摧毁网站、在线服务和网络基础设施的攻击。
+
+## 威胁行为者背景
+Operation PowerOFF是一项始于2022年的持续的、协调的国际努力。它不针对单一的威胁行为者群体，而是针对整个使DDoS攻击成为可能的商业生态系统。该行动的先前迭代导致了服务管理员的逮捕和数百个域名的查封。在这一波中识别出的用户不一定是复杂的网络犯罪分子；他们从不满的个人和游戏玩家到黑客活动家和潜在的入门级罪犯不等。识别出的用户规模—75,000—突显了对这些非法服务的普遍需求。该行动涉及包括美国、英国、德国、荷兰和澳大利亚在内的国家的当局。
+
+## 缓解措施与建议
+组织应保持强大的DDoS缓解策略，包括：
+*   与能够吸收和清除攻击流量的基于云的DDoS保护服务签订合同。
+*   实施网络架构最佳实践，如冗余和速率限制。
+*   拥有一个包括DDoS攻击期间和之后的通信协议的事件响应计划。
+*   监控网络流量，寻找异常峰值或表明攻击的模式。
+对于个人而言，这一行动是一个鲜明的提醒，使用“启动器”服务进行任何未经授权的测试自己资产以外的目的在大多数司法管辖区是非法的，可能会导致刑事指控、罚款和监禁。
+
+## 参考资料
+*   Europol. (2026, April 15). Operation PowerOFF: 53 domains seized in fight against DDoS-for-hire services. Retrieved from https://www.europol.europa.eu/media-press/newsroom/news/operation-poweroff-53-domains-seized-in-fight-against-ddos-for-hire-services
+*   BleepingComputer. (2026, April 15). Operation PowerOFF identifies 75k DDoS users, takes down 53 domains. Retrieved from https://www.bleepingcomputer.com/news/security/operation-poweroff-identifies-75k-ddos-users-takes-down-53-domains/

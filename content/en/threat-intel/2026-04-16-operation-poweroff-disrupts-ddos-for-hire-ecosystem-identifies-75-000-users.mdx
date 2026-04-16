@@ -1,0 +1,50 @@
+---
+title: 'Operation PowerOFF Disrupts DDoS-for-Hire Ecosystem, Identifies 75,000 Users'
+slug: >-
+  2026-04-16-operation-poweroff-disrupts-ddos-for-hire-ecosystem-identifies-75-000-users
+date: '2026-04-16'
+excerpt: >-
+  Law enforcement in Operation PowerOFF seized 53 domains linked to
+  DDoS-for-hire services and identified over 75,000 users of these platforms,
+  disrupting a major source of cybercrime-as-a-service.
+category: threat-intel
+tags:
+  - ddos
+  - law-enforcement
+  - cybercrime
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/operation-poweroff-identifies-75k-ddos-users-takes-down-53-domains/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-operation-poweroff-disrupts-ddos-for-hire-ecosystem-identifies-75-000-users
+severity: high
+---
+## Executive Summary
+Law enforcement agencies across 21 countries, coordinated by Europol, have disrupted a significant segment of the distributed denial-of-service (DDoS)-for-hire ecosystem. The latest phase of Operation PowerOFF, executed on April 13, 2026, resulted in the seizure of 53 internet domains used to sell or facilitate DDoS attack services. More critically, investigators identified over 75,000 users of these illicit platforms, creating a substantial intelligence repository on individuals who have purchased or used cybercrime-as-a-service tools.
+
+## Technical Analysis
+The operation targeted the infrastructure of so-called "booter" or "stresser" services, which market themselves as legitimate network testing tools but are primarily used to launch debilitating DDoS attacks for a fee. According to Europol, the seized domains were central to the command-and-control (C2) and payment infrastructure of these services. By taking control of these domains, authorities have severed the public-facing access points for these platforms, preventing existing customers from launching new attacks and halting new registrations. The technical mechanism of the takedown was a domain seizure, redirecting the addresses to a law enforcement-controlled page. The identification of 75,000 users was likely achieved through forensic analysis of backend servers and databases seized in prior phases of the operation or through subscriber records obtained from the domain registrars and hosting providers.
+
+## Indicators of Compromise
+None identified at this time. The operation focused on infrastructure seizure rather than the release of specific malware hashes or IP addresses associated with individual attacks.
+
+## Tactics, Techniques & Procedures
+The DDoS-for-hire services follow a consistent commercial model. Customers register and pay, often using cryptocurrencies, for subscription tiers that offer varying attack durations, bandwidth, and target counts. The services typically provide a web-based interface or an API where users input a target's IP address or URL. The platform's backend, often a botnet of compromised devices or a network of amplified reflection servers, then executes the attack. This model, known as DDoS-as-a-Service (DaaS), dramatically lowers the barrier to entry for cybercrime, enabling individuals with minimal technical skill to launch attacks capable of taking down websites, online services, and network infrastructure.
+
+## Threat Actor Context
+Operation PowerOFF is an ongoing, coordinated international effort that began in 2022. It does not target a single threat actor group but the entire commercial ecosystem that enables DDoS attacks. Previous iterations of the operation have led to arrests of service administrators and the seizure of hundreds of domains. The users identified in this wave are not necessarily sophisticated cybercriminals; they range from disgruntled individuals and gamers to hacktivists and potential entry-level criminals. The scale of identified users—75,000—underscores the pervasive demand for these illegal services. The operation involved authorities from countries including the United States, United Kingdom, Germany, Netherlands, and Australia, among others.
+
+## Mitigations & Recommendations
+Organizations should maintain robust DDoS mitigation strategies, including:
+*   Contracting with a cloud-based DDoS protection service that can absorb and scrub attack traffic.
+*   Implementing network architecture best practices, such as redundancy and rate limiting.
+*   Having an incident response plan that includes communication protocols for during and after a DDoS attack.
+*   Monitoring network traffic for unusual spikes or patterns indicative of an attack.
+For individuals, the action serves as a stark reminder that using "booter" services for any purpose other than authorized testing of one's own assets is illegal in most jurisdictions and can lead to criminal charges, fines, and imprisonment.
+
+## References
+*   Europol. (2026, April 15). Operation PowerOFF: 53 domains seized in fight against DDoS-for-hire services. Retrieved from https://www.europol.europa.eu/media-press/newsroom/news/operation-poweroff-53-domains-seized-in-fight-against-ddos-for-hire-services
+*   BleepingComputer. (2026, April 15). Operation PowerOFF identifies 75k DDoS users, takes down 53 domains. Retrieved from https://www.bleepingcomputer.com/news/security/operation-poweroff-identifies-75k-ddos-users-takes-down-53-domains/
