@@ -1,0 +1,61 @@
+---
+title: Fake Adobe Reader Downloads Deploy ScreenConnect via In-Memory Loader
+slug: >-
+  2026-04-16-fake-adobe-reader-downloads-deploy-screenconnect-via-in-memory-loader
+date: '2026-04-16'
+excerpt: >-
+  A new campaign delivers ConnectWise ScreenConnect by masquerading malware as
+  an Adobe Acrobat Reader installer, using advanced in-memory execution and
+  defense evasion to avoid detection.
+category: malware
+tags:
+  - malware-delivery
+  - defense-evasion
+  - screenconnect
+  - social-engineering
+language: en
+source_urls:
+  - >-
+    https://cybersecuritynews.com/fake-adobe-reader-download-delivers-screenconnect/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-fake-adobe-reader-downloads-deploy-screenconnect-via-in-memory-loader
+severity: high
+---
+## Executive Summary
+A newly documented malware campaign is delivering the legitimate ConnectWise ScreenConnect remote access tool via a sophisticated loader that impersonates an Adobe Acrobat Reader installer. The attack chain, reported by CyberSecurity News, relies on social engineering to initiate a multi-stage process that executes the final ScreenConnect payload entirely in memory, leaving minimal forensic artifacts on disk. This technique allows threat actors to establish persistent remote access while evading traditional signature-based detection.
+
+## Technical Analysis
+The attack begins with a user downloading what appears to be a legitimate Adobe Acrobat Reader installer, typically named `AcroRdrDCxxxxx_en_US.exe`. This executable is, in fact, a malicious loader. Upon execution, the loader performs several defense evasion maneuvers. It first checks for the presence of a debugger or analysis environment. If the coast is clear, it proceeds to decrypt and load a secondary payload directly into the memory space of its own process.
+
+This secondary payload is a fully functional ScreenConnect client, configured to connect to an attacker-controlled server. Crucially, the ScreenConnect binaries are never written to the victim's file system. Instead, they are fetched, decrypted, and reflectively loaded within the memory of the initial loader process. The loader further attempts to masquerade its process name and may attempt privilege escalation to ensure persistence and broader system access. The use of a legitimate, signed remote administration tool like ScreenConnect provides the attackers with powerful remote control capabilities while potentially bypassing application allow-listing policies that trust known software.
+
+## Indicators of Compromise
+None identified at this time. The specific file hashes, network indicators, and attacker-controlled ScreenConnect server addresses were not provided in the source material. The primary initial vector is a file masquerading as an Adobe Acrobat Reader installer, which may have a name following the pattern `AcroRdrDC[version]_en_US.exe`.
+
+## Tactics, Techniques & Procedures
+The campaign employs a range of techniques mapped to the MITRE ATT&CK framework:
+- **T1566.002 (Phishing: Spearphishing Link):** The initial lure is a fake Adobe Reader download.
+- **T1204.002 (User Execution: Malicious File):** Execution relies on the user running the downloaded installer.
+- **T1140 (Deobfuscate/Decode Files or Information):** The loader decrypts subsequent payloads.
+- **T1620 (Reflective Code Loading):** The ScreenConnect client is loaded directly into memory without touching disk.
+- **T1036 (Masquerading):** The malicious loader impersonates a legitimate Adobe executable.
+- **T1055 (Process Injection):** The final payload is injected into the loader's own process memory.
+- **T1218 (System Binary Proxy Execution):** Abuse of the legitimate, signed ScreenConnect binary for malicious purposes.
+- **T1078 (Valid Accounts):** The established ScreenConnect session provides the attacker with valid credentials on the victim system.
+
+## Threat Actor Context
+The source material does not attribute this campaign to a known threat actor or group. The tactics are consistent with financially motivated actors or initial access brokers seeking to deploy flexible remote access tools for follow-on activity, such as data theft or ransomware deployment. The choice of ScreenConnect, a tool commonly used in legitimate IT administration, suggests an intent to blend in with normal network traffic and avoid triggering security alerts associated with more notorious remote access trojans (RATs).
+
+## Mitigations & Recommendations
+Organizations should implement a defense-in-depth strategy to counter this and similar in-memory loader campaigns. Technical controls should include:
+- **Application Allow-listing:** Restrict execution to pre-approved, signed applications only. This can prevent the initial loader from running, even if it is downloaded.
+- **Enhanced Endpoint Detection and Response (EDR):** Deploy EDR solutions capable of detecting reflective loading, process hollowing, and other in-memory execution techniques.
+- **Network Segmentation and Monitoring:** Monitor for outbound connections to unknown IP addresses and domains, and restrict outbound traffic from workstations to only necessary services.
+- **User Training:** Educate users on the risks of downloading software from unofficial sources and to verify the authenticity of software installers, especially for common applications like Adobe Reader.
+- **Privilege Management:** Enforce the principle of least privilege to limit the impact of privilege escalation attempts by the loader.
+- **Threat Hunting:** Proactively hunt for processes with names mimicking legitimate software (e.g., Adobe) but exhibiting anomalous behavior, such as making network connections to non-standard endpoints.
+
+## References
+- CyberSecurity News: [Fake Adobe Reader Download Delivers ScreenConnect Through Stealthy In-Memory Loader](https://cybersecuritynews.com/fake-adobe-reader-download-delivers-screenconnect/)

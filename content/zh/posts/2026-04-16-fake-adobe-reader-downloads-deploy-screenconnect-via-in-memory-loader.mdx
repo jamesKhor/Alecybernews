@@ -1,0 +1,60 @@
+---
+title: 假冒Adobe Reader下载通过内存加载器部署ScreenConnect
+slug: >-
+  2026-04-16-fake-adobe-reader-downloads-deploy-screenconnect-via-in-memory-loader
+date: '2026-04-16'
+excerpt: >-
+  一项新活动通过伪装成Adobe Acrobat Reader安装程序的恶意软件来传递ConnectWise
+  ScreenConnect，使用高级内存执行和防御规避技术以避免检测。
+category: malware
+tags:
+  - malware-delivery
+  - defense-evasion
+  - screenconnect
+  - social-engineering
+language: zh
+source_urls:
+  - >-
+    https://cybersecuritynews.com/fake-adobe-reader-download-delivers-screenconnect/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-fake-adobe-reader-downloads-deploy-screenconnect-via-in-memory-loader
+severity: high
+---
+## 执行摘要
+一份新记录的恶意软件活动通过一个复杂的加载器分发合法的ConnectWise ScreenConnect远程访问工具，该加载器冒充Adobe Acrobat Reader安装程序。据CyberSecurity News报道，攻击链依赖于社交工程启动一个多阶段过程，该过程在内存中完全执行最终的ScreenConnect有效载荷，使磁盘上的取证痕迹最小化。这种技术允许威胁行为者建立持久的远程访问，同时逃避传统的基于签名的检测。
+
+## 技术分析
+攻击始于用户下载看似合法的Adobe Acrobat Reader安装程序，通常命名为`AcroRdrDCxxxxx_en_US.exe`。实际上，这个可执行文件是一个恶意加载器。执行后，加载器执行几个防御规避操作。它首先检查是否存在调试器或分析环境。如果一切正常，它继续解密并直接加载一个二级有效载荷到其自身进程的内存空间。
+
+这个二级有效载荷是一个完全功能的ScreenConnect客户端，配置为连接到攻击者控制的服务器。关键的是，ScreenConnect二进制文件从未写入受害者的文件系统。相反，它们被获取、解密，并在初始加载器进程的内存中反射性加载。加载器进一步尝试伪装其进程名称，并可能尝试提升权限以确保持久性和更广泛的系统访问。使用像ScreenConnect这样的合法、签名的远程管理工具为攻击者提供了强大的远程控制能力，同时可能绕过信任已知软件的应用程序允许列表策略。
+
+## 入侵指标
+目前没有识别出任何入侵指标。源材料中没有提供特定的文件哈希值、网络指标和攻击者控制的ScreenConnect服务器地址。主要的初始向量是一个伪装成Adobe Acrobat Reader安装程序的文件，其名称可能遵循`AcroRdrDC[版本]_en_US.exe`的模式。
+
+## 战术、技术与程序
+该活动采用了与MITRE ATT&CK框架映射的一系列技术：
+- **T1566.002（钓鱼：鱼叉式钓鱼链接）：**最初的诱饵是一个假冒的Adobe Reader下载。
+- **T1204.002（用户执行：恶意文件）：**执行依赖于用户运行下载的安装程序。
+- **T1140（解混淆/解码文件或信息）：**加载器解密后续的有效载荷。
+- **T1620（反射式代码加载）：**ScreenConnect客户端直接加载到内存中，不接触磁盘。
+- **T1036（伪装）：**恶意加载器冒充合法的Adobe可执行文件。
+- **T1055（进程注入）：**最终有效载荷注入到加载器自己的进程内存中。
+- **T1218（系统二进制代理执行）：**滥用合法、签名的ScreenConnect二进制文件用于恶意目的。
+- **T1078（有效账户）：**建立的ScreenConnect会话为攻击者提供了受害者系统上的有效凭证。
+
+## 威胁行为者背景
+源材料没有将此活动归因于已知的威胁行为者或团体。这些战术与寻求部署灵活远程访问工具以进行后续活动（如数据盗窃或勒索软件部署）的以财务为动机的行为者或初始访问经纪人一致。选择ScreenConnect，这是一个在合法IT管理中常用的工具，表明有意与正常网络流量混合，避免触发与更臭名昭著的远程访问木马（RATs）相关的安全警报。
+
+## 缓解措施与建议
+组织应实施深度防御策略，以应对此类内存加载器活动。技术控制应包括：
+- **应用程序允许列表：**将执行限制在预先批准的签名应用程序上。这可以阻止初始加载器运行，即使它被下载。
+- **增强型端点检测和响应（EDR）：**部署能够检测反射性加载、进程挖空和其他内存执行技术的EDR解决方案。
+- **网络分段和监控：**监控与未知IP地址和域名的出站连接，并限制工作站的出站流量仅用于必要的服务。
+- **用户培训：**教育用户了解从不官方来源下载软件的风险，并验证软件安装程序的真实性，特别是对于像Adobe Reader这样的常见应用程序。
+- **权限管理：**执行最小权限原则，以限制加载器的权限提升尝试的影响。
+- **威胁狩猎：**主动寻找模仿合法软件（例如Adobe）名称但表现出异常行为的进程，例如与非标准端点建立网络连接。
+
+## 参考资料
+- CyberSecurity News：[Fake Adobe Reader Download Delivers ScreenConnect Through Stealthy In-Memory Loader](https://cybersecuritynews.com/fake-adobe-reader-download-delivers-screenconnect/)
