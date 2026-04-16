@@ -1,0 +1,65 @@
+---
+title: UAC-0247 Threat Actor Targets Ukrainian Hospitals and Government with
+slug: >-
+  2026-04-16-uac-0247-threat-actor-targets-ukrainian-hospitals-and-government-with-data-steal
+date: '2026-04-16'
+excerpt: >-
+  The UAC-0247 threat actor is actively targeting Ukrainian municipal healthcare
+  and government bodies, deploying malware to steal browser data, WhatsApp
+  sessions, and credentials while moving laterally within networks.
+category: threat-intel
+tags:
+  - uac-0247
+  - ukraine
+  - data theft
+  - malware
+  - healthcare
+language: en
+source_urls:
+  - >-
+    https://cybersecuritynews.com/new-uac-0247-campaign-steals-browser-and-whatsapp-data/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-uac-0247-threat-actor-targets-ukrainian-hospitals-and-government-with-data-steal
+severity: high
+threat_actor: UAC-0247
+threat_actor_origin: Unknown
+affected_sectors:
+  - Healthcare
+  - Government
+affected_regions:
+  - Ukraine
+---
+## Executive Summary
+The UAC-0247 threat actor is conducting an active campaign targeting Ukrainian clinical hospitals, emergency ambulance services, and local government bodies to steal sensitive data from web browsers and WhatsApp. According to CyberSecurity News, the campaign has been ongoing since early 2026, with attackers focusing on lateral movement and credential harvesting within compromised networks. The exact initial infection vector remains unclear, but the operation demonstrates a persistent focus on critical civilian infrastructure.
+
+## Technical Analysis
+The campaign's technical specifics are not fully detailed in the available source. However, the report indicates that the malware deployed by UAC-0247 is designed to extract data from internet browsers and the WhatsApp desktop application. This typically involves stealing session cookies, authentication tokens, saved credentials, and local message databases, which can grant attackers persistent access to accounts even without passwords. The threat actor's ability to move "quietly through compromised networks" suggests the use of living-off-the-land techniques and tools for lateral movement, such as PowerShell, Windows Management Instrumentation (WMI), or stolen credentials to access additional systems. The primary impact is data theft and persistent network access, rather than immediate disruptive activity like ransomware.
+
+## Indicators of Compromise
+None identified at this time. The source report does not provide specific file hashes, domain names, or IP addresses associated with the UAC-0247 campaign.
+
+## Tactics, Techniques & Procedures
+Based on the described behavior, UAC-0247 likely employs several common techniques:
+*   **Initial Access:** The vector is unspecified but could involve spear-phishing or exploitation of known vulnerabilities in public-facing applications.
+*   **Execution & Persistence:** Likely uses executable payloads or script-based execution to establish a foothold on victim machines.
+*   **Credential Access:** Steals credentials and session data from browsers (e.g., Chrome, Edge) and the WhatsApp desktop client.
+*   **Lateral Movement:** Actively moves within the network using legitimate administrative tools and stolen credentials to access additional systems, particularly targeting sensitive data stores.
+*   **Collection:** Focuses on gathering authentication material and sensitive communications data from messaging platforms.
+
+## Threat Actor Context
+UAC-0247 is a threat cluster currently active against Ukrainian targets. The naming convention "UAC" (Ukraine Actor Cluster) is commonly used by cybersecurity researchers to track groups operating within or against Ukrainian entities. The origin and potential affiliation of UAC-0247—whether it is a state-sponsored, financially motivated, or hacktivist group—are not specified in the source material. Its sustained focus on healthcare and government sectors in Ukraine aligns with a pattern of cyber operations targeting critical national infrastructure during the ongoing conflict, though a direct link to geopolitical events cannot be confirmed without further evidence.
+
+## Mitigations & Recommendations
+Organizations, especially in the healthcare and government sectors in affected regions, should implement the following measures:
+*   Enforce strong, unique passwords and multi-factor authentication (MFA) on all accounts, particularly for administrative and email access.
+*   Segment networks to limit lateral movement, ensuring critical systems like patient databases and administrative networks are isolated.
+*   Monitor for unusual network authentication events and lateral movement using tools like PsExec, WMI, and RDP from unexpected sources.
+*   Implement application allowlisting to prevent the execution of unauthorized binaries and scripts.
+*   Regularly update and patch all software, especially public-facing services and client applications like browsers and messaging platforms.
+*   Conduct security awareness training focused on identifying spear-phishing attempts, which are a common initial vector for such targeted campaigns.
+*   Deploy Endpoint Detection and Response (EDR) solutions configured to detect credential dumping and anomalous process behavior.
+
+## References
+*   [New UAC-0247 Campaign Steals Browser and WhatsApp Data From Hospitals and Governments](https://cybersecuritynews.com/new-uac-0247-campaign-steals-browser-and-whatsapp-data/)

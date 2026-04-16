@@ -1,0 +1,62 @@
+---
+title: UAC-0247 威胁行为者针对乌克兰医院和政府
+slug: >-
+  2026-04-16-uac-0247-threat-actor-targets-ukrainian-hospitals-and-government-with-data-steal
+date: '2026-04-16'
+excerpt: UAC-0247 威胁行为者正在积极针对乌克兰市政医疗保健和政府机构，部署恶意软件以窃取浏览器数据、WhatsApp会话和凭证，同时在网络内部横向移动。
+category: threat-intel
+tags:
+  - uac-0247
+  - ukraine
+  - data theft
+  - malware
+  - healthcare
+language: zh
+source_urls:
+  - >-
+    https://cybersecuritynews.com/new-uac-0247-campaign-steals-browser-and-whatsapp-data/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-16-uac-0247-threat-actor-targets-ukrainian-hospitals-and-government-with-data-steal
+severity: high
+threat_actor: UAC-0247
+threat_actor_origin: Unknown
+affected_sectors:
+  - Healthcare
+  - Government
+affected_regions:
+  - Ukraine
+---
+## 执行摘要
+UAC-0247威胁行为者正在针对乌克兰的临床医院、紧急救护车服务和地方政府机构开展积极活动，目的是从网络浏览器和WhatsApp中窃取敏感数据。根据CyberSecurity News的报道，这场活动自2026年初开始，攻击者专注于在被破坏的网络中进行横向移动和收集凭证。确切的初始感染向量仍然不清楚，但该行动展示了对关键民用基础设施的持续关注。
+
+## 技术分析
+活动的技术细节在可用来源中没有完全详细说明。然而，报告指出，UAC-0247部署的恶意软件旨在从互联网浏览器和WhatsApp桌面应用程序中提取数据。这通常涉及窃取会话cookie、认证令牌、保存的凭证和本地消息数据库，这可以授予攻击者即使没有密码也能持续访问账户的权限。威胁行为者能够“在被破坏的网络中悄然移动”表明使用了土生土长的技术工具进行横向移动，例如PowerShell、Windows Management Instrumentation (WMI)或被盗凭证来访问额外的系统。主要影响是数据盗窃和持续的网络访问，而不是像勒索软件这样的即时破坏性活动。
+
+## 入侵指标
+目前没有识别出任何指标。源报告没有提供与UAC-0247活动相关的特定文件哈希值、域名或IP地址。
+
+## 战术、技术与程序
+根据描述的行为，UAC-0247可能使用几种常见技术：
+*   **初始访问：**向量未指定，但可能涉及鱼叉式网络钓鱼或利用公共应用程序中已知的漏洞。
+*   **执行与持久性：**可能使用可执行有效载荷或基于脚本的执行来在受害者机器上建立立足点。
+*   **凭证访问：**从浏览器（例如Chrome、Edge）和WhatsApp桌面客户端窃取凭证和会话数据。
+*   **横向移动：**积极使用合法的行政工具和被盗凭证在网络中移动，以访问额外的系统，特别是针对敏感数据存储。
+*   **收集：**专注于从消息平台收集认证材料和敏感通信数据。
+
+## 威胁行为者背景
+UAC-0247是一个目前针对乌克兰目标的威胁集群。命名约定“UAC”（Ukraine Actor Cluster）通常由网络安全研究人员用来跟踪在乌克兰境内或针对乌克兰实体运作的团体。UAC-0247的起源和潜在关联——无论是由国家赞助、出于财务动机还是黑客活动家团体——在源材料中未指定。其对乌克兰医疗保健和政府部门的持续关注与在持续冲突期间针对关键国家基础设施的网络行动模式一致，尽管没有进一步证据，无法确认与地缘政治事件的直接联系。
+
+## 缓解措施与建议
+组织，特别是在受影响地区的医疗保健和政府部门，应实施以下措施：
+*   在所有账户上强制执行强大、独特的密码和多因素认证（MFA），特别是对于行政和电子邮件访问。
+*   分割网络以限制横向移动，确保像患者数据库和行政网络这样的关键系统是隔离的。
+*   使用PsExec、WMI和RDP等工具监控来自意外来源的不寻常网络认证事件和横向移动。
+*   实施应用程序允许列表，以防止执行未经授权的二进制文件和脚本。
+*   定期更新和修补所有软件，特别是公共服务和客户端应用程序，如浏览器和消息平台。
+*   进行安全意识培训，重点是识别鱼叉式网络钓鱼企图，这是此类针对性活动常见的初始向量。
+*   部署配置用于检测凭证转储和异常进程行为的端点检测和响应（EDR）解决方案。
+
+## 参考资料
+*   [New UAC-0247 Campaign Steals Browser and WhatsApp Data From Hospitals and Governments](https://cybersecuritynews.com/new-uac-0247-campaign-steals-browser-and-whatsapp-data/)
