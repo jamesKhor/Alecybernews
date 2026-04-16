@@ -274,19 +274,26 @@ function buildDigest(windowHours: number): Digest {
     failedArticlesInRuns += event.failed ?? 0;
   }
 
-  // Health stoplight
-  // 🔴 red  : any run had conclusion=failure/timed_out/startup_failure
-  // 🟡 yellow: runs all succeeded, but counters show trouble (failed
-  //            articles, translation warnings, off-topic rejects)
-  // 🟢 green : all runs succeeded AND no per-article issues
+  // Health stoplight — only REAL problems trigger yellow/red.
+  //
+  // Safety filters WORKING (off-topic rejected, fact-check rejected,
+  // duplicates blocked) are GOOD — they mean the guards caught bad
+  // content before it published. These should NOT degrade the health
+  // indicator. Showing 🟡 for "5 off-topic rejected" confused the
+  // operator on 2026-04-16 — the system was healthy, just filtering.
+  //
+  // 🔴 red    : any pipeline RUN failed (conclusion=failure/timed_out)
+  // 🟡 yellow : runs succeeded, but per-article LLM FAILURES or
+  //             translation quality issues (actual quality problems)
+  // 🟢 green  : all runs OK + no quality issues
+  //
+  // NOT triggers: offTopicRejected, factCheckRejected, duplicatesBlocked
+  // (these are informational — they appear in the Safety Filters section
+  // of the digest but don't change the health emoji)
   let health: Digest["health"];
   if (failure > 0) {
     health = "red";
-  } else if (
-    failedArticlesInRuns > 0 ||
-    translationWarnings > 0 ||
-    offTopicRejected > 0
-  ) {
+  } else if (failedArticlesInRuns > 0 || translationWarnings > 0) {
     health = "yellow";
   } else {
     health = "green";
