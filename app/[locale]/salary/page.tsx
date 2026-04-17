@@ -25,6 +25,7 @@ import {
   CertRecordSchema,
   filterSalaries,
   getLocalized,
+  getLocalizedCert,
   classifyMarket,
   type MarketKey,
   type RoleKey,
@@ -201,9 +202,11 @@ export default async function SalaryPage({ params, searchParams }: PageProps) {
   // this swaps any Chinese-only fields (role / top_tier_note / salary
   // strings) to their `_en` overrides where present. For locale === "zh"
   // the base ZH fields are returned unchanged. This fixes the operator-
-  // reported bug (2026-04-17): "change the language manual to english
-  // still lots of mix of chinese in english version".
+  // reported bugs (2026-04-17 through 2026-04-18): "change the language
+  // manual to english still lots of mix of chinese in english version",
+  // followed by the cert-ROI-table CJK-bleed report (round 3c).
   const localizedData = salaryData.map((r) => getLocalized(r, locale));
+  const localizedCerts = certData.map((r) => getLocalizedCert(r, locale));
 
   // Apply URL-driven filters server-side so the rendered HTML matches
   // the URL state — crawlers + sharing both work without JS.
@@ -256,6 +259,41 @@ export default async function SalaryPage({ params, searchParams }: PageProps) {
       ),
       verdict_split: t("verdict_split"),
       verdict_default: t("verdict_default"),
+      // Round 3c additions — verdicts that were previously falling back
+      // to the generic "See why →" label. Now each has a compact
+      // specific label so the verdict column is informative on its own.
+      verdict_cisp_wins: t("verdict_cisp_wins"),
+      verdict_cissp_oscp_top_tier: t("verdict_cissp_oscp_top_tier"),
+      verdict_cisp_top_china: t("verdict_cisp_top_china"),
+      verdict_cissp_wins_for_salary: t("verdict_cissp_wins_for_salary"),
+      verdict_crisc_wins_for_risk_roles: t("verdict_crisc_wins_for_risk_roles"),
+      verdict_cysa_wins_for_entry: t("verdict_cysa_wins_for_entry"),
+      verdict_dengji_baohu_for_gov_path: t("verdict_dengji_baohu_for_gov_path"),
+      verdict_depends_on_goal: t("verdict_depends_on_goal"),
+      verdict_depends_on_role: t("verdict_depends_on_role"),
+      verdict_gcti_wins_for_cti_career: t("verdict_gcti_wins_for_cti_career"),
+      verdict_gcti_wins_for_salary: t("verdict_gcti_wins_for_salary"),
+      verdict_limited_in_china_market: t("verdict_limited_in_china_market"),
+      verdict_oscp_best_roi_for_pentest: t("verdict_oscp_best_roi_for_pentest"),
+      verdict_oscp_wins_brand_pnpt_wins_value: t(
+        "verdict_oscp_wins_brand_pnpt_wins_value",
+      ),
+      verdict_oscp_wins_for_jobs: t("verdict_oscp_wins_for_jobs"),
+      verdict_oscp_wins_for_self_funders: t(
+        "verdict_oscp_wins_for_self_funders",
+      ),
+      verdict_oscp_wins_technical_ceh_more_recognized: t(
+        "verdict_oscp_wins_technical_ceh_more_recognized",
+      ),
+      verdict_pnpt_wins_value: t("verdict_pnpt_wins_value"),
+      verdict_split_by_career_path: t("verdict_split_by_career_path"),
+      verdict_start_with_a_tier: t("verdict_start_with_a_tier"),
+      verdict_both_valid_different_ceiling: t(
+        "verdict_both_valid_different_ceiling",
+      ),
+      verdict_cisp_pte_for_domestic_market: t(
+        "verdict_cisp_pte_for_domestic_market",
+      ),
     },
   };
 
@@ -470,7 +508,7 @@ export default async function SalaryPage({ params, searchParams }: PageProps) {
         )}
 
         {/* Cert ROI table — separate section, anchor target from card chips */}
-        <CertROITable records={certData} labels={certLabels} />
+        <CertROITable records={localizedCerts} labels={certLabels} />
 
         {/* Methodology — earned-trust signal, not just legal disclaimer */}
         <section

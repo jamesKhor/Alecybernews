@@ -14,11 +14,12 @@
     "verdict": "cissp_wins",
     "verdict_reason": "国际认可度更高，甲方与外资公司硬性要求，跳槽谈薪筹码更足",
     "category": "management_certs",
-    "cert_a_cost_local_en": "≈ ¥4,000 exam fee + ¥12,000-20,000 training",
-    "cert_b_cost_local_en": "≈ ¥3,500 exam fee + ¥10,000-15,000 training",
-    "cert_a_salary_boost_en": "≈ ¥40-60k average annual raise; required for foreign-enterprise / MNC security management roles",
-    "cert_b_salary_boost_en": "≈ ¥30-50k average annual raise; preferred for in-house security manager roles",
-    "verdict_reason_en": "CISSP has stronger international recognition — essential for foreign enterprises, MNCs, or overseas career moves. CISM focuses more on security management and audit, suited to state-owned enterprise / bank security management tracks. If staying within China's in-house security market, CISM has better ROI; if considering overseas relocation, CISSP is non-negotiable."
+    "cert_a_cost_local_en": "¥5,400 exam fee; with training ≈ ¥15,000-35,000",
+    "cert_b_cost_local_en": "¥4,200 exam fee (ISACA member rate)",
+    "cert_a_salary_boost_en": "+22% average salary increase",
+    "cert_b_salary_boost_en": "+18% average salary increase",
+    "verdict_reason_en": "Higher international recognition; buy-side and foreign-enterprise employers require it; stronger leverage in salary negotiations.",
+    "angle_en": "Management-track cert showdown: which is easier to leverage into a CISO promotion?"
   },
   {
     "slug": "cissp-vs-cism-sg",
@@ -35,11 +36,12 @@
     "verdict": "cissp_wins",
     "verdict_reason": "CISSP 在 MAS/GovTech 职位描述出现频率是 CISM 的 3 倍",
     "category": "management_certs",
-    "cert_a_cost_local_en": "≈ SGD 950 exam fee (official); self-study possible with no training",
-    "cert_b_cost_local_en": "≈ SGD 760 exam fee + SGD 1,500-3,000 training",
-    "cert_a_salary_boost_en": "≈ SGD 15-25k/year raise; required for most senior security engineer JD postings",
-    "cert_b_salary_boost_en": "≈ SGD 10-18k/year raise; appears in security manager JD postings",
-    "verdict_reason_en": "In Singapore, CISSP is the absolute mainstream — it's listed as the top preferred cert in 80%+ of senior security engineer JDs. CISM is more relevant for security manager / director roles but still sits behind CISSP in frequency. For IC track, CISSP wins decisively; for management track with 5+ years experience, adding CISM to CISSP becomes meaningful."
+    "cert_a_cost_local_en": "SGD 1,020 exam fee",
+    "cert_b_cost_local_en": "SGD 820 exam fee (ISACA member rate)",
+    "cert_a_salary_boost_en": "+24% average salary increase",
+    "cert_b_salary_boost_en": "+16% average salary increase",
+    "verdict_reason_en": "CISSP appears 3× more frequently than CISM in MAS / GovTech job descriptions.",
+    "angle_en": "Singapore security management: CISSP or CISM — which to tackle first?"
   },
   {
     "slug": "cisp-vs-cissp-china",
@@ -56,11 +58,12 @@
     "verdict": "split",
     "verdict_reason": "在国内甲方/政府做等保项目必须有 CISP；想去外企、MNC 或谋求 CISO 职位必须有 CISSP。战略最优解：先考 CISP（12–18 个月），再攻 CISSP（薪资天花板直接翻倍）",
     "category": "china_vs_international",
-    "cert_a_cost_local_en": "¥12,800 (official authorized training ¥8,800 + exam registration ¥4,000; with ~25% discount, ≈ ¥9,600)",
-    "cert_b_cost_local_en": "¥5,400 (exam fee; with optional training ¥15,000-35,000)",
-    "cert_a_salary_boost_en": "CISP holders average salary ¥150k-¥200k (T1 city)",
-    "cert_b_salary_boost_en": "CISSP holders average salary ¥300k-¥500k (T1 city) — roughly 2× CISP",
-    "verdict_reason_en": "For in-house / government / state-owned enterprise projects in China, CISP is mandatory; for foreign enterprise, MNC, or CISO-track roles, CISSP is mandatory. Strategically optimal: take CISP first (12-18 months) then CISSP (salary ceiling effectively doubles)."
+    "cert_a_cost_local_en": "¥12,800 (official authorized training ¥8,800 + exam registration ¥4,000; after discount ≈ ¥9,600)",
+    "cert_b_cost_local_en": "¥5,400 exam fee; with training ≈ ¥15,000-35,000",
+    "cert_a_salary_boost_en": "CISP holders average ¥150-200k/yr (Tier-1 cities)",
+    "cert_b_salary_boost_en": "CISSP holders average ¥300-500k/yr (Tier-1 cities) — nearly 2× CISP",
+    "verdict_reason_en": "For buy-side / government Classified Protection (DJBH) projects in China, CISP is mandatory; for foreign enterprise, MNC, or CISO-track roles, CISSP is mandatory. Strategically optimal: take CISP first (12-18 months), then CISSP — salary ceiling effectively doubles.",
+    "angle_en": "Domestic vs international: CISP and CISSP show a near-2× salary gap"
   },
   {
     "slug": "oscp-vs-ceh-global",
@@ -77,11 +80,12 @@
     "verdict": "oscp_wins",
     "verdict_reason": "OSCP 是实际打靶考试，HR 看到 OSCP 默认你能真的动手；CEH 被认为是背题考试，实际含金量存疑",
     "category": "pentest_certs",
-    "cert_a_cost_local_en": "≈ $1,649 (lab subscription + exam); 90-day lab access; requires 48hr hands-on exam",
-    "cert_b_cost_local_en": "≈ $1,199 (exam) + $850-1,200 optional training; multiple-choice exam",
-    "cert_a_salary_boost_en": "+25-40% salary for pentest roles globally; required in 70%+ of senior pentest JD postings",
-    "cert_b_salary_boost_en": "+10-15% salary; often an HR-level filter cert rather than a true skill differentiator",
-    "verdict_reason_en": "OSCP proves you can actually hack — hiring managers trust it. CEH is a knowledge cert that HR uses for filtering; it doesn't signal hands-on capability. For any real pentest / red team role, OSCP is the right investment. CEH only makes sense if your government / enterprise HR workflow specifically demands it."
+    "cert_a_cost_local_en": "≈ ¥11,900 (90-day lab + exam; community estimates first-pass rate 15-20%)",
+    "cert_b_cost_local_en": "≈ ¥6,800 (with official question bank)",
+    "cert_a_salary_boost_en": "+30% average salary increase",
+    "cert_b_salary_boost_en": "+8% average salary increase",
+    "verdict_reason_en": "OSCP is a real hands-on hacking exam — HR assumes OSCP holders can actually operate. CEH is viewed as a memorization test; its practical weight is questionable.",
+    "angle_en": "Pentest career entry: OSCP's hands-on practice vs CEH's theory-heavy approach"
   },
   {
     "slug": "security-plus-vs-ejpt-entry",
@@ -98,11 +102,12 @@
     "verdict": "security_plus_wins_for_jobs",
     "verdict_reason": "Security+ 是很多公司 JD 的过滤词，能帮你过简历关；eJPT 技术含量更高但不够出名，适合纯技术路线",
     "category": "entry_level_certs",
-    "cert_a_cost_local_en": "≈ $404 exam; broad IT security knowledge coverage",
-    "cert_b_cost_local_en": "≈ $249 exam; pure hands-on junior pentest skills",
-    "cert_a_salary_boost_en": "Entry-level SOC / analyst roles often require Security+; baseline cert for US DoD 8570 compliance roles",
-    "cert_b_salary_boost_en": "Signals hands-on entry pentest ability; pairs well with OSCP preparation",
-    "verdict_reason_en": "Security+ wins if you're going into broad SOC / analyst / GRC roles — it's the baseline HR requires. eJPT wins if you're specifically on the red-team / pentest track — it's genuine hands-on skill. If budget only allows one and career direction is still undecided, take Security+ first."
+    "cert_a_cost_local_en": "≈ ¥2,800 (exam fee)",
+    "cert_b_cost_local_en": "≈ ¥1,450 (includes lab)",
+    "cert_a_salary_boost_en": "High HR recognition; resume screening pass rate +40%",
+    "cert_b_salary_boost_en": "Higher technical recognition but lower HR recognition",
+    "verdict_reason_en": "Security+ is a job-description filter word for many companies — it helps you pass the resume screen. eJPT has more technical substance but less name recognition, better suited to a pure-technical path.",
+    "angle_en": "First cert for a zero-background starter: which one?"
   },
   {
     "slug": "pnpt-vs-oscp-pentest",
@@ -118,7 +123,13 @@
     "cert_b_salary_boost": "业界黄金标准，平均薪资涨幅 +30%",
     "verdict": "oscp_wins_brand_pnpt_wins_value",
     "verdict_reason": "PNPT 性价比极高（TCM Security 出品，课程高质量），OSCP 品牌更响但贵 3.75 倍；预算有限先考 PNPT，再攒钱考 OSCP",
-    "category": "pentest_certs"
+    "category": "pentest_certs",
+    "angle_en": "Pentest newcomer: can PNPT actually challenge OSCP?",
+    "cert_a_cost_local_en": "≈ ¥2,900 (includes full course package)",
+    "cert_b_cost_local_en": "≈ ¥10,800 (90-day lab)",
+    "cert_a_salary_boost_en": "Rising technical reputation, fast growth 2023-2025",
+    "cert_b_salary_boost_en": "Industry gold standard; +30% average salary increase",
+    "verdict_reason_en": "PNPT has exceptional value-for-money (TCM Security produces high-quality courses); OSCP has stronger brand but costs 3.75× more. Budget-constrained: take PNPT first, then save up for OSCP."
   },
   {
     "slug": "cisp-vs-cisaw-china",
@@ -134,7 +145,13 @@
     "cert_b_salary_boost": "平均薪资涨幅 +8%",
     "verdict": "cisp_wins",
     "verdict_reason": "CISP 是中国信息安全行业从业资格最高认证，JD 要求频率远高于 CISAW；CISAW 适合预算不足的入门选手",
-    "category": "china_certs"
+    "category": "china_certs",
+    "angle_en": "China-domestic security practitioners: CISP vs CISAW — what's the actual difference?",
+    "cert_a_cost_local_en": "¥5,000 (mandatory authorized training)",
+    "cert_b_cost_local_en": "¥3,000 (exam fee)",
+    "cert_a_salary_boost_en": "+15% average salary increase",
+    "cert_b_salary_boost_en": "+8% average salary increase",
+    "verdict_reason_en": "CISP is China's highest information-security practitioner credential; it appears in JDs far more frequently than CISAW. CISAW suits budget-constrained entry-level candidates."
   },
   {
     "slug": "cisp-pte-vs-oscp-china",
@@ -150,7 +167,13 @@
     "cert_b_salary_boost": "外企/安全公司平均薪资涨幅 +30%",
     "verdict": "split_by_career_path",
     "verdict_reason": "在国内做等保/合规/政府项目选 CISP-PTE；想去外企渗透岗或出海选 OSCP；两者技术含量都真实",
-    "category": "china_vs_international"
+    "category": "china_vs_international",
+    "angle_en": "China-domestic pentest cert CISP-PTE vs international OSCP: buy-side or technical track?",
+    "cert_a_cost_local_en": "¥8,000 (mandatory training + exam)",
+    "cert_b_cost_local_en": "≈ ¥10,800 (90-day lab)",
+    "cert_a_salary_boost_en": "Required for government / state-owned enterprise project bidding; salary uplift depends on the project",
+    "cert_b_salary_boost_en": "Foreign enterprise / security-firm roles: +30% average salary increase",
+    "verdict_reason_en": "For China Classified Protection (DJBH) / compliance / government projects, choose CISP-PTE. For foreign-enterprise pentest roles or overseas relocation, choose OSCP. Both carry real technical substance."
   },
   {
     "slug": "cert-tier-list-sg-jobhunt",
@@ -166,7 +189,15 @@
     "cert_b_salary_boost": "A梯：Security+/CySA+/CEH — 过简历筛选有效",
     "verdict": "cissp_oscp_top_tier",
     "verdict_reason": "S梯：CISSP（管理）/OSCP（技术）；A梯：Security+/CySA+；B梯：CEH/eLearnSecurity；C梯：供应商认证（AWS/Azure，纯安全岗价值有限）",
-    "category": "tier_list"
+    "category": "tier_list",
+    "cert_a_en": "S/A/B/C tier list (Singapore job search)",
+    "cert_b_en": "Actual JD frequency analysis",
+    "angle_en": "Singapore security JD analysis: which certs actually land you an interview?",
+    "cert_a_cost_local_en": "Tier analysis (not a purchase recommendation)",
+    "cert_b_cost_local_en": "Data source: NodeFlair + LinkedIn SG job analysis",
+    "cert_a_salary_boost_en": "S-tier: CISSP / CISM / OSCP — strongest leverage in salary negotiation",
+    "cert_b_salary_boost_en": "A-tier: Security+ / CySA+ / CEH — effective for resume screening",
+    "verdict_reason_en": "S-tier: CISSP (management) / OSCP (technical); A-tier: Security+ / CySA+; B-tier: CEH / eLearnSecurity; C-tier: vendor certs (AWS / Azure — limited value for pure security roles)."
   },
   {
     "slug": "cert-tier-list-china-jobhunt",
@@ -182,7 +213,15 @@
     "cert_b_salary_boost": "A梯：CISP-PTE/等保测评师 — 乙方/项目岗必备",
     "verdict": "cisp_top_china",
     "verdict_reason": "S梯：CISP（通用）/CISSP（外企）；A梯：CISP-PTE/等保测评师；B梯：CISAW/Security+；C梯：未授权/过时认证",
-    "category": "tier_list"
+    "category": "tier_list",
+    "cert_a_en": "S/A/B/C tier list (China job search)",
+    "cert_b_en": "Actual JD frequency analysis",
+    "angle_en": "China security JD big-data analysis: which cert is most demanded on Boss Zhipin?",
+    "cert_a_cost_local_en": "Tier analysis (not a purchase recommendation)",
+    "cert_b_cost_local_en": "Data source: Boss Zhipin / Liepin security JD analysis",
+    "cert_a_salary_boost_en": "S-tier: CISP / CISSP — mandatory for mid-to-senior roles",
+    "cert_b_salary_boost_en": "A-tier: CISP-PTE / DJBH Assessor — required for sell-side / project roles",
+    "verdict_reason_en": "S-tier: CISP (general) / CISSP (foreign enterprise); A-tier: CISP-PTE / DJBH Assessor; B-tier: CISAW / Security+; C-tier: unauthorized or outdated certifications."
   },
   {
     "slug": "cert-roi-analysis",
@@ -198,7 +237,13 @@
     "cert_b_salary_boost": "平均涨幅 +8%，ROI 明显低于 OSCP",
     "verdict": "oscp_best_roi_for_pentest",
     "verdict_reason": "OSCP 考过后新加坡渗透岗起薪 SGD 70k，14 个月收回成本；CEH 认可度下滑，ROI 不如 Security+（$392）",
-    "category": "roi_analysis"
+    "category": "roi_analysis",
+    "angle_en": "Same cost, which cert pays back fastest? Let the numbers speak.",
+    "cert_a_cost_local_en": "≈ ¥10,800 (one-time)",
+    "cert_b_cost_local_en": "≈ ¥6,800 (EC-Council official)",
+    "cert_a_salary_boost_en": "Singapore junior pentest starting salary SGD 70k; +30% post-cert average uplift",
+    "cert_b_salary_boost_en": "+8% average uplift; ROI clearly below OSCP",
+    "verdict_reason_en": "After OSCP, Singapore pentest starting salary hits SGD 70k — payback in 14 months. CEH recognition is declining; its ROI is worse than Security+ ($392)."
   },
   {
     "slug": "cissp-vs-cloud-security-certs",
@@ -214,7 +259,13 @@
     "cert_b_salary_boost": "云安全工程师岗平均薪资涨幅 +28%，但适用范围窄",
     "verdict": "depends_on_role",
     "verdict_reason": "做云安全工程师选 AWS Security Specialty（涨幅更大）；做安全架构师/CISO 路线选 CISSP；两者不互斥，高级岗经常要求全有",
-    "category": "management_certs"
+    "category": "management_certs",
+    "angle_en": "CISSP or AWS Security: in the cloud era, which cert is more valuable?",
+    "cert_a_cost_local_en": "≈ ¥4,999 (training + exam)",
+    "cert_b_cost_local_en": "≈ ¥2,200 (exam fee)",
+    "cert_a_salary_boost_en": "+22% average salary increase; broader applicability",
+    "cert_b_salary_boost_en": "Cloud-security-engineer roles: +28% average salary increase; narrower applicability",
+    "verdict_reason_en": "For cloud security engineers, choose AWS Security Specialty (bigger uplift). For security architects / CISO-track roles, choose CISSP. They're not mutually exclusive — senior roles often require both."
   },
   {
     "slug": "blue-team-gcih-vs-cysa-plus",
@@ -230,7 +281,13 @@
     "cert_b_salary_boost": "HR 认知度高，涨幅 +15%，性价比更好",
     "verdict": "cysa_wins_for_entry",
     "verdict_reason": "入门阶段 CySA+ 性价比更高（$392 vs $979）；有 3+ 年经验后 GCIH 含金量大幅提升；蓝队最优路线：Security+ → CySA+ → GCIH",
-    "category": "blue_team_certs"
+    "category": "blue_team_certs",
+    "angle_en": "Blue-team entry: is GCIH or CySA+ more practical?",
+    "cert_a_cost_local_en": "≈ ¥7,100 (GIAC exam fee)",
+    "cert_b_cost_local_en": "≈ ¥2,800 (CompTIA exam fee)",
+    "cert_a_salary_boost_en": "SANS-branded; excellent technical reputation; +20% uplift",
+    "cert_b_salary_boost_en": "Higher HR recognition; +15% uplift; better value for money",
+    "verdict_reason_en": "For entry level, CySA+ has better ROI ($392 vs $979). With 3+ years of experience, GCIH's practical weight rises sharply. Optimal blue-team path: Security+ → CySA+ → GCIH."
   },
   {
     "slug": "entry-path-secplus-to-cissp",
@@ -246,7 +303,15 @@
     "cert_b_salary_boost": "3年后：新加坡渗透测试工程师 SGD 100-140k",
     "verdict": "both_valid_different_ceiling",
     "verdict_reason": "红队路线（Security+ → eJPT → OSCP）3年后薪资天花板更高，但学习难度大；蓝队路线就业机会多 3 倍；根据自己是否喜欢动手打靶来选",
-    "category": "career_path"
+    "category": "career_path",
+    "cert_a_en": "Track A: Security+ → CySA+ → CISSP",
+    "cert_b_en": "Track B: Security+ → eJPT → OSCP",
+    "angle_en": "Two paths into security — blue-team management vs red-team technical. What's the 3-year salary gap?",
+    "cert_a_cost_local_en": "≈ ¥10,700 (all three certs)",
+    "cert_b_cost_local_en": "≈ ¥15,100 (all three certs)",
+    "cert_a_salary_boost_en": "After 3 years: Singapore SOC L2 / Security Analyst SGD 80-110k",
+    "cert_b_salary_boost_en": "After 3 years: Singapore Pentest Engineer SGD 100-140k",
+    "verdict_reason_en": "Red-team track (Security+ → eJPT → OSCP) has a higher salary ceiling after 3 years but greater learning difficulty. Blue-team track has 3× more job openings. Choose based on whether you enjoy hands-on offensive work or broader defensive analysis."
   },
   {
     "slug": "dengji-baohu-assessor-reality",
@@ -262,7 +327,14 @@
     "cert_b_salary_boost": "平均薪资涨幅 +15%，适用范围更广",
     "verdict": "dengji_baohu_for_gov_path",
     "verdict_reason": "等保测评师是政府/国央企信息安全项目的强制要求，需求量稳定但市场小；想进大厂或外企选 CISP；想进体制或央企考评测评师是捷径",
-    "category": "china_certs"
+    "category": "china_certs",
+    "cert_a_en": "DJBH Classified Protection Assessor",
+    "angle_en": "DJBH Assessor: niche but stable — is this cert worth pursuing?",
+    "cert_a_cost_local_en": "¥3,000-5,000 (varies significantly by province)",
+    "cert_b_cost_local_en": "¥5,000 (national standard)",
+    "cert_a_salary_boost_en": "Government / state-owned enterprise assessor roles: ¥120-180k; stable demand",
+    "cert_b_salary_boost_en": "+15% average salary increase; broader applicability",
+    "verdict_reason_en": "DJBH Assessor is mandatory for government / state-owned enterprise information-security projects — stable demand but a small market. For big-tech or foreign enterprises, choose CISP. For a state-institution or central-enterprise career, DJBH Assessor is the shortcut."
   },
   {
     "slug": "cisp-pte-market-demand-2025",
@@ -278,7 +350,13 @@
     "cert_b_salary_boost": "国内渗透岗招聘要求：约 18% JD 提及，但认可度更高",
     "verdict": "cisp_pte_for_domestic_market",
     "verdict_reason": "在国内安全公司/等保项目，CISP-PTE 是显性加分项；想去外企或 Bug Bounty 路线，OSCP 更被认可；2025 年 CISP-PTE 需求稳定但别期待大幅涨薪",
-    "category": "china_certs"
+    "category": "china_certs",
+    "angle_en": "2025 CISP-PTE market-value survey: is it really worth ¥8,000?",
+    "cert_a_cost_local_en": "¥8,000 (mandatory training + exam)",
+    "cert_b_cost_local_en": "≈ ¥10,800 (90-day lab)",
+    "cert_a_salary_boost_en": "China sell-side pentest hiring: listed in ~35% of JDs",
+    "cert_b_salary_boost_en": "China pentest hiring: listed in ~18% of JDs but with higher recognition",
+    "verdict_reason_en": "For China security firms / DJBH projects, CISP-PTE is a visible plus. For foreign enterprise or Bug Bounty tracks, OSCP carries more weight. In 2025 CISP-PTE demand is stable but don't expect big salary jumps from it alone."
   },
   {
     "slug": "security-plus-vs-ejpt-china",
@@ -294,7 +372,13 @@
     "cert_b_salary_boost": "国内 HR 认知度约 10%，但技术社区认可",
     "verdict": "limited_in_china_market",
     "verdict_reason": "国内求职 Security+ 和 eJPT 认知度有限；外企/合资公司 Security+ 有用；纯技术路线 eJPT→OSCP 国际跳槽时价值更大；国内就业优先考 CISP/CISAW",
-    "category": "entry_level_certs"
+    "category": "entry_level_certs",
+    "angle_en": "Job hunting in China: are Security+ and eJPT even useful?",
+    "cert_a_cost_local_en": "≈ ¥2,800 (exam fee)",
+    "cert_b_cost_local_en": "≈ ¥1,450 (includes lab)",
+    "cert_a_salary_boost_en": "Domestic HR recognition ~20% (higher at foreign enterprises)",
+    "cert_b_salary_boost_en": "Domestic HR recognition ~10% but respected in the technical community",
+    "verdict_reason_en": "For domestic China hiring, Security+ and eJPT have limited recognition. Security+ is useful at foreign / joint-venture firms. For a pure-technical path, eJPT → OSCP has higher value when making international moves. For domestic employment, prioritize CISP / CISAW."
   },
   {
     "slug": "cert-path-sg-tier-list-detailed",
@@ -310,7 +394,15 @@
     "cert_b_salary_boost": "初级岗：SGD 55-80k，是入场券",
     "verdict": "start_with_a_tier",
     "verdict_reason": "先用 A 梯（Security+ + CySA+）拿到第一份工作，再存钱升 S 梯；直接冲 S 梯风险高：CISSP 要求 5年工作经验，OSCP 需要扎实基础",
-    "category": "tier_list"
+    "category": "tier_list",
+    "cert_a_en": "Ladder S: CISSP + OSCP",
+    "cert_b_en": "Ladder A: Security+ + CySA+",
+    "angle_en": "Complete Singapore cert path (with costs and timelines)",
+    "cert_a_cost_local_en": "SGD 3,080 (both certs combined)",
+    "cert_b_cost_local_en": "SGD 1,100 (both certs combined)",
+    "cert_a_salary_boost_en": "Mid-level roles: SGD 100-140k; senior roles: SGD 160-200k",
+    "cert_b_salary_boost_en": "Entry-level roles: SGD 55-80k (the entry ticket)",
+    "verdict_reason_en": "Use Ladder A (Security+ + CySA+) to land your first job, save up, then climb to Ladder S. Jumping straight to Ladder S is high-risk: CISSP requires 5 years of work experience, and OSCP demands a solid foundation."
   },
   {
     "slug": "oscp-vs-ceh-china-market",
@@ -326,7 +418,13 @@
     "cert_b_salary_boost": "国内认可度高于国际均值，涨幅 +12%",
     "verdict": "oscp_wins_technical_ceh_more_recognized",
     "verdict_reason": "在中国 CEH 的 HR 认知度比 OSCP 高（更多国内机构办培训）；但技术面试官更看重 OSCP；大厂/安全公司 OSCP 含金量更高",
-    "category": "pentest_certs"
+    "category": "pentest_certs",
+    "angle_en": "In China: OSCP or CEH for landing pentest work?",
+    "cert_a_cost_local_en": "≈ ¥10,800 (90-day lab)",
+    "cert_b_cost_local_en": "≈ ¥6,800",
+    "cert_a_salary_boost_en": "Technical community / foreign-enterprise recognition; pentest uplift +30%",
+    "cert_b_salary_boost_en": "Higher domestic recognition than international average; +12% uplift",
+    "verdict_reason_en": "In China, CEH has higher HR recognition than OSCP (more domestic training providers run CEH courses). But technical interviewers weight OSCP more heavily. For big-tech / security firms, OSCP carries more weight."
   },
   {
     "slug": "pnpt-value-proposition",
@@ -342,7 +440,13 @@
     "cert_b_salary_boost": "HR 认知度高但技术含金量被业界质疑",
     "verdict": "pnpt_wins_value",
     "verdict_reason": "PNPT 是 5 天真实渗透测试报告考试，CEH 是选择题；$399 vs $950，PNPT 贵在哪里？贵在它真的教你打靶",
-    "category": "pentest_certs"
+    "category": "pentest_certs",
+    "angle_en": "PNPT: the most underrated pentest cert — half the price of CEH and more hardcore",
+    "cert_a_cost_local_en": "≈ ¥2,900 (includes full TCM Security course package)",
+    "cert_b_cost_local_en": "≈ ¥6,800",
+    "cert_a_salary_boost_en": "Fastest-growing recognition 2023-2025; excellent hands-on reputation",
+    "cert_b_salary_boost_en": "High HR recognition but the industry questions its technical weight",
+    "verdict_reason_en": "PNPT is a 5-day real-world pentest-report exam; CEH is multiple-choice. $399 vs $950 — what does the PNPT premium buy? It actually teaches you to operate."
   },
   {
     "slug": "crto-vs-osep-redteam-sg-au",
@@ -358,7 +462,13 @@
     "cert_b_salary_boost": "新加坡红队高级岗 SGD 108k–180k/yr；企业JD出现频率高于CRTO",
     "verdict": "split",
     "verdict_reason": "CRTO 性价比领先（便宜约3倍），Cobalt Strike操作更current；OSEP 品牌更响，企业JD更常见，且是OSCE3路线的必考之一。预算有限先考CRTO；追求完整OffSec认证体系考OSEP",
-    "category": "advanced_technical"
+    "category": "advanced_technical",
+    "angle_en": "Advanced pentest: CRTO is 3× cheaper, OSEP is more famous — which do SG red-team roles prefer?",
+    "cert_a_cost_local_en": "£399 (~SGD 670 / ~AUD 760); includes 48-hour practical lab, 6/8-flags format",
+    "cert_b_cost_local_en": "SGD 2,350-3,700 (Learn One subscription $1,749-$2,749); includes 90-day lab + report-based exam",
+    "cert_a_salary_boost_en": "High technical recognition for red-team roles; Cobalt Strike + AD kill-chain practice, OPSEC-aware tradecraft",
+    "cert_b_salary_boost_en": "Singapore senior red-team roles SGD 108k-180k/yr; appears more frequently in enterprise JDs than CRTO",
+    "verdict_reason_en": "CRTO wins on value (~3× cheaper) and has more current Cobalt Strike tooling; OSEP has a stronger brand, appears more often in enterprise JDs, and is required for the OSCE3 certification path. Budget-constrained: take CRTO first; pursuing the full OffSec certification stack: take OSEP."
   },
   {
     "slug": "osep-vs-osed-osce3-path",
@@ -374,7 +484,13 @@
     "cert_b_salary_boost": "漏洞研究/exploit开发核心技能；与OSEP+OSWE合成OSCE3三连认证",
     "verdict": "depends_on_goal",
     "verdict_reason": "OSEP适合红队操作员路线（EDR规避、C2开发）；OSED适合漏洞研究/exploit开发路线；两者+OSWE = OSCE3，是OffSec最高荣誉认证，全球持有者极少。选哪个取决于你要做红队还是漏洞研究",
-    "category": "advanced_technical"
+    "category": "advanced_technical",
+    "angle_en": "OffSec's hardest triple: OSEP + OSED + OSWE (OSCE3) — what level does that unlock?",
+    "cert_a_cost_local_en": "≈ SGD 2,350 (Learn One 90-day subscription); covers EDR evasion, custom C2, process injection, AMSI bypass",
+    "cert_b_cost_local_en": "≈ SGD 2,350 (Learn One 90-day subscription); covers shellcode development, ROP chains, DEP/ASLR bypass, Windows exploit development",
+    "cert_a_salary_boost_en": "Core skill set for red-team operators; covers modern CrowdStrike / SentinelOne adversarial scenarios",
+    "cert_b_salary_boost_en": "Core skill set for vulnerability research / exploit development; combines with OSEP + OSWE to form OSCE3",
+    "verdict_reason_en": "OSEP fits the red-team-operator track (EDR evasion, C2 development); OSED fits the vulnerability-research / exploit-development track. OSEP + OSED + OSWE = OSCE3, OffSec's top honor with very few global holders. Choose based on whether you're heading to red team or vulnerability research."
   },
   {
     "slug": "crto2-edr-bypass-specialist",
@@ -390,7 +506,13 @@
     "cert_b_salary_boost": "企业JD品牌认知度更高；OSCE3路线必考；红队高级岗常见要求",
     "verdict": "split",
     "verdict_reason": "CRTO2 EDR绕过内容更current，实际对抗CrowdStrike/SentinelOne更实用；OSEP品牌认知度更高，企业JD出现更频繁。想要最新EDR对抗技术选CRTO2，想要JD加分和OSCE3路线选OSEP",
-    "category": "advanced_technical"
+    "category": "advanced_technical",
+    "angle_en": "Bypassing EDR is the real hardcore work: CRTO2 vs OSEP — which actually lets you fight CrowdStrike?",
+    "cert_a_cost_local_en": "£425 (~SGD 715 / ~AUD 815); covers EDR-aware execution, C++/C# custom tooling, PPID spoofing, ETW bypass, memory obfuscation, ASR bypass, WDAC abuse",
+    "cert_b_cost_local_en": "≈ SGD 2,350 (Learn One 90-day); some EDR-evasion content at 2020-era level; limitations against modern CrowdStrike / SentinelOne",
+    "cert_a_salary_boost_en": "Latest adversarial techniques targeting modern EDR (CrowdStrike / SentinelOne / Defender); CRTO2 content updates more frequently",
+    "cert_b_salary_boost_en": "Higher enterprise brand recognition; required on the OSCE3 path; common listing for senior red-team roles",
+    "verdict_reason_en": "CRTO2 has more current EDR-bypass content — genuinely more useful against modern CrowdStrike / SentinelOne. OSEP has stronger brand recognition and appears more often in enterprise JDs. Want cutting-edge EDR-bypass technique: CRTO2. Want JD weight and OSCE3 progression: OSEP."
   },
   {
     "slug": "gxpn-vs-oscp-exploit-dev",
@@ -406,7 +528,13 @@
     "cert_b_salary_boost": "新加坡渗透岗 JD 中最常见认证；平均薪资涨幅 +30%",
     "verdict": "oscp_wins_for_jobs",
     "verdict_reason": "OSCP出现在远多于GXPN的JD中；GXPN适合专职漏洞研究员，通常由雇主付费送培训。自费考证优先OSCP（$1,649 vs $9,779）；已在漏洞研究岗且公司愿意报销再考GXPN",
-    "category": "advanced_technical"
+    "category": "advanced_technical",
+    "angle_en": "GXPN costs $9,000 — is it worth it? vs OSCP, do Singapore employers actually recognize it?",
+    "cert_a_cost_local_en": "≈ SGD 13,200 (SEC660 course + exam); ~2,600 holders globally; covers advanced exploitation, ASLR/DEP/ROP bypass, custom fuzzing",
+    "cert_b_cost_local_en": "≈ SGD 2,230 (includes 90-day lab); 100,000+ holders globally",
+    "cert_a_salary_boost_en": "US exploit-researcher roles average $119,895-$158,000; typically employer-sponsored; expert-level vulnerability-research positions",
+    "cert_b_salary_boost_en": "Most-cited cert in Singapore pentest JDs; +30% average salary boost",
+    "verdict_reason_en": "OSCP appears in far more JDs than GXPN. GXPN fits dedicated vulnerability researchers, usually with employer-paid training. For self-funded candidates take OSCP first ($1,649 vs $9,779); if already in a vulnerability-research role with employer reimbursement, layer GXPN on top."
   },
   {
     "slug": "grem-malware-analyst",
@@ -422,7 +550,13 @@
     "cert_b_salary_boost": "渗透测试/红队；平均薪资涨幅 +30%",
     "verdict": "depends_on_goal",
     "verdict_reason": "完全不同的职业路线：GREM面向恶意软件分析师、威胁情报、蓝队；OSCP面向渗透测试、红队。先想清楚你要做攻击还是防守——选错了方向白花钱",
-    "category": "advanced_technical"
+    "category": "advanced_technical",
+    "angle_en": "Reverse-engineering malware vs pentest: GREM and OSCP serve completely different career paths",
+    "cert_a_cost_local_en": "≈ SGD 11,800 (FOR610 course $8,000-$9,500 + exam); covers IDA Pro / Ghidra, static + dynamic malware analysis, unpacking, memory forensics",
+    "cert_b_cost_local_en": "≈ SGD 2,230 (includes 90-day lab); offensive pentest focus",
+    "cert_a_salary_boost_en": "Malware analyst / threat intelligence / blue team; US average salary $117,000; typically employer-sponsored",
+    "cert_b_salary_boost_en": "Pentest / red team roles; +30% average salary boost",
+    "verdict_reason_en": "Completely different career paths: GREM targets malware analyst / threat intelligence / blue team; OSCP targets pentest / red team. Decide whether you want offense or defense first — picking the wrong direction wastes the investment."
   },
   {
     "slug": "crest-cct-uk-gov-requirement",
@@ -439,7 +573,15 @@
     "cert_b_salary_boost": "技术能力证明，全球认可；在英国个人技术JD常见要求",
     "verdict": "split",
     "verdict_reason": "CREST CCT是英国受监管市场的营业执照——没有它就无法赢得UK政府/CBEST合同；OSCP证明个人技术能力。在英国做渗透测试两者都需要：先考OSCP打基础，有5年经验后考CREST CCT解锁政府合同",
-    "category": "advanced_technical"
+    "category": "advanced_technical",
+    "market_en": "UK & Europe",
+    "market_note_en": "UK / Europe specific — not relevant for SG / AU / CN markets",
+    "angle_en": "Mandatory UK Government pentest credential: CREST CCT vs OSCP — which matters more for UK work?",
+    "cert_a_cost_local_en": "≈ £3,200 (two exam components £1,600 each); requires ~10,000 hours of experience (5 years); 6-hour practical + written exam",
+    "cert_b_cost_local_en": "≈ £1,300 (includes 90-day lab); no work-experience prerequisite",
+    "cert_a_salary_boost_en": "UK Government pentest PPN 014 (2025) mandatory requirement; CBEST (Bank of England financial testing) mandatory; no CREST = no UK Government / CBEST contract",
+    "cert_b_salary_boost_en": "Proves individual technical capability; globally recognized; common requirement in UK pentest JDs",
+    "verdict_reason_en": "CREST CCT is the UK's regulated-market operating license — without it you cannot win UK Government / CBEST contracts. OSCP proves individual technical capability. For UK pentest work you need both: OSCP first to establish the foundation, then CREST CCT after 5 years of experience to unlock government contracts."
   },
   {
     "slug": "cisa-vs-cism-audit-vs-management",
@@ -455,7 +597,13 @@
     "cert_b_salary_boost": "美国均薪 $140,000–$165,000；CISO晋升路线最常见管理认证；企业内部安全管理层要求",
     "verdict": "depends_on_goal",
     "verdict_reason": "CISA走审计/合规职业路线，四大和监管机构强需求，法律/财务背景转型最快；CISM走管理/领导力路线，适合有一定经验想晋升管理层的人。两者考试费用相同，选哪个取决于你想去四大还是想做CISO",
-    "category": "governance_certs"
+    "category": "governance_certs",
+    "angle_en": "Auditor vs manager: CISA and CISM — which gets a non-technical candidate into security faster?",
+    "cert_a_cost_local_en": "$760 non-member / $575 ISACA member; preferred for Big 4 audit / regulator / bank compliance roles; no technical prerequisite; audit / finance backgrounds fit best",
+    "cert_b_cost_local_en": "$760 non-member / $575 ISACA member; security management, governance, risk path; US average salary $140,000-$165,000",
+    "cert_a_salary_boost_en": "US average $132,000; Big 4 consulting (PwC / Deloitte / KPMG / EY) IT audit roles explicitly require it; high-frequency cert for bank / regulator compliance roles",
+    "cert_b_salary_boost_en": "US average $140,000-$165,000; most common management cert on the CISO promotion path; corporate internal security-management requirement",
+    "verdict_reason_en": "CISA takes the audit / compliance career path — strong demand at Big 4 and regulators; fastest pivot for legal / finance backgrounds. CISM takes the management / leadership path — fits candidates with experience seeking a management promotion. Exam fees are identical; choose based on whether you want Big 4 consulting or a CISO role."
   },
   {
     "slug": "crisc-risk-specialist",
@@ -471,7 +619,13 @@
     "cert_b_salary_boost": "美国均薪 $140,000–$165,000；适用范围更广但风险管理细分不如CRISC精准",
     "verdict": "crisc_wins_for_risk_roles",
     "verdict_reason": "CRISC是IT风险管理最精准的认证，银行/保险公司招风险专员时明确偏好CRISC；美国均薪$151,000超过CISM。有金融/风险/内审背景的人考CRISC是最快进网安高薪岗的路线",
-    "category": "governance_certs"
+    "category": "governance_certs",
+    "angle_en": "IT risk-management specialist: CRISC averages ¥200k+ — who's the best fit to pursue it?",
+    "cert_a_cost_local_en": "$760 non-member; covers IT risk identification, assessment, response; highly valued by banks / insurers / regulators; finance / risk backgrounds are a strong fit",
+    "cert_b_cost_local_en": "$575 ISACA member; general security-management path; broader industry applicability",
+    "cert_a_salary_boost_en": "US average $151,000; one of the highest-paying ISACA certs; preferred cert for IT risk roles at banks / insurers / regulators",
+    "cert_b_salary_boost_en": "US average $140,000-$165,000; broader applicability but less precise for risk-management specializations than CRISC",
+    "verdict_reason_en": "CRISC is the most precise credential for IT risk management; banks and insurers explicitly prefer CRISC when hiring risk specialists; US average $151,000 exceeds CISM. For candidates with finance / risk / internal-audit backgrounds, CRISC is the fastest path to a high-paying security role."
   },
   {
     "slug": "gcti-threat-intel-analyst",
@@ -487,7 +641,13 @@
     "cert_b_salary_boost": "HR过滤认证，入门基础，不区分专业方向",
     "verdict": "gcti_wins_for_cti_career",
     "verdict_reason": "完全不同的层次——GCTI是威胁情报分析师的专业认证，Security+是通用入门证书。有地缘政治分析/研究/情报背景的人考GCTI直接切入高薪专业岗位，不需要学编程",
-    "category": "threat_intel"
+    "category": "threat_intel",
+    "angle_en": "High-paying security roles that don't require coding: threat intelligence analyst — how do you approach GCTI?",
+    "cert_a_cost_local_en": "$999 (standalone exam) / with FOR578 course ≈ $7,000+ (typically employer-sponsored); covers threat-actor profiling, MITRE ATT&CK application, intelligence analysis, dark-web monitoring, structured analytic techniques; no command-line requirement",
+    "cert_b_cost_local_en": "≈ SGD 550 (SG) / AUD 590 (AU); general security foundation cert",
+    "cert_a_salary_boost_en": "Threat intelligence analyst roles; Singapore government agencies (CSA / MAS) / bank intelligence teams; no exploit-code writing needed",
+    "cert_b_salary_boost_en": "HR-filter cert; entry-level baseline; does not differentiate specialization",
+    "verdict_reason_en": "Completely different tiers — GCTI is a professional credential for threat intelligence analysts; Security+ is a general entry-level cert. Candidates with geopolitical analysis / research / intelligence backgrounds can use GCTI to jump directly into high-paying specialist roles without learning to code."
   },
   {
     "slug": "cissp-cism-china-management-path",
@@ -503,7 +663,13 @@
     "cert_b_salary_boost": "T1城市CISM管理岗¥220k–350k；纯管理路线更快考过；国内大型国企/金融机构管理层常见",
     "verdict": "cissp_wins_for_salary",
     "verdict_reason": "CISSP薪资天花板明显更高（T1均薪差约¥100k–150k）；但CISM考试难度更低，对纯管理路线更聚焦。想要最高薪资上限选CISSP；想快速拿证走纯管理路线选CISM；最优策略：先考CISM，再攻CISSP",
-    "category": "management_certs"
+    "category": "management_certs",
+    "angle_en": "China enterprise security-management path: CISSP doubles the salary vs CISM is faster to obtain — which should you pick?",
+    "cert_a_cost_local_en": "¥5,400 exam fee; with training ≈ ¥15,000-35,000; Tier-1 city average ¥300-500k",
+    "cert_b_cost_local_en": "¥4,200 ISACA member exam fee; more management-focused path; Tier-1 city average ¥220-350k (management roles)",
+    "cert_a_salary_boost_en": "Tier-1 city CISSP holders average ¥300-500k; mandatory requirement for foreign-enterprise / large-internet-company CISO roles",
+    "cert_b_salary_boost_en": "Tier-1 city CISM management roles ¥220-350k; faster to pass for a pure management track; common requirement at large domestic state-owned enterprises and financial institutions",
+    "verdict_reason_en": "CISSP has a clearly higher salary ceiling (Tier-1 average ¥100-150k higher); CISM has lower exam difficulty and a tighter focus on pure management tracks. For maximum salary ceiling: CISSP. For fast credential + pure management track: CISM. Optimal strategy: take CISM first, then tackle CISSP."
   },
   {
     "slug": "cisa-big4-audit-path",
@@ -519,7 +685,13 @@
     "cert_b_salary_boost": "企业内部CISO/安全总监路线；SG薪资天花板更高；但需要5年工作经验+技术背景",
     "verdict": "split",
     "verdict_reason": "职业路径完全不同——CISA进四大咨询，做IT审计/合规顾问，服务多家客户；CISSP做企业内部CISO，深耕一个组织。四大工作经验积累快但压力大；内部CISO稳定但晋升慢。先明确自己想要咨询生涯还是企业生涯",
-    "category": "governance_certs"
+    "category": "governance_certs",
+    "angle_en": "Big 4 consulting vs corporate internal: CISA into Big 4, CISSP to CISO — which path to pick?",
+    "cert_a_cost_local_en": "$575 ISACA member; preferred cert at Big 4 (PwC / Deloitte / KPMG / EY) for cyber-consulting / IT audit roles; SG holders salary SGD 70-110k",
+    "cert_b_cost_local_en": "$749; SG holders salary SGD 120-200k (senior roles); requires 5 years of work experience",
+    "cert_a_salary_boost_en": "Preferred cert for Big 4 IT audit / cyber consulting; clear promotion path once inside Big 4; no work-experience prerequisite (relatively friendly)",
+    "cert_b_salary_boost_en": "Corporate internal CISO / security-director path; higher SG salary ceiling but requires 5 years of experience + technical background",
+    "verdict_reason_en": "Completely different career paths — CISA takes you into Big 4 consulting, doing IT audit / compliance advisory for multiple clients; CISSP takes you into corporate internal CISO roles, going deep in one organization. Big 4 accumulates experience fast but is high-pressure; corporate CISO is stable but promotion is slower. First clarify whether you want a consulting career or a corporate career."
   },
   {
     "slug": "non-tech-cert-tierlist-sg",
@@ -535,7 +707,15 @@
     "cert_b_salary_boost": "SG威胁情报分析师SGD 75–110k；政府机构/银行情报团队有需求",
     "verdict": "split",
     "verdict_reason": "两张证书都不需要写代码。审计/财务背景走CISA进四大；研究分析背景走GCTI进政府情报机构或银行威胁情报团队。判断依据：你是喜欢写合规报告还是喜欢研究黑客组织？",
-    "category": "non_technical_entry"
+    "category": "non_technical_entry",
+    "cert_a_en": "CISA (audit track — no coding required)",
+    "cert_b_en": "GCTI (threat intelligence track — no coding required)",
+    "angle_en": "Zero coding, still high salary: Singapore's non-technical security cert rankings",
+    "cert_a_cost_local_en": "$575 (ISACA member); no coding required; audit / finance backgrounds fit best; preferred cert for SG Big 4 IT audit / cyber consulting",
+    "cert_b_cost_local_en": "$999 (standalone exam); no command-line requirement; analysis / research backgrounds fit best; Singapore CSA / MAS / bank threat-intelligence teams",
+    "cert_a_salary_boost_en": "SG holders salary SGD 65-100k; sustained high demand at Big 4",
+    "cert_b_salary_boost_en": "SG threat-intelligence analyst SGD 75-110k; demand at government agencies / bank intelligence teams",
+    "verdict_reason_en": "Neither cert requires writing code. Audit / finance backgrounds go CISA into Big 4; research / analysis backgrounds go GCTI into government intelligence agencies or bank threat-intel teams. The deciding question: do you prefer writing compliance reports or researching hacker groups?"
   },
   {
     "slug": "non-tech-cert-tierlist-china",
@@ -551,7 +731,14 @@
     "cert_b_salary_boost": "四大中国区IT审计岗首选；外资企业合规岗认可度高；T1城市薪资¥150k–220k",
     "verdict": "depends_on_goal",
     "verdict_reason": "CISP走国内政府/央国企安全管理路线，国内认可度更高；CISA走四大/外资企业审计路线，国际认可度更高。目标是留在国内体制内选CISP；目标是进四大或外资公司选CISA",
-    "category": "non_technical_entry"
+    "category": "non_technical_entry",
+    "cert_a_en": "CISP (Management Track)",
+    "angle_en": "How do non-coders get into security in China? CISP Management Track vs CISA Audit Track",
+    "cert_a_cost_local_en": "¥12,800 (including authorized training + exam); management track with no deep technical prerequisite; main credential for domestic government / state-owned enterprise management roles",
+    "cert_b_cost_local_en": "$575 ISACA member (≈ ¥4,200); pure audit / compliance path; recognized by Big 4 China + foreign enterprises",
+    "cert_a_salary_boost_en": "Main gateway for domestic government / state-owned enterprise security-management roles; management-track salary ¥150-250k (Tier-1)",
+    "cert_b_salary_boost_en": "Preferred cert for Big 4 China IT audit roles; strong recognition at foreign-enterprise compliance roles; Tier-1 city salary ¥150-220k",
+    "verdict_reason_en": "CISP takes the domestic government / state-owned enterprise security-management path — higher domestic recognition; CISA takes the Big 4 / foreign-enterprise audit path — higher international recognition. Staying in the domestic system: CISP. Targeting Big 4 or foreign enterprises: CISA."
   },
   {
     "slug": "sans-giac-bundle-worth-it",
@@ -567,7 +754,14 @@
     "cert_b_salary_boost": "SG/AU招聘JD最常见技术认证；自费1,649刀，JD出现频率最高",
     "verdict": "oscp_wins_for_self_funders",
     "verdict_reason": "GIAC认证本身质量很高，但套餐设计针对雇主送培——自费$8,500+考GPEN，不如$1,649考OSCP。如果公司愿意报销，考GIAC没问题；如果自费，OSCP每花一块钱的JD曝光度高出5倍以上",
-    "category": "advanced_technical"
+    "category": "advanced_technical",
+    "cert_a_en": "GIAC (standalone exam, e.g. GPEN $999)",
+    "angle_en": "Self-funded vs employer-funded: is GIAC's $9,000 package worth it vs OSCP for Singapore professionals?",
+    "cert_a_cost_local_en": "$999 (standalone exam, self-study without SANS course) / with SANS course ≈ $8,500-9,779 (typically employer-sponsored)",
+    "cert_b_cost_local_en": "≈ SGD 2,230 (includes 90-day lab); self-funding friendly, no accompanying course needed",
+    "cert_a_salary_boost_en": "GIAC certifications have excellent technical quality; but SANS courses are designed for employer-sponsored training — self-funded ROI is lower",
+    "cert_b_salary_boost_en": "Most frequent technical cert in SG / AU hiring JDs; self-funded at $1,649, highest JD-exposure per dollar spent",
+    "verdict_reason_en": "GIAC certifications are genuinely high-quality, but the bundle is designed around employer-paid training. Self-funding $8,500+ for GPEN is worse than $1,649 for OSCP. If your company will reimburse, GIAC is fine; if self-funded, OSCP delivers 5× more JD exposure per dollar."
   },
   {
     "slug": "gcti-vs-osint-cti-career",
@@ -583,6 +777,13 @@
     "cert_b_salary_boost": "自学路线进入门槛低，但谈薪资时无标准化证明材料；企业HR无法快速评估能力",
     "verdict": "gcti_wins_for_salary",
     "verdict_reason": "GCTI持证者薪资溢价$15,000–$25,000/yr，1年内回本。自学OSINT能入行但谈薪时处于弱势。对有分析背景（情报/政治/研究）的人：$999考试单独备考（SANS INDEX方法）是最高ROI的入行投资",
-    "category": "threat_intel"
+    "category": "threat_intel",
+    "cert_b_en": "OSINT self-study path (no certification)",
+    "angle_en": "Threat intelligence analyst: pay $999 for GCTI, or self-study OSINT for free?",
+    "cert_a_cost_local_en": "$999 (standalone exam) / with FOR578 course $7,000+ (employer-sponsored); covers the intelligence lifecycle, threat-actor profiling, MITRE ATT&CK, dark-web monitoring, structured analytic techniques; no command-line requirement",
+    "cert_b_cost_local_en": "¥0 (MITRE ATT&CK official site, OpenCTI, MISP, Maltego free edition); no cert — relies on portfolio and project experience",
+    "cert_a_salary_boost_en": "GCTI holders earn $15,000-$25,000/yr more than non-certified CTI analysts (enterprise buyers recognize the structured analytic methodology)",
+    "cert_b_salary_boost_en": "Self-study path has low entry barriers but no standardized proof at salary-negotiation time; enterprise HR cannot quickly evaluate capability",
+    "verdict_reason_en": "GCTI holders earn $15,000-$25,000/yr more and recoup the cost within a year. Self-studying OSINT opens doors but weakens salary negotiations. For candidates with analytical backgrounds (intelligence / politics / research), the $999 standalone exam (SANS INDEX preparation method) is the highest-ROI entry investment."
   }
 ]
