@@ -1,0 +1,69 @@
+---
+title: WordPress 供应链攻击通过 Flippa 销售感染 30 余款插件
+slug: 2026-04-17-wordpress-supply-chain-attack-infects-30-plugins-via-flippa-
+date: '2026-04-17'
+excerpt: >-
+  一名恶意买家利用 Flippa 市场收购了一家插件开发商，向安装量达数十万的 30 多款 WordPress 插件中注入后门，以部署隐藏的 SEO
+  垃圾内容。
+category: vulnerabilities
+tags:
+  - wordpress
+  - supply chain attack
+  - flippa
+  - essential plugin
+  - wp online support
+  - seo spam
+  - backdoor
+  - plugin vulnerability
+language: zh
+locale_pair: 2026-04-17-wordpress-supply-chain-attack-infects-30-plugins-via-flippa-
+author: ZCyberNews
+draft: false
+---
+一起重大的WordPress供应链攻击已波及超过30款插件，涉及数十万活跃安装量。此次事件源于攻击者通过Flippa市场收购了一家合法的开发者公司。新所有者仅被称为“Kris”，其植入了一个高级后门，该后门潜伏八个月后激活，开始向网站注入对站长隐藏但搜索引擎可见的SEO垃圾内容。这起事件导致WordPress.org在一天内永久关闭了所有受影响插件，凸显了开源插件生态系统中一个关键漏洞：所有权变更可能引入恶意代码，却不会触发安全审查。
+
+## 核心插件后门与攻击链剖析
+
+攻击始于2025年8月**核心插件**的出售，该实体原名WP Online Support，后经品牌重塑。买家在插件仓库的首次提交，以适配WordPress 6.8.2兼容性更新为幌子，引入了一个远程代码执行后门。法证分析显示，在**Countdown Timer Ultimate**等插件的2.6.7版本中，名为`class-anylc-admin.php`的文件被添加了191行恶意代码。
+
+后门通过一个名为`wpos-analytics`的模块运作，该模块此前是一个合法的分析数据收集系统。新代码建立了三个关键组件：
+1.  `fetch_ver_info()`方法：使用`file_get_contents()`从攻击者控制的域名`analytics.essentialplugin.com`获取数据，并将响应传递给`@unserialize()`。
+2.  `version_info_clean()`方法：设计用于执行结构为`@$clean($this->version_cache, $this->changelog)`的函数调用，其中函数名和参数完全由反序列化的远程数据控制。
+3.  一个未经身份验证的REST API端点，注册时使用`permission_callback: __return_true`，为远程触发提供了直接途径。
+
+此设置构成了典型的任意函数调用漏洞。后门一直处于休眠状态，直到2026年4月5日至6日，命令与控制服务器开始分发恶意载荷。载荷是一个名为`wp-comments-posts.php`的文件——故意拼错核心WordPress文件`wp-comments-post.php`——该文件被下载并执行。其主要操作是将一大段混淆的PHP代码直接注入网站的`wp-config.php`文件。这种持久化机制确保攻击在插件更新后依然存在。
+
+## 影响及利用以太坊智能合约的新型C2技术
+
+注入到`wp-config.php`的代码促成了大规模的SEO垃圾内容操作。它从C2服务器获取链接、重定向和虚假页面内容，并仅将这些内容展示给标识为**Googlebot**的用户代理，使得普通网站访问者和管理员无法察觉。这种称为“伪装”的技术旨在操纵搜索引擎排名而不惊动网站所有者。
+
+该活动在技术层面最显著的特点是其对关停的抵御能力。研究人员发现，恶意软件通过公共区块链RPC端点查询**以太坊智能合约**来解析其C2域名。这意味着攻击者可以随时更新智能合约以指向新域名，从而使传统的域名扣押或关停请求失效。这种基础设施的敏捷性给防御者带来了重大挑战。
+
+此次攻击影响范围巨大。WordPress.org插件团队于2026年4月7日永久关闭了来自**核心插件**作者的至少30款免费插件。这些插件功能涵盖滑块、倒计时器、图库和常见问题解答等，总计代表数十万活跃安装量。任何在2026年4月之前未更新这些插件的网站都可能受到初始感染。关键的是，尽管WordPress.org在4月8日强制自动更新至2.6.9.1版本以禁用插件的回连功能，但此更新*并未*移除`wp-config.php`中的恶意注入。受感染的网站在插件更新后仍处于活跃感染状态，需要手动修复。
+
+## 检测指标与手动修复步骤
+
+防御者应立即清查其WordPress安装中是否包含来自受影响**核心插件**产品组合的任何插件。已关闭的插件包括但不限于：
+*   `accordion-and-accordion-slider`
+*   `album-and-image-gallery-plus-lightbox`
+*   `countdown-timer-ultimate`
+*   `popup-anything-on-click`
+*   `sp-faq`
+*   `sp-news-and-widget`
+*   `timeline-and-history-slider`
+*   `wp-blog-and-widgets`
+*   `wp-testimonial-with-widget`
+
+WordPress.org的强制更新添加了`return;`语句以短路恶意函数，但`wpos-analytics`模块仍然存在。彻底清理需要完全移除该模块。管理员可通过以下步骤创建修补版本：
+1.  从插件文件夹中删除`/wpos-analytics/`目录。
+2.  移除主插件PHP文件中的加载器函数块（通常可通过类似“Plugin Wpos Analytics Data Starts”的注释或名为`wpos_analytics_anl`的函数识别）。
+3.  递增插件头中的版本号。
+
+最关键的检测步骤是检查`wp-config.php`文件。恶意软件在`require_once ABSPATH . 'wp-settings.php';`所在行追加了约6KB的混淆代码。简单的文件大小检查即可发现问题：干净的`wp-config.php`通常约为3-4KB，而受感染的文件会膨胀至9KB以上。如果存在此注入，网站需要进行全面的安全审计，因为后门可能已被用于部署其他载荷。历史C2域名`analytics.essentialplugin.com`目前返回`{"message":"closed"}`，但日志中任何指向该主机的出站连接都是明确的入侵指标。
+
+## WordPress生态系统防御的关键要点
+
+*   **立即审计受影响插件并检查`wp-config.php`。** 系统管理员必须扫描所有托管的WordPress站点，查找列出的**核心插件**标识符。仅更新插件是不够的；必须手动检查`wp-config.php`文件是否被追加了恶意代码，任何感染都需要进行全面的清理。
+*   **将插件所有权变更视为安全风险。** 此次攻击与[2017年事件]([wordpress plugin supply chain attack])类似，当时一款被收购的插件被武器化。WordPress.org生态系统目前缺乏标记或审查插件所有权变更的机制。组织应监控关键插件的提交历史和作者变更，因为维护者的突然变更可能预示着供应链攻击。
+*   **实施强健的备份和文件完整性监控。** 此次攻击是通过详细的备份取证发现的，通过比较每日快照中`wp-config.php`文件的大小来识别。保持频繁、不可变的备份，并对`wp-config.php`等核心文件实施文件完整性监控，对于检测未经授权的修改和实现精确恢复至关重要。
+*   **发现感染即假设已失陷并进行全面调查。** `wp-config.php`注入的存在表明后门曾处于活跃状态。防御者应假设攻击者拥有无限制访问权限，并搜索在感染期间可能安装的其他后门、未经授权的管理员用户或其他恶意脚本。
