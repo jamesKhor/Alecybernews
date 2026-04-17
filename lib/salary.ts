@@ -73,10 +73,19 @@ export const SalaryRecordSchema = z.object({
   // Populated per-slug in data/salary-data.json via a translation pass;
   // preserved across future YAML syncs by mergePreservedFields().
   role_en: z.string().optional(),
+  top_tier_salary_en: z.string().optional(),
   top_tier_note_en: z.string().optional(),
   entry_salary_en: z.string().optional(),
   mid_salary_en: z.string().optional(),
   senior_salary_en: z.string().optional(),
+  // Array override. Operator caught 2026-04-18 that several records'
+  // top_hiring arrays were ZH-only company names (成都：腾讯成都分部、
+  // 华为成都研究所 / 政府机构 DSTA/GovTech / 五大银行网安部门). When
+  // present, replaces the whole array on EN view. Length may differ
+  // from the base array — some records collapse or expand during
+  // translation (e.g. 各市场代表性公司见各市场词条 which is filler
+  // and becomes an empty array with [] on EN view).
+  top_hiring_en: z.array(z.string()).optional(),
 });
 export type SalaryRecord = z.infer<typeof SalaryRecordSchema>;
 
@@ -96,6 +105,34 @@ export const CertRecordSchema = z.object({
   verdict: z.string(),
   verdict_reason: z.string(),
   category: z.string().optional(),
+  // ── English overrides (optional) ─────────────────────────────────
+  // Same pattern as SalaryRecord. Source YAMLs in zcyber-xhs are
+  // ZH-heavy; these override whichever display fields would otherwise
+  // bleed Chinese through to /en/salary.
+  //
+  // Rules for translation (operator-supplied 2026-04-18):
+  //   - Certification acronyms stay verbatim (CISSP, OSCP, CRTO,
+  //     GXPN, GREM, CISP, CBEST, etc.) — they're proper nouns even
+  //     in Chinese industry contexts. Don't "translate" acronyms.
+  //   - Company names → official English (腾讯 → Tencent, 华为 →
+  //     Huawei, 阿里云 → Alibaba Cloud, 港交所 → HKEX, 汇丰 → HSBC).
+  //   - Cities → English (成都 → Chengdu, 杭州 → Hangzhou).
+  //   - Job titles → English (银行安全主管 → Bank Security Head).
+  //
+  // cert_a / cert_b carry pairing labels that often have Chinese
+  // structural text (梯: "ladder"; vs "对比"; 路线A vs 路线B "Track A
+  // vs Track B"). The EN overrides below translate the structural
+  // text while preserving cert acronyms.
+  cert_a_en: z.string().optional(),
+  cert_b_en: z.string().optional(),
+  market_en: z.string().optional(),
+  market_note_en: z.string().optional(),
+  angle_en: z.string().optional(),
+  cert_a_cost_local_en: z.string().optional(),
+  cert_b_cost_local_en: z.string().optional(),
+  cert_a_salary_boost_en: z.string().optional(),
+  cert_b_salary_boost_en: z.string().optional(),
+  verdict_reason_en: z.string().optional(),
 });
 export type CertRecord = z.infer<typeof CertRecordSchema>;
 
@@ -271,10 +308,41 @@ export function getLocalized(
   return {
     ...record,
     role: record.role_en ?? record.role,
+    top_tier_salary: record.top_tier_salary_en ?? record.top_tier_salary,
     top_tier_note: record.top_tier_note_en ?? record.top_tier_note,
     entry_salary: record.entry_salary_en ?? record.entry_salary,
     mid_salary: record.mid_salary_en ?? record.mid_salary,
     senior_salary: record.senior_salary_en ?? record.senior_salary,
+    // Array override: if top_hiring_en exists, use it (even if empty,
+    // which lets us remove meaningless filler rows on the EN view).
+    top_hiring: record.top_hiring_en ?? record.top_hiring,
+  };
+}
+
+/**
+ * CertRecord counterpart to getLocalized(). Same pattern: swap in
+ * `_en` fields when locale === "en" and they exist, otherwise fall
+ * back to the base field. Certification acronyms are never translated.
+ */
+export function getLocalizedCert(
+  record: CertRecord,
+  locale: "en" | "zh",
+): CertRecord {
+  if (locale === "zh") return record;
+  return {
+    ...record,
+    cert_a: record.cert_a_en ?? record.cert_a,
+    cert_b: record.cert_b_en ?? record.cert_b,
+    market: record.market_en ?? record.market,
+    market_note: record.market_note_en ?? record.market_note,
+    angle: record.angle_en ?? record.angle,
+    cert_a_cost_local: record.cert_a_cost_local_en ?? record.cert_a_cost_local,
+    cert_b_cost_local: record.cert_b_cost_local_en ?? record.cert_b_cost_local,
+    cert_a_salary_boost:
+      record.cert_a_salary_boost_en ?? record.cert_a_salary_boost,
+    cert_b_salary_boost:
+      record.cert_b_salary_boost_en ?? record.cert_b_salary_boost,
+    verdict_reason: record.verdict_reason_en ?? record.verdict_reason,
   };
 }
 

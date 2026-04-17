@@ -160,13 +160,31 @@ export function SalaryCard({ record, locale, labels }: Props) {
                   ≈ {formatUsdShort(usdMid)}
                 </dd>
               </div>
-              {/* Big number — the data hero */}
-              <p className="text-[15px] sm:text-base font-semibold font-mono text-foreground tabular-nums leading-tight">
-                <span className="text-muted-foreground/70 mr-1 font-normal">
-                  {symbol}
-                </span>
-                {b.raw}
-              </p>
+              {/* Big number — the data hero.
+                  Currency-prefix policy (operator-reported 2026-04-18):
+                  The card used to blindly prepend {symbol} before every
+                  string, producing gibberish like "HK$MY MYR 60k → HK
+                  HKD 360k" when the string already contained currencies.
+                  Now we auto-suppress the prefix if the string ALREADY
+                  has any currency marker (ISO code, symbol, or
+                  directional arrow indicating a comparison). Pure number
+                  strings like "264,000–420,000" still get prefixed. */}
+              {(() => {
+                const hasEmbeddedCurrency =
+                  /→|⇒|\bvs\b|\bUSD\b|\bSGD\b|\bMYR\b|\bHKD\b|\bCNY\b|\bAUD\b|\bSEK\b|\bGBP\b|\bEUR\b|¥|S\$|HK\$|A\$|£|€/.test(
+                    b.raw,
+                  );
+                return (
+                  <p className="text-[15px] sm:text-base font-semibold font-mono text-foreground tabular-nums leading-tight">
+                    {!hasEmbeddedCurrency && (
+                      <span className="text-muted-foreground/70 mr-1 font-normal">
+                        {symbol}
+                      </span>
+                    )}
+                    {b.raw}
+                  </p>
+                );
+              })()}
               {/* Bar — pure CSS, no JS dep, with subtle tick anchors */}
               <div className="relative h-1.5 rounded-full bg-muted/40 overflow-hidden">
                 {b.range && (
@@ -176,7 +194,11 @@ export function SalaryCard({ record, locale, labels }: Props) {
                       left: `${lowPct}%`,
                       width: `${Math.max(2, widthPct - lowPct)}%`,
                     }}
-                    aria-label={`${b.label}: ${b.raw} ${record.currency}`}
+                    aria-label={
+                      /\b(USD|SGD|MYR|HKD|CNY|AUD|SEK|GBP|EUR)\b/.test(b.raw)
+                        ? `${b.label}: ${b.raw}`
+                        : `${b.label}: ${b.raw} ${record.currency}`
+                    }
                   />
                 )}
               </div>

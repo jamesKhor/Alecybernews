@@ -47,9 +47,14 @@
     "source_url": "https://reeracoen.sg/en/articles/part-1-2025-fresh-graduate-salaries-in-singapore-key-trends-and-insights",
     "category": "singapore_salaries",
     "role_en": "Singapore vs Sweden Senior Engineer Salary Showdown",
-    "entry_salary_en": "SG: SGD 42-72k / SE: SEK 480-600k (≈ USD 43-53k)",
-    "mid_salary_en": "SG: SGD 80-110k / SE: SEK 620-780k (≈ USD 55-69k)",
-    "senior_salary_en": "SG: SGD 108-150k / SE: SEK 850-1.1M (≈ USD 75-97k)"
+    "entry_salary_en": "SGD 42-72k · SEK 480-600k (≈ USD 43-53k)",
+    "mid_salary_en": "SGD 80-110k · SEK 620-780k (≈ USD 55-69k)",
+    "senior_salary_en": "SGD 108-150k · SEK 850k-1.1M (≈ USD 75-97k)",
+    "top_hiring_en": [
+      "Government agencies (DSTA / GovTech) — strong preference for cybersecurity background",
+      "MAS (regulator) — continuous growth in compliance roles",
+      "Top 5 local banks — cybersecurity divisions"
+    ]
   },
   {
     "slug": "sg-pentest-salary-2025",
@@ -205,7 +210,13 @@
     "shocking_fact": "腾讯/阿里安全高级工程师 P7+ 年总包可达 ¥800k，但需要 8 年以上经验+顶会论文，竞争极激烈",
     "source_url": "https://www.maimai.cn",
     "category": "china_salaries",
-    "role_en": "China T1 Security Engineer Salary (Beijing / Shanghai / Shenzhen / Hangzhou)"
+    "role_en": "China T1 Security Engineer Salary (Beijing / Shanghai / Shenzhen / Hangzhou)",
+    "top_hiring_en": [
+      "Tencent Security",
+      "Alibaba Security",
+      "ByteDance Security",
+      "Huawei Cyber Security"
+    ]
   },
   {
     "slug": "cn-t1-jiafang-vs-yifang",
@@ -228,10 +239,15 @@
     "shocking_fact": "大厂薪资是乙方的 1.5-2 倍，但大厂内卷严重；乙方经验更广、跳槽机会多；甲方稳定但天花板低",
     "source_url": "https://www.maimai.cn",
     "category": "china_salaries",
-    "role_en": "China T1: Tech-Co (甲方/In-house) vs Security Consulting (乙方) — Pay + Career Comparison",
-    "entry_salary_en": "In-house ¥250-400k vs Consulting ¥180-300k (0-3 yrs)",
-    "mid_salary_en": "In-house ¥400-700k vs Consulting ¥280-500k (3-6 yrs)",
-    "senior_salary_en": "In-house ¥700k-1.2M vs Consulting ¥500-900k (6+ yrs; in-house usually wins on pay, consulting wins on experience breadth)"
+    "role_en": "China T1: In-house Security (buy-side) vs Consulting (sell-side) — Pay + Career Comparison",
+    "entry_salary_en": "In-house CNY 250-400k · Consulting CNY 180-300k (0-3 yrs)",
+    "mid_salary_en": "In-house CNY 400-700k · Consulting CNY 280-500k (3-6 yrs)",
+    "senior_salary_en": "In-house CNY 700k-1.2M · Consulting CNY 500-900k (6+ yrs; in-house usually wins on pay, consulting wins on breadth)",
+    "top_hiring_en": [
+      "In-house (buy-side): Banks / telecom carriers / state-owned enterprise information security departments",
+      "Consulting (sell-side): QAX, Sangfor, NSFOCUS",
+      "Big Tech: BAT (Baidu, Alibaba, Tencent), ByteDance, Huawei"
+    ]
   },
   {
     "slug": "cn-t2-city-salary-discount",
@@ -254,7 +270,12 @@
     "shocking_fact": "T2城市安全薪资约为 T1 的 70%，但房价/生活成本约为 T1 的 45-55%，实际购买力更高",
     "source_url": "https://www.maimai.cn",
     "category": "china_salaries",
-    "role_en": "China T2 City Salary Discount Analysis (vs T1 baseline)"
+    "role_en": "China T2 City Salary Discount Analysis (vs T1 baseline)",
+    "top_hiring_en": [
+      "Chengdu: Tencent Chengdu branch, Huawei Chengdu Research Institute",
+      "Hangzhou: Alibaba Cloud Security, NetEase Security",
+      "Wuhan: Fiberhome Communications Security"
+    ]
   },
   {
     "slug": "au-sydney-security-analyst-salary",
@@ -329,7 +350,8 @@
     "category": "hongkong_salaries",
     "top_tier_salary": "HKD 1,600,000–2,200,000 (Big4 高级经理 / iBank 红队负责人 / 资深 TI Consultant)",
     "top_tier_note": "圈内实例：资深 TI Consultant 月薪 HKD 85,000（不含奖金），全年加 bonus 可达 HKD 1.3–1.6M；做到 Big4 senior manager / Director 的话 1.8–2.2M。",
-    "top_tier_note_en": "Industry examples: senior Threat Intelligence Consultants earn HKD 85,000/month base (excluding bonus) — annual total with bonus reaches HKD 1.3-1.6M. Big 4 senior managers and directors hit HKD 1.8-2.2M."
+    "top_tier_note_en": "Industry examples: senior Threat Intelligence Consultants earn HKD 85,000/month base (excluding bonus) — annual total with bonus reaches HKD 1.3-1.6M. Big 4 senior managers and directors hit HKD 1.8-2.2M.",
+    "top_tier_salary_en": "HKD 1.6-2.2M (Big 4 Senior Manager / iBank red-team lead / senior TI Consultant)"
   },
   {
     "slug": "senior-sg-vs-au-vs-hk-comparison",
@@ -348,9 +370,10 @@
     "shocking_fact": "税前澳洲最高，税后新加坡最高（个税 7% vs 澳洲 32.5% vs 香港 15%）；如果考虑 CPF + 住房补贴，新加坡综合福利包最优",
     "source_url": "https://nodeflair.com/salaries",
     "category": "cross_market",
-    "entry_salary_en": "USD-equivalent comparison for senior tier",
+    "entry_salary_en": "USD-equivalent comparison (senior tier only)",
     "mid_salary_en": "Pre-tax vs after-tax real gap",
-    "senior_salary_en": "SG: USD 120k / AU: USD 130k / HK: USD 128k (all pre-tax)"
+    "senior_salary_en": "SGD: 120k · AUD: 130k · HKD: 128k (all pre-tax USD-eq)",
+    "top_hiring_en": ["Data sources: Glassdoor + NodeFlair + SEEK"]
   },
   {
     "slug": "entry-level-global-comparison",
@@ -369,8 +392,10 @@
     "shocking_fact": "澳洲税前最高但税后优势缩小；新加坡税后+无强制储蓄拿到手最多；中国T1城市绝对金额低但购买力不差",
     "source_url": "各市场求职平台综合",
     "category": "cross_market",
-    "mid_salary_en": "Entry-level global comparison: SG → HK → AU → CN T1 → MY",
-    "senior_salary_en": "SG USD 31k / HK USD 34k / AU USD 50k / CN T1 USD 28k / MY USD 13k"
+    "mid_salary_en": "USD-eq: SGD 31k · HKD 34k · AUD 50k · CNY 28k · MYR 13k",
+    "senior_salary_en": "USD-eq: SGD 31k · HKD 34k · AUD 50k · CNY 28k · MYR 13k",
+    "top_hiring_en": [],
+    "entry_salary_en": "USD-eq: SGD 40k · MYR 11k · CNY 28k · AUD 55k · HKD 51k"
   },
   {
     "slug": "remote-work-sg-salary-kl-cost",
@@ -389,9 +414,13 @@
     "shocking_fact": "SGD 80k/年 在吉隆坡的购买力相当于在新加坡 SGD 140k，而且不用缴新加坡 CPF（雇主不强制）",
     "source_url": "个人经验 + LinkedIn 职位分析",
     "category": "remote_work",
-    "entry_salary_en": "Remote working SG salary MYR 180-220k while living in KL (cost-of-living arbitrage)",
-    "mid_salary_en": "SG salary S$72-108k → MYR equivalent 240-360k/yr",
-    "senior_salary_en": "SG salary S$108-150k → MYR equivalent 360-500k/yr; net quality of life jump 2-3×"
+    "entry_salary_en": "SG-paid remote role: SGD 72-108k (≈ MYR 240-360k/yr) while living in KL",
+    "mid_salary_en": "SG-paid remote role: SGD 108-150k (≈ MYR 360-500k/yr)",
+    "senior_salary_en": "SG-paid remote role: SGD 150k+ (≈ MYR 500k+/yr); net QoL 2-3× vs local KL pay",
+    "top_hiring_en": [
+      "Singapore-incorporated companies hiring remote",
+      "MNC regional security teams"
+    ]
   },
   {
     "slug": "cn-jiafang-vs-yifang-career-advice",
@@ -414,9 +443,13 @@
     "source_url": "https://www.maimai.cn",
     "category": "china_salaries",
     "role_en": "China: In-house vs Consulting — Which Path For Your Career?",
-    "entry_salary_en": "In-house advantage: steady pay, lateral moves limited",
+    "entry_salary_en": "In-house advantage: steady pay, fewer lateral moves",
     "mid_salary_en": "Consulting advantage: rapid skill breadth, faster mid-career pivot",
-    "senior_salary_en": "Senior pay: In-house ¥700k-1.2M → Consulting Partner ¥1.5-3M (for those who make Partner; attrition is high)"
+    "senior_salary_en": "Senior: In-house CNY 700k-1.2M · Consulting Partner CNY 1.5-3M (for those who make Partner — attrition is high)",
+    "top_hiring_en": [
+      "Consulting (sell-side): QAX, Sangfor, NSFOCUS, Venustech",
+      "In-house (buy-side): top banks / telecom carriers / state-owned enterprise information security departments"
+    ]
   },
   {
     "slug": "my-grc-analyst-salary",
@@ -438,7 +471,12 @@
     "hook": "马来西亚GRC分析师：非技术背景进安全行业最快的路",
     "shocking_fact": "GRC 分析师不需要会写代码，法律/审计背景直接可转型，是马来西亚非技术背景进安全行业最热门路线",
     "source_url": "https://www.jobstreet.com.my",
-    "category": "malaysia_salaries"
+    "category": "malaysia_salaries",
+    "top_hiring_en": [
+      "CyberSecurity Malaysia",
+      "Big 4 (PwC / Deloitte KL)",
+      "Local bank compliance departments"
+    ]
   },
   {
     "slug": "sg-grc-analyst-salary",
@@ -490,7 +528,15 @@
     "category": "hongkong_salaries",
     "top_tier_salary": "HKD 1,200,000–1,600,000 (iBank Lead Detection Engineer / SOC Manager)",
     "top_tier_note": "投行 / 港交所体系内的 SOC Manager 或 Lead Detection 工程师，常配合 stock + retention bonus 拿到此区间。",
-    "top_tier_note_en": "Investment bank and HKEX SOC Managers or Lead Detection Engineers typically hit this range with stock grants + retention bonuses layered on top."
+    "top_tier_note_en": "Investment bank and HKEX SOC Managers or Lead Detection Engineers typically hit this range with stock grants + retention bonuses layered on top.",
+    "top_hiring_en": [
+      "HSBC Cybersecurity Operations",
+      "Standard Chartered (HK)",
+      "Hang Seng Bank",
+      "PwC HK Cyber",
+      "HKMA (Hong Kong Monetary Authority)"
+    ],
+    "top_tier_salary_en": "HKD 1.2-1.6M (iBank Lead Detection Engineer / SOC Manager)"
   },
   {
     "slug": "cn-to-hk-cyber-migration-salary",
@@ -514,9 +560,15 @@
     "shocking_fact": "持CISSP + 3年T1城市经验的大陆工程师，通过香港优才计划（QMAS）成功率极高；入职香港后薪资税后净得通常比大陆高 40-60%，且持香港永久居民身份后可再跳澳洲/英国",
     "source_url": "https://www.immd.gov.hk/eng/services/visas/quality_migrant_admission_scheme.html",
     "category": "hongkong_salaries",
-    "entry_salary_en": "China T1 ¥200k/yr → Hong Kong HKD 480k/yr (post-tax gap ~50%)",
-    "mid_salary_en": "China T1 ¥300k/yr → Hong Kong HKD 720k/yr",
-    "senior_salary_en": "China T1 ¥400k/yr → Hong Kong HKD 900k-1.2M/yr"
+    "entry_salary_en": "CNY 200k/yr → HKD 480k/yr (post-tax gap ~50%)",
+    "mid_salary_en": "CNY 300k/yr → HKD 720k/yr",
+    "senior_salary_en": "CNY 400k/yr → HKD 900k-1.2M/yr",
+    "top_hiring_en": [
+      "HSBC / Citi / JPMorgan HK cyber teams",
+      "Big 4 HK (PwC / Deloitte / EY / KPMG)",
+      "Huawei HK (bilingual candidates strongly preferred)",
+      "OGCIO (Hong Kong Government)"
+    ]
   },
   {
     "slug": "sg-vs-hk-senior-engineer-showdown",
@@ -538,8 +590,9 @@
     "shocking_fact": "税前新加坡略高；但税后两者接近——新加坡个税最高22%+CPF 20%，香港薪俸税最高15%；香港最大优势是无强制储蓄扣除，拿到手现金更多；新加坡优势是政府补贴+社会福利更完善",
     "source_url": "https://nodeflair.com/salaries / https://www.glassdoor.com/Salaries/hong-kong",
     "category": "cross_market",
-    "entry_salary_en": "N/A (this comparison is senior-only)",
-    "senior_salary_en": "SG: USD 108k–150k / HK: USD 95k–140k (pre-tax)"
+    "entry_salary_en": "N/A (senior-only comparison)",
+    "senior_salary_en": "SGD 108-150k · HKD 95-140k (USD-eq, pre-tax)",
+    "mid_salary_en": "SGD 80-110k · HKD 75-105k (USD-eq)"
   },
   {
     "slug": "my-to-hk-cyber-career-jump",
@@ -563,9 +616,15 @@
     "shocking_fact": "马来西亚华人背景在香港金融机构竞争力极强——普通话+粤语+英语三语优势，加上熟悉中国大陆市场，HSBC等大行跨境合规团队抢着要",
     "source_url": "https://www.jobsdb.com/hk",
     "category": "hongkong_salaries",
-    "entry_salary_en": "MY MYR 60k/yr → HK HKD 360k-420k/yr (post-tax net ~4-5× jump)",
-    "mid_salary_en": "MY MYR 90k/yr → HK HKD 540k-660k/yr",
-    "senior_salary_en": "MY MYR 120k/yr → HK HKD 720k-960k/yr"
+    "entry_salary_en": "MYR 60k/yr → HKD 360-420k/yr (post-tax net ~4-5× jump)",
+    "mid_salary_en": "MYR 90k/yr → HKD 540-660k/yr",
+    "senior_salary_en": "MYR 120k/yr → HKD 720-960k/yr",
+    "top_hiring_en": [
+      "Deloitte HK (Malaysian bilingual Mandarin + English candidates highly valued)",
+      "KPMG HK",
+      "Standard Chartered (Greater China business needs ethnic-Chinese staff)",
+      "Hong Kong financial institutions compliance departments"
+    ]
   },
   {
     "slug": "hk-hkma-fintech-security-specialist",
@@ -595,7 +654,15 @@
     "category": "hongkong_salaries",
     "top_tier_salary": "HKD 1,800,000–2,500,000+ (regional CISO / 银行安全主管 / Big4 ex-partner)",
     "top_tier_note": "网络业内人脉直接核实：HK 在职 CISO 年薪约 HKD 2M。Big4/MNC 区域 CISO 可冲到 HKD 2.5–4M。",
-    "top_tier_note_en": "Direct industry intelligence: an in-house Hong Kong CISO earns approximately HKD 2M annually. Big 4 / MNC regional CISOs can reach HKD 2.5-4M."
+    "top_tier_note_en": "Direct industry intelligence: an in-house Hong Kong CISO earns approximately HKD 2M annually. Big 4 / MNC / multinational regional CISOs can reach HKD 2.5-4M.",
+    "top_hiring_en": [
+      "HKMA (Hong Kong Monetary Authority)",
+      "HKEX (Hong Kong Exchanges and Clearing)",
+      "HSBC cybersecurity division",
+      "Standard Chartered Asia-Pacific Security",
+      "Hong Kong virtual banks (ZA Bank / Mox / Livi)"
+    ],
+    "top_tier_salary_en": "HKD 1.8-2.5M+ (regional CISO / Bank Security Head / Big 4 ex-partner)"
   },
   {
     "slug": "hk-full-career-ladder",
@@ -626,9 +693,16 @@
     "source_url": "PayScale HK 2025 / SalaryExpert 2026 / Robert Half HK Salary Guide 2026 / Randstad HK 2025 / 行业验证",
     "category": "hongkong_salaries",
     "role_en": "Full Career Ladder: Analyst → Manager → Director → CISO (Hong Kong financial sector, 7 levels)",
-    "entry_salary_en": "264,000–420,000 (Junior Analyst, 0-2 yrs)",
-    "mid_salary_en": "480,000–660,000 (Consultant / Senior Analyst, 3-5 yrs; avg HKD 552k per SalaryExpert)",
-    "senior_salary_en": "660,000–1,020,000 (Senior Engineer / Senior Consultant, 6-9 yrs; avg HKD 818k per Robert Half)"
+    "entry_salary_en": "264k-420k (Junior Analyst, 0-2 yrs)",
+    "mid_salary_en": "480k-660k (Consultant / Senior Analyst, 3-5 yrs; avg 552k per SalaryExpert)",
+    "senior_salary_en": "660k-1.02M (Senior Engineer / Senior Consultant, 6-9 yrs; avg 818k per Robert Half)",
+    "top_hiring_en": [
+      "HSBC — Global CISO APAC, top-of-market pay",
+      "Standard Chartered — CISO reporting to Global CRO",
+      "HKEX (Hong Kong Exchanges) — exchange-level Director package HKD 1.8M+",
+      "Big 4 (PwC / Deloitte HK) — fast Consultant → Manager promotion path",
+      "HKMA (regulator) — high stability"
+    ]
   },
   {
     "slug": "hk-ti-consultant-ceiling",
@@ -658,8 +732,13 @@
     "category": "hongkong_salaries",
     "role_en": "Hong Kong: Senior Threat Intelligence Consultant — Monthly + Total Package",
     "entry_salary_en": "N/A (senior-only record)",
-    "mid_salary_en": "HKD 50,000-70,000/month base (pre-bonus)",
-    "senior_salary_en": "HKD 85,000/month base (industry-verified direct intel; total annual package incl. bonus HKD 1.3-1.6M)"
+    "mid_salary_en": "50-70k/month base (pre-bonus)",
+    "senior_salary_en": "85k/month base (industry-verified; total annual package incl. bonus 1.3-1.6M)",
+    "top_hiring_en": [
+      "Foreign investment-bank CTI teams (Goldman Sachs / JPMorgan / HSBC) — highest pay",
+      "CrowdStrike / Mandiant HK — technical threat intelligence",
+      "Big 4 Cyber Threat Intelligence practice"
+    ]
   },
   {
     "slug": "sg-full-career-ladder",
@@ -689,9 +768,16 @@
     "source_url": "https://nodeflair.com/salaries / https://itel.com.sg/cybersecurity-salary-in-singapore-market-breakdown-for-2025/ / salary.sg",
     "category": "singapore_salaries",
     "role_en": "Full Career Ladder: Analyst → Manager → Director → CISO (Singapore, 7 levels)",
-    "entry_salary_en": "42,000–72,000 (Junior Analyst, 0-2 yrs)",
-    "mid_salary_en": "72,000–108,000 (Consultant / Senior Analyst, 3-5 yrs)",
-    "senior_salary_en": "108,000–160,000 (Senior Engineer / Senior Consultant, 6-9 yrs)"
+    "entry_salary_en": "42-72k (Junior Analyst, 0-2 yrs)",
+    "mid_salary_en": "72-108k (Consultant / Senior Analyst, 3-5 yrs)",
+    "senior_salary_en": "108-160k (Senior Engineer / Senior Consultant, 6-9 yrs)",
+    "top_hiring_en": [
+      "DBS / UOB / OCBC — local-bank CISO package SGD 400-600k+ (with equity)",
+      "GovTech Singapore — government CISO, SGD 300k+, strong job stability",
+      "Grab / Shopee — tech-firm Head of Security, equity tied to valuation",
+      "Big 4 (PwC / Deloitte SG) — Consultant to Partner track",
+      "MAS (regulator) — regulatory track, limited ceiling"
+    ]
   },
   {
     "slug": "au-full-career-ladder",
@@ -722,9 +808,15 @@
     "source_url": "https://www.roberthalf.com/au/en/job-details/ciso/sydney / https://terratern.com/blog/cyber-security-salary-australia / https://www.e2cyber.com.au/salary-rate-guide",
     "category": "australia_salaries",
     "role_en": "Full Career Ladder: Analyst → Manager → Director → CISO (Australia, 7 levels)",
-    "entry_salary_en": "75,000–95,000 (Junior Analyst, 0-2 yrs)",
-    "mid_salary_en": "95,000–130,000 (Consultant / Senior Analyst, 3-5 yrs)",
-    "senior_salary_en": "150,000–200,000 (Senior Engineer / Senior Consultant, 6-9 yrs)"
+    "entry_salary_en": "75-95k (Junior Analyst, 0-2 yrs)",
+    "mid_salary_en": "95-130k (Consultant / Senior Analyst, 3-5 yrs)",
+    "senior_salary_en": "150-200k (Senior Engineer / Senior Consultant, 6-9 yrs)",
+    "top_hiring_en": [
+      "Commonwealth Bank / ANZ / Westpac — major-bank CISO package AUD 500k+",
+      "ASD (Australian Signals Directorate) — government CISO, AUD 350-400k + NV2 clearance",
+      "BHP / Rio Tinto — mining-sector CISO, AUD 450k+, OT security expertise in demand",
+      "Telstra — telco CISO, AUD 400k+"
+    ]
   },
   {
     "slug": "cn-full-career-ladder",
@@ -755,9 +847,16 @@
     "source_url": "https://www.morganmckinley.com.cn/zh-hans/salary-guide + CSDN 2025网安薪酬趋势 + 脉脉数据",
     "category": "china_salaries",
     "role_en": "Full Career Ladder: Security Engineer → Manager → Director → CISO (China T1 tech + finance, 7 levels)",
-    "entry_salary_en": "200,000–300,000 (Junior, 0-2 yrs)",
-    "mid_salary_en": "300,000–500,000 (Mid-level, 3-5 yrs)",
-    "senior_salary_en": "550,000–1,000,000 (Senior Engineer / Senior Consultant, 8-12 yrs; finance sector specialists ¥800k+)"
+    "entry_salary_en": "200-300k (Junior, 0-2 yrs)",
+    "mid_salary_en": "300-500k (Mid-level, 3-5 yrs)",
+    "senior_salary_en": "550k-1M (Senior Engineer / Senior Consultant, 8-12 yrs; finance sector specialists 800k+)",
+    "top_hiring_en": [
+      "Tencent Security — VP-level total package with stock options over ¥5M, extremely competitive",
+      "Alibaba Cloud / Ant Group Security — Chief Security Officer package ¥3M+",
+      "ByteDance Security — fast growth, shorter equity vesting cycle",
+      "Big state-owned banks (ICBC / ABC / BOC / CCB) — CISO, stable track",
+      "Huawei Cyber Security — lab-style deep-tech roles"
+    ]
   },
   {
     "slug": "my-full-career-ladder",
@@ -788,9 +887,16 @@
     "source_url": "https://www.payscale.com/research/MY/Job=Security_Manager/Salary / https://www.salaryexpert.com/salary/job/director-cyber-security/malaysia / https://my.jobstreet.com",
     "category": "malaysia_salaries",
     "role_en": "Full Career Ladder: Security Analyst → Manager → Director → CISO (Malaysia, 7 levels)",
-    "entry_salary_en": "54,000–90,000 (Junior Analyst, 0-2 yrs)",
-    "mid_salary_en": "90,000–130,000 (Consultant / Senior Analyst, 3-5 yrs)",
-    "senior_salary_en": "130,000–200,000 (Senior Engineer / Senior Consultant, 6-9 yrs)"
+    "entry_salary_en": "54-90k (Junior Analyst, 0-2 yrs)",
+    "mid_salary_en": "90-130k (Consultant / Senior Analyst, 3-5 yrs)",
+    "senior_salary_en": "130-200k (Senior Engineer / Senior Consultant, 6-9 yrs)",
+    "top_hiring_en": [
+      "Maybank / CIMB — local major banks, CISO total package MYR 500-700k",
+      "Petronas — state-owned oil & gas, CISO MYR 600k+",
+      "TM (Telekom Malaysia) — telco security lead",
+      "Big 4 (PwC / Deloitte KL) — Consulting track",
+      "CyberSecurity Malaysia — government agency"
+    ]
   },
   {
     "slug": "cross-market-ciso-comparison",
@@ -816,8 +922,11 @@
     "source_url": "NodeFlair 2026 / Robert Half HK+AU 2026 / SalaryExpert 2025 / Morgan McKinley CN 2025 / 行业核实数据",
     "category": "cross_market",
     "role_en": "5-Market Career Ceiling Comparison: Who Earns Most At The Top? (HK / SG / AU / CN / MY)",
-    "entry_salary_en": "3-5 yrs: HK USD 58k / SG USD 66k / AU USD 82k / CN T1 USD 53k / MY USD 20k",
-    "mid_salary_en": "6-9 yrs: HK USD 105k / SG USD 120k / AU USD 148k / CN T1 USD 97k / MY USD 36k",
-    "senior_salary_en": "10+ yrs (CISO-track): HK USD 260k / SG USD 222k / AU USD 233k / CN T1 USD 160k / MY USD 55k"
+    "entry_salary_en": "3-5 yrs (USD-eq): HKD 58k · SGD 66k · AUD 82k · CNY 53k · MYR 20k",
+    "mid_salary_en": "6-9 yrs (USD-eq): HKD 105k · SGD 120k · AUD 148k · CNY 97k · MYR 36k",
+    "senior_salary_en": "10+ yrs CISO (USD-eq): HKD 260k · SGD 222k · AUD 233k · CNY 160k · MYR 55k",
+    "top_hiring_en": [
+      "Data sources: PayScale / SalaryExpert / NodeFlair / Robert Half / Morgan McKinley / SEEK / industry verification"
+    ]
   }
 ]

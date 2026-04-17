@@ -13,7 +13,12 @@
     "cert_b_salary_boost": "平均薪资涨幅 +18%",
     "verdict": "cissp_wins",
     "verdict_reason": "国际认可度更高，甲方与外资公司硬性要求，跳槽谈薪筹码更足",
-    "category": "management_certs"
+    "category": "management_certs",
+    "cert_a_cost_local_en": "≈ ¥4,000 exam fee + ¥12,000-20,000 training",
+    "cert_b_cost_local_en": "≈ ¥3,500 exam fee + ¥10,000-15,000 training",
+    "cert_a_salary_boost_en": "≈ ¥40-60k average annual raise; required for foreign-enterprise / MNC security management roles",
+    "cert_b_salary_boost_en": "≈ ¥30-50k average annual raise; preferred for in-house security manager roles",
+    "verdict_reason_en": "CISSP has stronger international recognition — essential for foreign enterprises, MNCs, or overseas career moves. CISM focuses more on security management and audit, suited to state-owned enterprise / bank security management tracks. If staying within China's in-house security market, CISM has better ROI; if considering overseas relocation, CISSP is non-negotiable."
   },
   {
     "slug": "cissp-vs-cism-sg",
@@ -29,7 +34,12 @@
     "cert_b_salary_boost": "平均薪资涨幅 +16%",
     "verdict": "cissp_wins",
     "verdict_reason": "CISSP 在 MAS/GovTech 职位描述出现频率是 CISM 的 3 倍",
-    "category": "management_certs"
+    "category": "management_certs",
+    "cert_a_cost_local_en": "≈ SGD 950 exam fee (official); self-study possible with no training",
+    "cert_b_cost_local_en": "≈ SGD 760 exam fee + SGD 1,500-3,000 training",
+    "cert_a_salary_boost_en": "≈ SGD 15-25k/year raise; required for most senior security engineer JD postings",
+    "cert_b_salary_boost_en": "≈ SGD 10-18k/year raise; appears in security manager JD postings",
+    "verdict_reason_en": "In Singapore, CISSP is the absolute mainstream — it's listed as the top preferred cert in 80%+ of senior security engineer JDs. CISM is more relevant for security manager / director roles but still sits behind CISSP in frequency. For IC track, CISSP wins decisively; for management track with 5+ years experience, adding CISM to CISSP becomes meaningful."
   },
   {
     "slug": "cisp-vs-cissp-china",
@@ -45,7 +55,12 @@
     "cert_b_salary_boost": "CISSP 持有者平均年薪 ¥300k–¥500k（T1城市）——接近 CISP 的 2 倍",
     "verdict": "split",
     "verdict_reason": "在国内甲方/政府做等保项目必须有 CISP；想去外企、MNC 或谋求 CISO 职位必须有 CISSP。战略最优解：先考 CISP（12–18 个月），再攻 CISSP（薪资天花板直接翻倍）",
-    "category": "china_vs_international"
+    "category": "china_vs_international",
+    "cert_a_cost_local_en": "¥12,800 (official authorized training ¥8,800 + exam registration ¥4,000; with ~25% discount, ≈ ¥9,600)",
+    "cert_b_cost_local_en": "¥5,400 (exam fee; with optional training ¥15,000-35,000)",
+    "cert_a_salary_boost_en": "CISP holders average salary ¥150k-¥200k (T1 city)",
+    "cert_b_salary_boost_en": "CISSP holders average salary ¥300k-¥500k (T1 city) — roughly 2× CISP",
+    "verdict_reason_en": "For in-house / government / state-owned enterprise projects in China, CISP is mandatory; for foreign enterprise, MNC, or CISO-track roles, CISSP is mandatory. Strategically optimal: take CISP first (12-18 months) then CISSP (salary ceiling effectively doubles)."
   },
   {
     "slug": "oscp-vs-ceh-global",
@@ -61,7 +76,12 @@
     "cert_b_salary_boost": "平均薪资涨幅 +8%",
     "verdict": "oscp_wins",
     "verdict_reason": "OSCP 是实际打靶考试，HR 看到 OSCP 默认你能真的动手；CEH 被认为是背题考试，实际含金量存疑",
-    "category": "pentest_certs"
+    "category": "pentest_certs",
+    "cert_a_cost_local_en": "≈ $1,649 (lab subscription + exam); 90-day lab access; requires 48hr hands-on exam",
+    "cert_b_cost_local_en": "≈ $1,199 (exam) + $850-1,200 optional training; multiple-choice exam",
+    "cert_a_salary_boost_en": "+25-40% salary for pentest roles globally; required in 70%+ of senior pentest JD postings",
+    "cert_b_salary_boost_en": "+10-15% salary; often an HR-level filter cert rather than a true skill differentiator",
+    "verdict_reason_en": "OSCP proves you can actually hack — hiring managers trust it. CEH is a knowledge cert that HR uses for filtering; it doesn't signal hands-on capability. For any real pentest / red team role, OSCP is the right investment. CEH only makes sense if your government / enterprise HR workflow specifically demands it."
   },
   {
     "slug": "security-plus-vs-ejpt-entry",
@@ -77,7 +97,12 @@
     "cert_b_salary_boost": "技术认可度高，但 HR 认知度低",
     "verdict": "security_plus_wins_for_jobs",
     "verdict_reason": "Security+ 是很多公司 JD 的过滤词，能帮你过简历关；eJPT 技术含量更高但不够出名，适合纯技术路线",
-    "category": "entry_level_certs"
+    "category": "entry_level_certs",
+    "cert_a_cost_local_en": "≈ $404 exam; broad IT security knowledge coverage",
+    "cert_b_cost_local_en": "≈ $249 exam; pure hands-on junior pentest skills",
+    "cert_a_salary_boost_en": "Entry-level SOC / analyst roles often require Security+; baseline cert for US DoD 8570 compliance roles",
+    "cert_b_salary_boost_en": "Signals hands-on entry pentest ability; pairs well with OSCP preparation",
+    "verdict_reason_en": "Security+ wins if you're going into broad SOC / analyst / GRC roles — it's the baseline HR requires. eJPT wins if you're specifically on the red-team / pentest track — it's genuine hands-on skill. If budget only allows one and career direction is still undecided, take Security+ first."
   },
   {
     "slug": "pnpt-vs-oscp-pentest",
