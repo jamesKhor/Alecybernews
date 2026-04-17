@@ -1,0 +1,51 @@
+---
+title: Payouts King 勒索软件部署 QEMU 虚拟机作为隐蔽的反向 SSH 后门
+slug: >-
+  2026-04-17-payouts-king-ransomware-deploys-qemu-vms-as-stealthy-reverse-ssh-backdoors
+date: '2026-04-17'
+excerpt: Payouts King 勒索软件团伙正在部署开源 QEMU 模拟器，在被入侵的主机上创建隐藏的虚拟机，建立持久的反向 SSH 后门，以规避传统的端点检测。
+category: malware
+tags:
+  - ransomware
+  - evasion
+  - qemu
+  - linux
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/payouts-king-ransomware-uses-qemu-vms-to-bypass-endpoint-security/
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-17-payouts-king-ransomware-deploys-qemu-vms-as-stealthy-reverse-ssh-backdoors
+severity: high
+threat_actor: Payouts King
+---
+## 执行摘要
+Payouts King 勒索软件行动采用了一种新颖的防御规避技术，利用开源 QEMU 硬件仿真器在被入侵的 Linux 系统上创建隐藏的虚拟机。根据网络安全公司 Halcyon 的分析，威胁行为者部署这些虚拟机以建立持久的、加密的反向 SSH 后门，允许他们保持访问并从虚拟化环境中执行勒索软件负载，这个环境对基于主机的安全工具来说基本上是不可见的。这种方法代表了对手工艺的显著升级，超越了传统的本地二进制文件（LOLBins），滥用合法的系统虚拟化软件以实现隐身。
+
+## 技术分析
+攻击链始于威胁行为者获得初始访问权限，通常是通过被泄露的凭证或利用面向互联网的服务中的漏洞。一旦进入目标 Linux 主机，他们下载并执行一个 shell 脚本，如果不存在，则安装 QEMU 和相关依赖项。核心规避技术涉及创建一个最小化的、定制的 QEMU 虚拟机镜像——一个 34MB 的 Alpine Linux 文件系统——托管在攻击者的基础设施上。
+
+然后攻击者配置 QEMU 以无头模式（无图形界面）运行此虚拟机，并设置端口转发。至关重要的是，他们配置虚拟机的 SSH 服务器连接回攻击者控制的命令和控制（C2）服务器，建立一个反向 SSH 隧道。这个隧道为攻击者提供了从虚拟机内部进行加密的、仅出站的命令执行能力。由于恶意活动被包含在虚拟化的 QEMU 进程中，该进程看起来像是一个合法的系统服务，基于主机的端点检测和响应（EDR）解决方案难以检查虚拟机内部的网络流量和运行的进程。勒索软件负载本身随后从这个隔离的、隐蔽的环境中执行。
+
+## 入侵指标
+目前没有识别出任何指标。Alpine Linux 镜像和部署脚本的具体哈希值在源材料中没有公开披露。防御者应监控意外安装 `qemu-system-x86` 包或执行带有网络转发参数的 QEMU 进程，特别是与出站 SSH 连接到未知外部 IP 地址结合时。
+
+## 战术、技术与程序
+根据 Halcyon 报告，观察到的 TTPs 映射到以下 MITRE ATT&CK 框架技术：
+- **T1562.001（损害防御：禁用或修改工具）**：滥用 QEMU 的虚拟化创建一个与主机安全监控隔离的环境。
+- **T1573.002（加密通道：非对称加密）**：使用 SSH 进行加密的命令和控制。
+- **T1095（非应用层协议）**：使用 SSH（对于许多勒索软件操作来说是非标准的 C2 协议）进行通信。
+- **T1027（混淆文件或信息）**：在虚拟机的混淆上下文中执行最终的勒索软件负载。
+- **T1059.004（命令和脚本解释器：Unix Shell）**：使用 bash 脚本进行部署和执行。
+- **T1210（远程服务利用）**：假定的初始访问向量以部署 QEMU 机制。
+
+## 威胁行为者背景
+Payouts King 勒索软件背后的团队在 2026 年初出现。Halcyon 分析人员评估认为 Payouts King 是一个独特的行动，不是已知 Black Basta 勒索软件集团的直接重新品牌，尽管它可能共享一些意识形态或战术血统。使用 QEMU 进行隐身是其操作安全的显著演变。勒索软件本身是用 Golang 编写的，并采用双重勒索模型，在加密之前窃取数据，并威胁在专用的泄露网站上发布。迄今为止识别出的主要目标是制造和技术行业的组织，但该技术可以移植到任何运行 Linux 系统并有足够的资源托管 QEMU 虚拟机的环境中。
+
+## 缓解措施与建议
+组织应实施分层防御策略以应对这种新颖的规避技术。网络级检测至关重要：监控来自非标准或意外的内部主机的出站 SSH 连接，特别是到未知外部 IP 地址。在主机上，实施严格的应用程序允许列表，以防止未经授权安装或执行像 QEMU 这样的虚拟化软件。使用行为分析来标记生成网络监听器或建立出站隧道的进程。确保强大的凭证卫生习惯，并修补面向互联网的系统以阻止 Payouts King 可能利用的初始访问向量。最后，分割网络以限制横向移动，减少如果单个主机被入侵并用于启动隐藏虚拟机的影响。
+
+## 参考资料
+- BleepingComputer：[Payouts King ransomware uses QEMU VMs to bypass endpoint security](https://www.bleepingcomputer.com/news/security/payouts-king-ransomware-uses-qemu-vms-to-bypass-endpoint-security/)
