@@ -288,17 +288,83 @@ export async function POST(req: NextRequest) {
             return { ...result, idx };
           }),
         );
-        const usable = fetched.filter((f) => !f.error && f.text.length >= 300);
+        const extractable = fetched.filter(
+          (f) => !f.error && f.text.length >= 300,
+        );
 
-        if (usable.length < 2) {
-          const errSummary = fetched
+        // ── Quality filter: keyword-match score ─────────────────────────
+        // Protect LLM generation from off-topic sources (e.g. Brave returns
+        // an NBA article matching "Shiny Hunters"). Pure deterministic
+        // filter — no LLM tokens spent. A source must contain ≥60% of the
+        // query keywords (≥3 chars) to pass. Below that, it's tangential.
+        const queryTokens = deferredResearchKeywords
+          .toLowerCase()
+          .split(/\s+/)
+          .map((t) => t.replace(/[^a-z0-9]/g, ""))
+          .filter((t) => t.length >= 3);
+        const matchThreshold = Math.max(2, Math.ceil(queryTokens.length * 0.6));
+
+        send({
+          type: "status",
+          step: "filtering",
+          message: `🧪 Quality filter: checking sources match [${queryTokens.join(", ")}] (≥${matchThreshold} of ${queryTokens.length} keywords)…`,
+        });
+
+        const usable: typeof extractable = [];
+        const discarded: { host: string; matched: number; total: number }[] =
+          [];
+        for (const src of extractable) {
+          // Count how many query tokens appear in the (lowercased) text
+          const lowText = src.text.toLowerCase();
+          const matched = queryTokens.filter((tok) =>
+            lowText.includes(tok),
+          ).length;
+          let host = src.url;
+          try {
+            host = new URL(src.url).hostname.replace(/^www\./, "");
+          } catch {
+            /* keep url */
+          }
+          if (matched >= matchThreshold) {
+            usable.push(src);
+            send({
+              type: "status",
+              step: "filter-keep",
+              message: `  ✓ ${host} — matched ${matched}/${queryTokens.length} keywords`,
+            });
+          } else {
+            discarded.push({ host, matched, total: queryTokens.length });
+            send({
+              type: "status",
+              step: "filter-discard",
+              message: `  ✗ ${host} — discarded (only ${matched}/${queryTokens.length} keywords matched)`,
+            });
+          }
+        }
+
+        // Minimum 3 sources (was 2) — triangulation standard for journalism.
+        // If keyword filter was too strict (e.g. query used stopwords),
+        // fall back to extractable sources to avoid rejecting a valid run.
+        const MIN_SOURCES = 3;
+        if (usable.length < MIN_SOURCES) {
+          const fetchErrs = fetched
             .filter((f) => f.error)
-            .map((f) => `${new URL(f.url).hostname}: ${f.error}`)
+            .map((f) => {
+              try {
+                return `${new URL(f.url).hostname}: ${f.error}`;
+              } catch {
+                return `${f.url}: ${f.error}`;
+              }
+            })
             .slice(0, 3)
             .join("; ");
+          const discardedSummary =
+            discarded.length > 0
+              ? `${discarded.length} discarded as off-topic`
+              : "";
           send({
             type: "error",
-            message: `Only ${usable.length} source(s) had extractable content (need ≥2). ${errSummary ? "Failures: " + errSummary : ""}`,
+            message: `Only ${usable.length}/${MIN_SOURCES} sources matched your keywords. ${discardedSummary}${fetchErrs ? `. Fetch failures: ${fetchErrs}` : ""}. Try more specific keywords or paste mode.`,
           });
           writer.close();
           return;
