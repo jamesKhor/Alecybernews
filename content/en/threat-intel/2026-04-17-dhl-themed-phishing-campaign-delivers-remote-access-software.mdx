@@ -1,0 +1,67 @@
+---
+title: DHL-Themed Phishing Campaign Delivers Remote Access Software
+slug: 2026-04-17-dhl-themed-phishing-campaign-delivers-remote-access-software
+date: '2026-04-17'
+excerpt: >-
+  A new phishing campaign impersonates DHL to trick recipients into installing
+  legitimate remote access software, which attackers then use as a foothold to
+  deploy additional malware, including ransomware.
+category: threat-intel
+tags:
+  - phishing
+  - ransomware
+  - initial-access
+  - social-engineering
+language: en
+source_urls:
+  - >-
+    https://www.malwarebytes.com/blog/news/2026/04/your-shipment-has-arrived-email-hides-remote-access-software
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-17-dhl-themed-phishing-campaign-delivers-remote-access-software
+severity: high
+affected_sectors:
+  - logistics
+  - shipping
+  - general-business
+---
+## Executive Summary
+A new phishing campaign is using convincing DHL-branded emails to deliver legitimate remote access software, establishing an initial foothold for threat actors. According to Malwarebytes researchers, attackers leverage this access to deploy additional malware, including ransomware, directly onto compromised systems. The operation highlights a continued trend of abusing trusted software brands and tools to bypass security controls and establish persistent access.
+
+## Technical Analysis
+The campaign begins with a phishing email bearing the subject line "Your shipment has arrived." The message mimics DHL's branding and informs the recipient that a package delivery attempt failed, urging them to open an attached file to view delivery details and reschedule. The attachment is a password-protected ZIP archive, a common technique to evade basic email security scanners. The password for the archive is included in the email body.
+
+Inside the archive is a malicious Windows Script File (WSF) named `DHL_Delivery_Details.wsf`. When executed, this script file downloads and runs a legitimate installer for AnyDesk, a widely used remote desktop application. The script configures AnyDesk to start with Windows and sets a custom, attacker-controlled access password, ensuring persistent remote access. Malwarebytes notes that the attackers then use this remote access to manually explore the compromised system, escalate privileges if necessary, and deploy secondary payloads. These follow-on payloads have included information-stealing malware and ransomware, though the specific ransomware family was not identified in the report.
+
+## Indicators of Compromise
+None identified at this time. The report from Malwarebytes did not provide specific file hashes, domains, or IP addresses associated with this campaign. The primary indicator remains the social engineering lure: password-protected ZIP archives delivered via email claiming to be from DHL regarding a failed shipment.
+
+## Tactics, Techniques & Procedures
+The threat actors employ a multi-stage intrusion chain blending social engineering and living-off-the-land tactics.
+- **Tactic: Initial Access (TA0001)**
+  - **Technique: Phishing (T1566)**: Spearphishing Attachment (T1566.001) is used to deliver the malicious WSF file.
+- **Tactic: Execution (TA0002)**
+  - **Technique: Command and Scripting Interpreter (T1059)**: Windows Command Shell (T1059.003) and Windows Script (T1059.005) are used to execute the downloaded WSF script.
+- **Tactic: Persistence (TA0003)**
+  - **Technique: Boot or Logon Autostart Execution (T1547)**: Registry Run Keys / Startup Folder (T1547.001) is achieved by configuring the legitimate AnyDesk software to launch at system startup.
+- **Tactic: Defense Evasion (TA0005)**
+  - **Technique: Masquerading (T1036)**: The files and email are masqueraded as legitimate DHL communications.
+  - **Technique: Obfuscated Files or Information (T1027)**: The malicious payload is delivered inside a password-protected ZIP archive to hinder static analysis.
+  - **Technique: Trusted Developer Utilities (T1218)**: The attackers abuse the legitimate, signed AnyDesk installer for malicious purposes.
+- **Tactic: Command and Control (TA0011)**
+  - **Technique: Remote Access Software (T1219)**: The primary objective is the installation and configuration of AnyDesk for persistent remote control.
+
+## Threat Actor Context
+The specific threat actor behind this campaign is not identified. The tactics are consistent with financially motivated groups, including ransomware affiliates, who commonly use remote access tools as a first step for hands-on-keyboard attacks. The use of a legitimate, high-reputation remote access tool like AnyDesk is a well-established technique to blend in with normal network traffic and avoid detection by security software that may only flag known-bad remote access tools (RATs).
+
+## Mitigations & Recommendations
+Organizations and users should implement layered defenses to counter this threat.
+- **User Training**: Educate employees on phishing tactics, specifically warning them about unsolicited emails with attachments, especially password-protected archives, even from seemingly trusted brands like shipping companies.
+- **Email Filtering**: Deploy advanced email security solutions capable of analyzing archive contents, including password-protected files, and detecting script-based threats like WSF files.
+- **Application Control**: Implement application allowlisting policies to prevent the execution of unauthorized software, including unexpected remote access tools from non-standard locations.
+- **Endpoint Detection & Response (EDR)**: Use EDR tools to monitor for suspicious process chains, such as `wscript.exe` or `cmd.exe` spawning processes that download and install remote access software.
+- **Network Monitoring**: Monitor outbound network traffic for connections to known remote desktop and remote access software vendors' servers that are not part of the organization's standard software portfolio.
+- **Vendor Communication**: Remind staff that legitimate logistics companies like DHL will not send executable files or scripts as attachments for delivery notifications.
+
+## References
+- Malwarebytes Labs: [“Your shipment has arrived” email hides remote access software](https://www.malwarebytes.com/blog/news/2026/04/your-shipment-has-arrived-email-hides-remote-access-software)
