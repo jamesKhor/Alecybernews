@@ -1,0 +1,57 @@
+---
+title: 假冒 Ledger 硬件钱包在中国市场上销售窃取加密货币
+slug: >-
+  2026-04-17-counterfeit-ledger-hardware-wallets-sold-on-chinese-marketplaces-steal-crypto-se
+date: '2026-04-17'
+excerpt: >-
+  一位网络安全研究人员揭露了一起复杂的供应链攻击，涉及在中国市场上销售的假冒 Ledger Nano S Plus 硬件钱包。这些假设备旨在窃取恢复种子和
+  PIN 码，使大约 20 个区块链上的加密货币被盗。
+category: threat-intel
+tags:
+  - supply-chain
+  - cryptocurrency
+  - hardware
+  - fraud
+language: zh
+source_urls:
+  - 'https://cybersecuritynews.com/fake-ledger-hardware-wallets/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-17-counterfeit-ledger-hardware-wallets-sold-on-chinese-marketplaces-steal-crypto-se
+severity: high
+affected_sectors:
+  - cryptocurrency
+---
+## 执行摘要
+一位巴西网络安全研究员揭露了一起大规模供应链攻击事件，涉及假冒的Ledger Nano S Plus硬件钱包。这些假设备在中国的阿里巴巴和AliExpress等市场上销售，设计用于在初始设置过程中秘密捕获用户的24个单词恢复种子和PIN，并将数据传输给攻击者，从而完全盗取加密货币资产。这位以Reddit用户名u/Past_Computer2901发帖的研究员购买了并分析了一台设备，发现它是一个复杂的复制品，旨在模仿真正的Ledger体验，同时作为一个专门的盗窃工具。
+
+## 技术分析
+假冒设备是硬件级别的伪造品，而不是被泄露的真正的Ledger。根据研究员的拆解和分析，钱包包含一个定制的恶意印刷电路板（PCB）和固件。主要攻击向量是设备的入职流程。当受害者初始化钱包时，它提示他们输入一个新的PIN，然后生成一个24个单词的恢复种子，并像预期的那样在屏幕上显示。用户不知道的是，设备同时在其内部存储器中存储了这个种子和输入的PIN。
+
+该设备配备了蓝牙低功耗（BLE）模块，真正的Ledger Nano S Plus并不具备。这个模块被用来窃取种子和PIN数据。研究员的分析表明，设备可能将这些数据传输到附近的攻击者控制的接收器，或者可能传输到攻击者控制下的配对移动设备。恶意固件还设计为非法签署交易，允许攻击者从任何由泄露种子派生的钱包中提取资金。研究员估计，假冒设备支持大约20个不同区块链网络上的盗窃。
+
+## 入侵指标
+目前没有识别出任何入侵指标。物理假冒设备在视觉上是令人信服的复制品。主要的技术IOCs——未经授权的BLE模块和恶意固件的存在——需要物理拆卸或深入固件分析才能检测到，这超出了大多数最终用户的能力。
+
+## 战术、技术与程序
+威胁行为者采用了经典的供应链泄露战术（T1195.002，供应链泄露：泄露软件供应链），通过将恶意硬件引入零售分销渠道。技术涉及：
+1.  **制造令人信服的假冒品：**生产硬件，密切模仿真正的Ledger设备的包装、建造质量和初始用户界面。
+2.  **预装恶意固件：**加载定制固件，设计用于在看似合法的设置流程中拦截和窃取敏感的加密材料。
+3.  **隐蔽的数据泄露渠道：**通过添加BLE模块实现隐蔽的数据泄露方法，这是被复制的正品模型中不存在的功能。
+4.  **滥用可信平台：**利用大型、信誉良好的在线市场为欺诈性列表增加可信度，并吸引全球观众。
+
+## 威胁行为者背景
+在可用的源材料中没有识别出这起行动背后的特定威胁行为者或团体。行动的规模，需要专门的硬件制造、固件开发和市场店面管理，表明这是一个资源丰富、以财务为动机的犯罪企业。通过硬件钱包假冒品针对加密货币用户是一个已知的、高回报的攻击向量，但这一实例在执行上显得特别复杂。研究员的发现被发布在Reddit上，目前尚不清楚在公开披露之前，Ledger或执法机构是否被正式通知。
+
+## 缓解措施与建议
+加密货币持有者在购买硬件钱包时必须格外小心。Ledger官方声明，其设备应该只从Ledger.com或其网站上列出的授权转售商购买。
+*   **从官方渠道购买：**无论卖家评级或价格如何，永远不要从第三方市场如亚马逊、eBay、AliExpress或阿里巴巴购买硬件钱包。
+*   **使用Ledger Genuine Check：**所有新的Ledger设备都包含一个安全元素，允许Ledger Live桌面应用程序在设置期间加密验证设备的真伪。这是最关键的步骤。
+*   **自己初始化设备：**真正的硬件钱包将在设置期间在设备本身上生成一个新的种子短语。如果设备带有预印的种子短语卡，则肯定被泄露。
+*   **物理检查（谨慎）：**虽然假货令人信服，但在包装、字体或组件布局上可能存在差异。然而，视觉检查不是加密真实性检查的可靠替代品。
+*   **假设泄露：**如果您已经设置了从第三方市场购买并用于存储资产的硬件钱包，您必须考虑种子短语已被泄露。资产应立即转移到通过Ledger Live验证为真实的设备生成的钱包中。
+
+## 参考资料
+*   Reddit用户u/Past_Computer2901的帖子，详细描述了发现和分析假冒Ledger钱包的过程。[https://www.reddit.com/r/ledgerwallet/comments/1f8g9p8/warning_fake_ledger_nano_s_plus_on_alibaba/](https://www.reddit.com/r/ledgerwallet/comments/1f8g9p8/warning_fake_ledger_nano_s_plus_on_alibaba/)
+*   CyberSecurity News文章总结了研究员的发现。[https://cybersecuritynews.com/fake-ledger-hardware-wallets/](https://cybersecuritynews.com/fake-ledger-hardware-wallets/)

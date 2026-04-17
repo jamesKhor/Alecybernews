@@ -1,0 +1,59 @@
+---
+title: Counterfeit Ledger Hardware Wallets Sold on Chinese Marketplaces Steal Crypto
+slug: >-
+  2026-04-17-counterfeit-ledger-hardware-wallets-sold-on-chinese-marketplaces-steal-crypto-se
+date: '2026-04-17'
+excerpt: >-
+  A cybersecurity researcher has uncovered a sophisticated supply chain attack
+  involving counterfeit Ledger Nano S Plus hardware wallets sold on Chinese
+  marketplaces. The fake devices are designed to steal recovery seeds and PINs,
+  enabling theft of cryptocurrency across approximately 20 blockchains.
+category: threat-intel
+tags:
+  - supply-chain
+  - cryptocurrency
+  - hardware
+  - fraud
+language: en
+source_urls:
+  - 'https://cybersecuritynews.com/fake-ledger-hardware-wallets/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-17-counterfeit-ledger-hardware-wallets-sold-on-chinese-marketplaces-steal-crypto-se
+severity: high
+affected_sectors:
+  - cryptocurrency
+---
+## Executive Summary
+A large-scale supply chain attack involving counterfeit Ledger Nano S Plus hardware wallets has been exposed by a Brazilian cybersecurity researcher. The fake devices, sold on Chinese marketplaces like Alibaba and AliExpress, are engineered to surreptitiously capture a user's 24-word recovery seed and PIN during the initial setup process, transmitting the data to the attacker and enabling complete theft of cryptocurrency assets. The researcher, posting under the pseudonym u/Past_Computer2901 on Reddit, purchased and analyzed a device, finding it to be a sophisticated replica designed to mimic the genuine Ledger experience while functioning as a dedicated theft tool.
+
+## Technical Analysis
+The counterfeit device is a hardware-level forgery, not a compromised genuine Ledger. According to the researcher's teardown and analysis, the wallet contains a custom, malicious printed circuit board (PCB) and firmware. The primary attack vector is the device's onboarding process. When a victim initializes the wallet, it prompts them to enter a new PIN and then generates a 24-word recovery seed, displaying it on the screen as expected. Unbeknownst to the user, the device simultaneously stores this seed and the entered PIN in its internal memory.
+
+The device is equipped with a Bluetooth Low Energy (BLE) module, which the genuine Ledger Nano S Plus does not possess. This module is used to exfiltrate the stolen seed and PIN data. The researcher's analysis indicates the device likely transmits this data to a nearby attacker-controlled receiver or potentially to a paired mobile device under the attacker's control. The malicious firmware is also designed to sign transactions illegitimately, allowing an attacker to drain funds from any wallet derived from the compromised seed. The researcher estimates the fake devices support theft across roughly 20 different blockchain networks.
+
+## Indicators of Compromise
+None identified at this time. The physical counterfeit devices are visually convincing replicas. The primary technical IOCs—the presence of an unauthorized BLE module and malicious firmware—require physical disassembly or deep firmware analysis to detect, which is beyond the capability of most end-users.
+
+## Tactics, Techniques & Procedures
+The threat actors employ a classic supply chain compromise tactic (T1195.002, Supply Chain Compromise: Compromise Software Supply Chain) by introducing malicious hardware into the retail distribution channel. The technique involves:
+1.  **Manufacturing Convincing Counterfeits:** Producing hardware that closely mimics the packaging, build quality, and initial user interface of a genuine Ledger device.
+2.  **Pre-installed Malicious Firmware:** Loading custom firmware designed to intercept and exfiltrate sensitive cryptographic material during the legitimate-seeming setup flow.
+3.  **Covert Exfiltration Channel:** Implementing a stealthy data exfiltration method via an added BLE module, a feature not present in the authentic model being copied.
+4.  **Abuse of Trusted Platforms:** Leveraging large, reputable online marketplaces to lend credibility to the fraudulent listings and reach a global audience.
+
+## Threat Actor Context
+The specific threat actor or group behind this operation is not identified in the available source material. The operation's scale, requiring specialized hardware manufacturing, firmware development, and marketplace storefront management, suggests a well-resourced, financially motivated criminal enterprise. The targeting of cryptocurrency users through hardware wallet counterfeits is a known, high-reward attack vector, but this instance appears notably sophisticated in its execution. The researcher's findings were posted to Reddit, and it is unclear if Ledger or law enforcement agencies were formally notified prior to the public disclosure.
+
+## Mitigations & Recommendations
+Cryptocurrency holders must exercise extreme caution when purchasing hardware wallets. Ledger officially states its devices should only be purchased from Ledger.com or authorized resellers listed on its website.
+*   **Purchase from Official Sources:** Never buy hardware wallets from third-party marketplaces like Amazon, eBay, AliExpress, or Alibaba, regardless of seller ratings or price.
+*   **Use the Ledger Genuine Check:** All new Ledger devices contain a secure element that allows the Ledger Live desktop application to cryptographically verify the device's authenticity during setup. This is the most critical step.
+*   **Initialize the Device Yourself:** A genuine hardware wallet will always generate a new seed phrase on the device itself during setup. A device that arrives with a pre-printed seed phrase card is definitively compromised.
+*   **Physically Inspect (with caution):** While the fakes are convincing, discrepancies may exist in packaging, fonts, or component layout. However, visual inspection is not a reliable substitute for the cryptographic genuine check.
+*   **Assume Compromise:** If you have already set up a hardware wallet purchased from a third-party marketplace and used it to store assets, you must consider the seed phrase compromised. Assets should be immediately transferred to a wallet generated by a device verified as genuine via Ledger Live.
+
+## References
+*   Reddit user u/Past_Computer2901 post detailing the discovery and analysis of the counterfeit Ledger wallet. [https://www.reddit.com/r/ledgerwallet/comments/1f8g9p8/warning_fake_ledger_nano_s_plus_on_alibaba/](https://www.reddit.com/r/ledgerwallet/comments/1f8g9p8/warning_fake_ledger_nano_s_plus_on_alibaba/)
+*   CyberSecurity News article summarizing the researcher's findings. [https://cybersecuritynews.com/fake-ledger-hardware-wallets/](https://cybersecuritynews.com/fake-ledger-hardware-wallets/)
