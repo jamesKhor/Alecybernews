@@ -12,7 +12,6 @@ import type { CertRecord } from "@/lib/salary";
 
 interface Props {
   records: CertRecord[];
-  locale: "en" | "zh";
   labels: {
     title: string;
     standfirst: string;
@@ -47,7 +46,7 @@ function verdictLabel(verdict: string, labels: Props["labels"]): string {
   return labels.verdictMap.verdict_default ?? verdict;
 }
 
-export function CertROITable({ records, locale, labels }: Props) {
+export function CertROITable({ records, labels }: Props) {
   // Sort: highest-cost certs first (CISSP, OSCP) — typically the most
   // career-defining decisions, deserve top placement
   const sorted = [...records].sort(
@@ -198,14 +197,6 @@ export function CertROITable({ records, locale, labels }: Props) {
           </article>
         ))}
       </div>
-
-      {/* Anti-locale: small note about ZH-leaning shocking_facts */}
-      {locale === "en" && (
-        <p className="mt-4 text-xs text-muted-foreground italic">
-          Note: original analysis is China- and APAC-focused; some commentary
-          may render in Chinese.
-        </p>
-      )}
     </section>
   );
 }

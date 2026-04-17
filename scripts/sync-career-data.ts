@@ -105,13 +105,25 @@ function writeJson(filePath: string, data: unknown[]): void {
  * Merge manually-curated fields from the EXISTING JSON snapshot into the
  * fresh sync result, keyed by `slug`.
  *
- * WHY: some fields (e.g. `top_tier_salary`, `top_tier_note`) are added
- * directly in this repo by the operator/another session, not in the
- * source YAML. Without this merge a sync would clobber them.
+ * WHY: some fields (e.g. `top_tier_salary`, `top_tier_note`, `*_en`) are
+ * added directly in this repo by the operator/another session, not in
+ * the source YAML. Without this merge a sync would clobber them.
  *
  * Rule: any key present in the existing record AND absent from the
  * fresh record gets carried over. Keys present in BOTH always take the
  * fresh value (source-of-truth wins for shared fields).
+ *
+ * Preserved-field classes (2026-04-17):
+ *   - `top_tier_salary` / `top_tier_note` — operator's HK industry intel
+ *   - `role_en` / `top_tier_note_en` / `entry_salary_en` /
+ *     `mid_salary_en` / `senior_salary_en` — English translations of
+ *     Chinese-only source strings (added when operator reported CJK
+ *     bleed-through on /en/salary).
+ *
+ * The xhs-session should NOT emit these fields in its YAMLs — they
+ * belong at the consumer boundary, not the data source. If xhs ever
+ * starts emitting them, the sync will take the YAML version (as
+ * designed, since "both present" means source-of-truth wins).
  */
 function mergePreservedFields<T extends { slug?: string }>(
   fresh: T[],

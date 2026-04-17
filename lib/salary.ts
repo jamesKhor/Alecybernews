@@ -59,6 +59,24 @@ export const SalaryRecordSchema = z.object({
   // for other markets where we have credible data.
   top_tier_salary: z.string().optional(),
   top_tier_note: z.string().optional(),
+  // ── English overrides (optional) ─────────────────────────────────
+  // The source YAMLs live in zcyber-xhs (Chinese-audience project) so
+  // many text fields are Chinese-only. When displayed on /en/salary
+  // they bleed through as mixed-language. Operator caught this on
+  // 2026-04-17 after switching language manually.
+  //
+  // Schema fix: optional `_en` fields that take precedence when the
+  // reader locale is "en". If missing, we fall back to the base field
+  // (some base fields are already English — SG / AU / MY records
+  // mostly — so no override needed there).
+  //
+  // Populated per-slug in data/salary-data.json via a translation pass;
+  // preserved across future YAML syncs by mergePreservedFields().
+  role_en: z.string().optional(),
+  top_tier_note_en: z.string().optional(),
+  entry_salary_en: z.string().optional(),
+  mid_salary_en: z.string().optional(),
+  senior_salary_en: z.string().optional(),
 });
 export type SalaryRecord = z.infer<typeof SalaryRecordSchema>;
 
@@ -227,6 +245,38 @@ export function currencySymbol(code: string): string {
 }
 
 // ── Filter helpers (used by server component to read URL params) ─────────
+
+/**
+ * Return a SalaryRecord with fields swapped to their English overrides
+ * when the target locale is "en" and an `_en` variant exists.
+ *
+ * Why this pattern: the source YAML is ZH-first (per operator's xhs
+ * project). English readers saw Chinese role / note / salary-range
+ * strings bleeding through on /en/salary. This helper normalizes at
+ * the presentation boundary without changing the data model's single
+ * source of truth (the base fields stay authoritative; `_en` is pure
+ * override, not duplication).
+ *
+ * Behavior:
+ *   - locale === "zh" → returns record unchanged (base fields are ZH)
+ *   - locale === "en" → returns record with base fields replaced by
+ *     their `_en` counterparts WHERE PRESENT. Missing `_en` means the
+ *     base field was already English, so it's used as-is.
+ */
+export function getLocalized(
+  record: SalaryRecord,
+  locale: "en" | "zh",
+): SalaryRecord {
+  if (locale === "zh") return record;
+  return {
+    ...record,
+    role: record.role_en ?? record.role,
+    top_tier_note: record.top_tier_note_en ?? record.top_tier_note,
+    entry_salary: record.entry_salary_en ?? record.entry_salary,
+    mid_salary: record.mid_salary_en ?? record.mid_salary,
+    senior_salary: record.senior_salary_en ?? record.senior_salary,
+  };
+}
 
 export function filterSalaries(
   records: SalaryRecord[],

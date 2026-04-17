@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_SC } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Script from "next/script";
@@ -13,6 +13,29 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Noto Sans SC — consistent Heiti rendering across ALL platforms.
+// Without this, Windows users see Microsoft YaHei (acceptable) or
+// worse, SimSun fallback (Songti serif, which 小鹿Lawrence specifically
+// flagged as bad for small-screen readability in the Pixel Street
+// episode). iOS users see PingFang SC. The result: brand inconsistency
+// between XHS readers and direct visitors.
+//
+// With this webfont loaded:
+//   - All platforms render CJK in Noto Sans SC first
+//   - Fallback chain only triggers if the webfont fails to load
+//   - Google Fonts auto-subsets based on characters actually used
+//     (via unicode-range) so the bundle cost stays bounded
+//
+// Weights chosen to match our design system (400 body, 600 semibold
+// labels, 700 headlines, 900 display hero). display:swap avoids FOIT.
+const notoSansSC = Noto_Sans_SC({
+  variable: "--font-noto-sc",
+  subsets: ["latin"], // actual CJK glyphs come via unicode-range subsetting
+  weight: ["400", "500", "600", "700", "900"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -85,7 +108,7 @@ export default async function RootLayout({
     <html
       lang={lang}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSansSC.variable} h-full antialiased`}
     >
       <head>
         {/* Google AdSense — must be in <head> for site verification */}

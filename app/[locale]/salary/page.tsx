@@ -24,6 +24,7 @@ import {
   SalaryRecordSchema,
   CertRecordSchema,
   filterSalaries,
+  getLocalized,
   classifyMarket,
   type MarketKey,
   type RoleKey,
@@ -196,16 +197,24 @@ export default async function SalaryPage({ params, searchParams }: PageProps) {
 
   const t = await getTranslations({ locale, namespace: "salary" });
 
+  // Localize records at the presentation boundary. For locale === "en"
+  // this swaps any Chinese-only fields (role / top_tier_note / salary
+  // strings) to their `_en` overrides where present. For locale === "zh"
+  // the base ZH fields are returned unchanged. This fixes the operator-
+  // reported bug (2026-04-17): "change the language manual to english
+  // still lots of mix of chinese in english version".
+  const localizedData = salaryData.map((r) => getLocalized(r, locale));
+
   // Apply URL-driven filters server-side so the rendered HTML matches
   // the URL state — crawlers + sharing both work without JS.
   const market = (sp.market ?? "all") as MarketKey | "all";
   const role = (sp.role ?? "all") as RoleKey | "all";
-  const filtered = filterSalaries(salaryData, { market, role });
+  const filtered = filterSalaries(localizedData, { market, role });
 
   // At-a-glance stats — counted from the FULL dataset (not the filtered
   // view) so the hero summary always reflects the dataset's true breadth.
   const marketsCovered = new Set(
-    salaryData.map((r) => classifyMarket(r.market)),
+    localizedData.map((r) => classifyMarket(r.market)),
   ).size;
 
   // ── Translation labels passed to components (keep them simple props) ──
@@ -461,7 +470,7 @@ export default async function SalaryPage({ params, searchParams }: PageProps) {
         )}
 
         {/* Cert ROI table — separate section, anchor target from card chips */}
-        <CertROITable records={certData} locale={locale} labels={certLabels} />
+        <CertROITable records={certData} labels={certLabels} />
 
         {/* Methodology — earned-trust signal, not just legal disclaimer */}
         <section

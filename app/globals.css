@@ -93,32 +93,45 @@
 }
 
 /* ─── Font stacks ─────────────────────────────────────────────────
-   Next/Font loads Geist/Geist Mono with subset=["latin"] only, so
-   the font files have zero CJK glyphs. Without an explicit fallback
-   the browser picks whatever system CJK font it likes first — which
-   on macOS/iOS is PingFang SC, on Windows is Microsoft YaHei, on
-   Android is Noto Sans CJK — each with subtly different metrics.
-   The result is "Latin = Geist, Chinese = mismatched fallback" in
-   the same heading or table row, which reads as broken.
 
-   Fix: declare a deliberate CJK fallback chain in BOTH the sans and
-   mono family stacks. The browser still uses Geist for Latin glyphs;
-   CJK glyphs fall through to the first installed font in the chain.
-   The CJK fonts we chose (PingFang SC → Hiragino → Microsoft YaHei
-   → Noto Sans SC) are all geometric sans-serif families that pair
-   well with Geist's proportions.
+   CJK rendering bug (reported by operator on Windows 2026-04-17):
+   ---------------------------------------------------------------
+   Geist + Geist Mono have zero CJK glyphs (next/font subset=["latin"]).
+   When the browser hits a Chinese character:
 
-   We also alias --font-mono to the same CJK chain so tabular numbers
-   inside labels like "YoE" or market tags never fall to a serif. */
+     OLD stack: Geist → system-ui → Segoe UI → Roboto → PingFang SC
+       On Windows, system-ui / Segoe UI have no CJK, so the browser
+       falls to the OS default — which on many Win10/11 installs is
+       SimSun (宋体 Songti, serif). Latin = clean Geist sans, Chinese
+       = decorated serif. Reads as broken. The Pixel Street episode
+       specifically flags this: Heiti > Songti on screens.
+
+     NEW stack (below): Geist → Noto Sans SC → PingFang SC →
+       Microsoft YaHei → Hiragino → ... → system-ui → sans-serif
+       Browser tries Latin fonts first (Geist matches), then jumps
+       into Heiti-family CJK fonts. It cannot reach system-ui and
+       cannot fall to SimSun. Chinese always renders in clean Heiti,
+       consistent across macOS / iOS / Windows / Android.
+
+   Noto Sans SC is loaded as a webfont via next/font in layout.tsx.
+   It's the guaranteed consistent CJK renderer across platforms;
+   native-font names after it are redundant fallbacks.
+
+   --font-sans-stack    → body + Tailwind .font-sans override
+   --font-mono-stack    → .font-mono (currency, tabular numbers)
+   --font-display-stack → .font-display (cinematic hero only) */
 :root {
   --font-sans-stack:
-    var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", Roboto,
-    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei",
-    "Noto Sans SC", sans-serif;
+    var(--font-geist-sans), var(--font-noto-sc), "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei",
+    "Noto Sans CJK SC", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono-stack:
     var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
-    "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC",
-    monospace;
+    var(--font-noto-sc), "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei",
+    "Noto Sans CJK SC", monospace;
+  --font-display-stack:
+    var(--font-geist-sans), var(--font-noto-sc), "PingFang SC",
+    "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
 }
 
 body {
@@ -127,11 +140,18 @@ body {
   font-family: var(--font-sans-stack);
 }
 
-/* Ensure Tailwind's `.font-mono` uses the CJK-safe mono stack so that
-   mixed-script numbers like "HKD 200 万" render with consistent metrics
-   instead of falling to a serif fallback for the CJK character. */
+/* Tailwind v4 generates its own font-sans / font-mono utilities with
+   default font-family values. Our overrides must win the cascade with
+   !important so every font-* utility usage routes through the CJK-safe
+   stack without having to touch every component. */
+.font-sans {
+  font-family: var(--font-sans-stack) !important;
+}
 .font-mono {
   font-family: var(--font-mono-stack) !important;
+}
+.font-display {
+  font-family: var(--font-display-stack) !important;
 }
 
 /* Prose / MDX article styles */

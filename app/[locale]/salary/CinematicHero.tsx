@@ -95,10 +95,14 @@ export function CinematicHero({ labels }: Props) {
         }}
       />
 
-      {/* Content. min-height pushes the hero close to full viewport on
-          desktop but caps on mobile so the user can still see the body
-          copy + CTA without scrolling. */}
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-8 py-16 sm:py-24 md:py-32 min-h-[80vh] sm:min-h-[88vh] flex flex-col justify-between gap-12">
+      {/* Content. min-height is tuned per breakpoint:
+            - Mobile (< 640px): 62vh — enough for full wordmark + CTA
+              above the keyboard/fold on a 6" phone, not so tall that
+              users must scroll past empty space to reach data.
+            - Desktop (>= 640px): 88vh — full cinematic moment.
+          Padding + gap also shrunk on mobile so the 4-line wordmark
+          doesn't squeeze the body copy off-screen on narrow devices. */}
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-8 py-10 sm:py-24 md:py-32 min-h-[62vh] sm:min-h-[88vh] flex flex-col justify-between gap-6 sm:gap-12">
         {/* TOP: wordmark, 4 lines, alternating opacity */}
         <div aria-hidden className="flex flex-col">
           {[
@@ -109,15 +113,22 @@ export function CinematicHero({ labels }: Props) {
           ].map((line, i) => (
             <div
               key={i}
-              className={`font-black leading-[0.88] tracking-tight uppercase
-                text-[18vw] sm:text-[16vw] md:text-[14vw] lg:text-[13rem] xl:text-[15rem]
+              // font-display routes through the CJK-safe stack. font-black
+              // (900) gives short display words the weight the Pixel Street
+              // episode prescribes: "if stylized text is just a few words,
+              // make the font weight heavy or it loses impact."
+              // Mobile: 17vw on a 375px phone ≈ 64px, "CAREER" at 6
+              // chars still fits inside px-4 content width with breathing
+              // room (was 18vw — ran tight on 320px phones).
+              className={`font-display font-black leading-[0.86] tracking-tight uppercase
+                text-[17vw] sm:text-[16vw] md:text-[14vw] lg:text-[13rem] xl:text-[15rem]
                 ${line.align}
                 ${line.strong ? "text-white" : "text-white/[0.14]"}
                 ${i > 0 ? "-mt-[0.08em]" : ""}`}
               style={{
-                fontFamily: "var(--font-sans-stack)",
-                // Slight letter-spacing tightening at very large sizes
-                // so the word looks crafted, not defaulted.
+                // Tighten letter-spacing at display sizes so the word
+                // looks crafted, not defaulted. The font-display class
+                // above already sets font-family via CSS.
                 letterSpacing: "-0.035em",
                 // Subtle text-shadow on strong lines for cinematic glow
                 textShadow: line.strong
