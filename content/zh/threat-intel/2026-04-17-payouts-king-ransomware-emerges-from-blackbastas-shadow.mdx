@@ -1,0 +1,51 @@
+---
+title: Payouts King 勒索软件从 BlackBasta 的阴影中浮现
+slug: 2026-04-17-payouts-king-ransomware-emerges-from-blackbastas-shadow
+date: '2026-04-17'
+excerpt: >-
+  与前 BlackBasta 联盟成员有关的 Payouts King 勒索软件集团自 2025 年 4
+  月以来进行了针对性攻击，结合数据盗窃与选择性加密向受害者施压。
+category: threat-intel
+tags:
+  - ransomware
+  - threat-actor
+  - data-exfiltration
+language: zh
+source_urls:
+  - 'https://cybersecuritynews.com/payouts-king-rises-as-new-ransomware-threat/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-17-payouts-king-ransomware-emerges-from-blackbastas-shadow
+severity: high
+threat_actor: Payouts King
+---
+## 执行摘要
+Payouts King 勒索软件行动已成为一个重大威胁，研究人员将其战术和基础设施与现已解散的 BlackBasta 勒索软件即服务（RaaS）团体联系起来。根据 CyberSecurity News 的一份报告，该团体自至少 2025 年 4 月以来一直活跃，进行针对性攻击，优先考虑数据盗窃和选择性文件加密，以最大化对受害者支付的压力。该团体的低调和有意识的目标选择表明，其继承了其前身推广的专业附属模型。
+
+## 技术分析
+Payouts King 勒索软件的加密例程或初始访问向量的技术细节在可用来源中没有公开记录。该团体的操作安全性似乎很坚固，因为它自一年多前出现以来，成功避免了广泛的检测和分析。主要的技术特点是其混合攻击模型，它在部署文件加密恶意软件之前积极地泄露受害者数据。这种双管齐下的方法——结合数据泄露的威胁和运营中断——是现代高影响力勒索软件行动的标志。源材料中没有详细说明用于加密文件的特定文件扩展名、加密算法或解密器的存在。
+
+## 入侵指标
+目前没有识别出任何入侵指标。源报告没有提供与 Payouts King 团体相关的特定文件哈希值、域名、IP 地址或其他技术指标。
+
+## 战术、技术与程序
+根据源报告，Payouts King 使用一套与复杂勒索软件附属机构一致的 TTP：
+*   **加密前的数据盗窃：** 该团体在部署勒索软件之前进行广泛的数据泄露，利用被盗数据增加额外的勒索压力。
+*   **选择性文件加密：** 该团体似乎没有在整个网络上不加选择地部署加密，而是加密特定的、关键的文件，以增加对业务运营的影响，同时可能避开一些检测机制。
+*   **安静、有针对性的操作：** 该团体保持了低调的公众形象，表明它谨慎选择受害者，专注于操作安全性，以避免引起执法或安全供应商的注意。
+*   **勒索软件即服务模型：** 与 BlackBasta 附属机构的联系强烈暗示 Payouts King 按照附属或 RaaS 模型运营，核心开发人员维护恶意软件和基础设施，然后由合作伙伴用于进行攻击。
+
+## 威胁行为者背景
+研究人员直接将 Payouts King 团体与 BlackBasta 勒索软件行动的前附属机构联系起来。BlackBasta 是一个多产的 RaaS 行动，它在 2022 年和 2023 年造成了重大损害，然后似乎解散。Payouts King 的出现表明，BlackBasta 的熟练人员、基础设施和攻击方法并没有退休，而是在新品牌下重新组建。这种重新品牌和连续性的模式在勒索软件生态系统中很常见，允许团体摆脱声誉包袱，规避特定的对策，并混淆归因工作，同时保持犯罪收入流。
+
+## 缓解措施与建议
+组织应该对使用数据盗窃和加密的勒索软件团体应用标准、高价值的缓解措施：
+*   **实施和测试备份：** 维护频繁、不可变的、离线的备份关键数据。定期测试恢复程序，以确保运营弹性。
+*   **加强端点检测：** 部署配置用于检测和阻止可疑文件加密活动和大量文件更改的端点检测和响应（EDR）工具。
+*   **网络分段：** 采用强大的网络分段，限制横向移动，防止单一初始妥协导致整个网络加密。
+*   **监控数据流出：** 实施数据丢失预防（DLP）解决方案，并监控网络流量，寻找大量、未经授权的数据泄露的迹象，这通常先于加密阶段。
+*   **应用最小权限原则：** 严格限制用户和系统帐户权限，以减少凭证泄露的影响。
+*   **保持软件更新：** 及时修补面向公众的应用程序和操作系统，以关闭勒索软件附属机构利用的常见初始访问向量。
+
+## 参考资料
+*   [Payouts King Rises as New Ransomware Threat Linked to Former BlackBasta Affiliates](https://cybersecuritynews.com/payouts-king-rises-as-new-ransomware-threat/)
