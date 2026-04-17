@@ -206,9 +206,13 @@ export async function POST(req: NextRequest) {
         let searchResults;
         const searchStart = Date.now();
         try {
+          // No freshness filter — niche cybersecurity coverage (e.g.
+          // "thegentlemen ransomware" on dexpose.io, hookphish.com) often
+          // lacks proper date metadata, so Brave's freshness filter hides
+          // them. We rely on the keyword-match quality filter below to
+          // reject off-topic matches instead.
           searchResults = await searchBrave(deferredResearchKeywords, {
             count: 8,
-            freshness: "pm", // past month — trending cyber stories
           });
         } catch (err) {
           const msg =
@@ -362,9 +366,38 @@ export async function POST(req: NextRequest) {
             discarded.length > 0
               ? `${discarded.length} discarded as off-topic`
               : "";
+          // Actionable recovery hints based on WHY it failed:
+          // - 0 matches AND Brave returned results → probably a typo
+          //   (e.g. "Adaptivist" when correct is "Adaptavist"). Operator
+          //   sees the returned domains and can recheck spelling.
+          // - Some matches but below threshold → genuinely niche; broaden
+          //   keywords or paste mode.
+          // - All fetch failures → sites block bots; paste mode.
+          let hint: string;
+          if (searchResults.length > 0 && usable.length === 0) {
+            // Show the actual domains Brave returned so operator can spot
+            // a typo at a glance (e.g. results are about "Adaptavist" but
+            // query said "Adaptivist").
+            const returnedDomains = searchResults
+              .slice(0, 6)
+              .map((r) => {
+                try {
+                  return new URL(r.url).hostname.replace(/^www\./, "");
+                } catch {
+                  return r.url;
+                }
+              })
+              .join(", ");
+            hint = `Possible TYPO — Brave returned ${searchResults.length} results (${returnedDomains}) but none contained your keywords verbatim. Check spelling of the threat actor / victim name.`;
+          } else if (fetched.every((f) => f.error)) {
+            hint =
+              "All sources blocked or timed out. Paste mode is more reliable for bot-blocked sites.";
+          } else {
+            hint = "Try more specific keywords or paste mode.";
+          }
           send({
             type: "error",
-            message: `Only ${usable.length}/${MIN_SOURCES} sources matched your keywords. ${discardedSummary}${fetchErrs ? `. Fetch failures: ${fetchErrs}` : ""}. Try more specific keywords or paste mode.`,
+            message: `Only ${usable.length}/${MIN_SOURCES} sources matched your keywords. ${discardedSummary}${fetchErrs ? `. Fetch failures: ${fetchErrs}` : ""}. ${hint}`,
           });
           writer.close();
           return;

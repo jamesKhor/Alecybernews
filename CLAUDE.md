@@ -56,11 +56,19 @@ This site has a **hard zero-downtime requirement**. The architecture below was b
 - Routes to `content-only` job: SSH → `git pull` → `curl /api/revalidate?tag=articles` → done
 - PM2 is NOT touched. No rebuild. ISR picks up new MDX files from disk on next regeneration cycle.
 
-**2. Code pushes (~3 min, zero downtime with cluster mode)** — rare, happens a few times per week
+**2. Code pushes (~2-3 min, TRUE zero downtime via Option B)** — rare, happens a few times per week
 
 - Any change outside `content/**` (lib, app, workflows, package.json, etc.)
-- Routes to `full-deploy` job: SSH → `npm ci` → `npm run build` → `pm2 reload` (cluster mode cycles workers one at a time)
-- Old build keeps serving traffic throughout the build. New workers start with new code, old workers drain and exit.
+- Routes to `full-deploy` job with this flow:
+  1. **Build on GitHub Actions runner** (7GB RAM, clean Node 22) — `npm ci` + `npm run build`
+  2. **Verify artifact** — prerender-manifest.json must exist
+  3. **Rsync `.next/` to VPS** into `/home/zcybernews/zcybernews/.next-staging/` (does NOT touch live `.next`)
+  4. **SSH to VPS:** `git pull` (source), `npm ci` (server-side deps), atomic directory swap (`mv .next .next-prev && mv .next-staging .next`)
+  5. **`pm2 reload`** — cluster mode cycles workers one at a time, old workers drain while new workers pick up the fresh `.next`
+  6. Health check: `curl http://localhost:3000` must return 200
+- Old build keeps serving traffic the entire time the new build is being prepared.
+- Rollback: `mv .next .next-crashed && mv .next-prev .next && pm2 reload zcybernews` — instant.
+- **This replaced the old stop-build-start pattern on 2026-04-17** (commit after the SEV3 502 during deploy). The old pattern had 60-90s downtime per code deploy because it built on the 2GB VPS, requiring `pm2 stop` to avoid file write races. The new pattern has zero downtime because the build happens on a separate machine.
 
 **3. Emergency rebuild** — workflow_dispatch with `force_full_rebuild: true`
 
