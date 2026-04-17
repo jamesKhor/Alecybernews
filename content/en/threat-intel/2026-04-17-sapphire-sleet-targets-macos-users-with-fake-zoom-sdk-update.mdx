@@ -1,0 +1,63 @@
+---
+title: Sapphire Sleet Targets macOS Users with Fake Zoom SDK Update
+slug: 2026-04-17-sapphire-sleet-targets-macos-users-with-fake-zoom-sdk-update
+date: '2026-04-17'
+excerpt: >-
+  North Korean threat actor Sapphire Sleet is distributing a new macOS malware
+  via a fake Zoom SDK installer, stealing passwords, crypto wallets, and
+  personal data through a multi-stage social engineering campaign.
+category: threat-intel
+tags:
+  - macos
+  - apt
+  - social-engineering
+  - north-korea
+  - malware
+language: en
+source_urls:
+  - >-
+    https://cybersecuritynews.com/fake-zoom-sdk-update-delivers-sapphire-sleet-malware/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-17-sapphire-sleet-targets-macos-users-with-fake-zoom-sdk-update
+severity: high
+threat_actor: Sapphire Sleet
+threat_actor_origin: North Korea
+affected_sectors:
+  - technology
+  - cryptocurrency
+affected_regions:
+  - global
+---
+## Executive Summary
+A North Korean advanced persistent threat (APT) group tracked as Sapphire Sleet is conducting a new social engineering campaign targeting macOS users. According to a report from CyberSecurity News, the threat actor is distributing a malicious application masquerading as an update for the Zoom software development kit (SDK). The campaign does not exploit software vulnerabilities but relies on convincing social engineering to deliver a multi-stage payload designed to steal passwords, cryptocurrency wallets, and sensitive personal data.
+
+## Technical Analysis
+The attack chain begins with a malicious disk image file, `ZoomSDK_Installer.dmg`, which is likely distributed via spear-phishing or compromised websites. When mounted, the image presents a fake installer application named `ZoomSDK_Installer.app`. This application is not a legitimate Zoom product but a custom-built first-stage payload. When executed, it displays a decoy dialog box claiming to be installing the Zoom SDK, while simultaneously launching a hidden second-stage payload in the background.
+
+The second-stage payload is a Mach-O binary that acts as a downloader. According to the source report, this downloader fetches and executes the final malware payload from a remote command-and-control (C2) server. The final payload is designed to perform comprehensive information theft, including scraping passwords from keychains and browsers, exfiltrating files from cryptocurrency wallet directories (such as `~/Library/Application Support/Electrum` and `~/Library/Ethereum/keystore`), and collecting system information. The malware's modular, multi-stage design complicates detection and analysis.
+
+## Indicators of Compromise
+None identified at this time. The source report did not provide specific file hashes, domain names, or IP addresses associated with the campaign. Organizations should treat any unsolicited downloads claiming to be Zoom SDK updates for macOS with extreme suspicion.
+
+## Tactics, Techniques & Procedures
+The campaign employs a consistent set of techniques aligned with the MITRE ATT&CK framework:
+*   **Initial Access (TA0001):** The primary vector is **Phishing (T1566)**, specifically via malicious disk image files delivered through likely spear-phishing.
+*   **Execution (TA0002):** The attacker relies on **User Execution (T1204)**. The victim must manually open the DMG file and run the fraudulent installer application.
+*   **Defense Evasion (TA0005):** The use of a **Decoy Content (T1036.005)** installer window distracts the user while malicious processes run hidden in the background. The multi-stage payload delivery also demonstrates **Obfuscated Files or Information (T1027)**.
+*   **Collection (TA0009):** The final payload's capabilities map to **Data from Local System (T1005)**, targeting specific directories associated with passwords and cryptocurrency assets.
+*   **Command and Control (TA0011):** The downloader component establishes **Application Layer Protocol (T1071)** communication with a remote C2 server to retrieve the final stage.
+
+## Threat Actor Context
+The activity is attributed to the North Korean APT group Sapphire Sleet, which is tracked by other vendors under names including Lazarus Group, APT38, and TraderTraitor. The group is financially motivated and has a long history of targeting the cryptocurrency sector and technology firms with sophisticated malware campaigns across Windows, Linux, and macOS. This campaign represents a continuation of their focus on cryptocurrency theft and their adaptation of social engineering lures to target macOS users, a demographic often associated with the technology and startup sectors.
+
+## Mitigations & Recommendations
+Organizations and individuals, particularly those in the technology and cryptocurrency sectors, should implement the following mitigations:
+1.  **User Training:** Educate employees on social engineering risks. Emphasize that software updates should only be downloaded from official vendor websites or through built-in update mechanisms, not from unsolicited emails or links.
+2.  **Endpoint Protection:** Deploy and maintain endpoint detection and response (EDR) solutions capable of monitoring for suspicious process execution and network connections from macOS systems.
+3.  **Application Allowlisting:** Where feasible, implement application allowlisting policies to prevent the execution of unauthorized applications, including those from downloaded DMG files.
+4.  **System Hardening:** Configure macOS Gatekeeper settings to block applications from unidentified developers by default, though note that sophisticated attackers may sign their payloads with stolen or fake certificates.
+5.  **Network Monitoring:** Monitor outbound network traffic for connections to unknown or suspicious domains, which may indicate a downloader or C2 callback.
+
+## References
+*   CyberSecurity News: [Fake Zoom SDK Update Delivers Sapphire Sleet Malware in New macOS Intrusion Chain](https://cybersecuritynews.com/fake-zoom-sdk-update-delivers-sapphire-sleet-malware/)

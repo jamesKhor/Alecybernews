@@ -1,0 +1,62 @@
+---
+title: Sapphire Sleet 针对 macOS 用户的假 Zoom SDK 更新
+slug: 2026-04-17-sapphire-sleet-targets-macos-users-with-fake-zoom-sdk-update
+date: '2026-04-17'
+excerpt: >-
+  朝鲜威胁行为者 Sapphire Sleet 通过假 Zoom SDK 安装程序分发新的 macOS
+  恶意软件，通过多阶段社会工程活动窃取密码、加密钱包和个人数据。
+category: threat-intel
+tags:
+  - macos
+  - apt
+  - social-engineering
+  - north-korea
+  - malware
+language: zh
+source_urls:
+  - >-
+    https://cybersecuritynews.com/fake-zoom-sdk-update-delivers-sapphire-sleet-malware/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-17-sapphire-sleet-targets-macos-users-with-fake-zoom-sdk-update
+severity: high
+threat_actor: Sapphire Sleet
+threat_actor_origin: North Korea
+affected_sectors:
+  - technology
+  - cryptocurrency
+affected_regions:
+  - global
+---
+## 执行摘要
+一个被追踪为Sapphire Sleet的朝鲜高级持续性威胁（APT）组织正在进行一场针对macOS用户新的社会工程学活动。根据CyberSecurity News的一份报告，该威胁行为者正在分发一个伪装成Zoom软件开发工具包（SDK）更新的恶意应用程序。这场活动并不利用软件漏洞，而是依赖于令人信服的社会工程学手段来传递一个多阶段的有效载荷，旨在窃取密码、加密货币钱包和敏感个人数据。
+
+## 技术分析
+攻击链始于一个恶意的磁盘映像文件`ZoomSDK_Installer.dmg`，该文件很可能通过鱼叉式网络钓鱼或被破坏的网站进行分发。当挂载时，映像呈现一个名为`ZoomSDK_Installer.app`的假冒安装程序。这个应用程序不是合法的Zoom产品，而是一个定制的第一阶段有效载荷。当执行时，它显示一个诱饵对话框，声称正在安装Zoom SDK，同时在后台同时启动一个隐藏的第二阶段有效载荷。
+
+第二阶段有效载荷是一个Mach-O二进制文件，充当下载器。根据源报告，这个下载器从远程命令和控制（C2）服务器获取并执行最终的恶意软件有效载荷。最终有效载荷旨在进行全面的信息窃取，包括从钥匙串和浏览器中刮取密码，从加密货币钱包目录（例如`~/Library/Application Support/Electrum`和`~/Library/Ethereum/keystore`）中渗出文件，以及收集系统信息。恶意软件的模块化、多阶段设计使检测和分析变得复杂。
+
+## 入侵指标
+目前没有识别出任何指标。源报告没有提供与活动相关的具体文件哈希值、域名或IP地址。组织应对任何未经请求的下载声称是macOS的Zoom SDK更新保持极度怀疑。
+
+## 战术、技术与程序
+该活动采用了与MITRE ATT&CK框架一致的一系列技术：
+*   **初始访问（TA0001）：** 主要向量是**网络钓鱼（T1566）**，特别是通过可能的鱼叉式网络钓鱼传递的恶意磁盘映像文件。
+*   **执行（TA0002）：** 攻击者依赖于**用户执行（T1204）**。受害者必须手动打开DMG文件并运行欺诈性安装程序。
+*   **防御绕过（TA0005）：** 使用**诱饵内容（T1036.005）**安装程序窗口分散用户的注意力，而恶意进程在后台隐藏运行。多阶段有效载荷传递还展示了**文件或信息隐藏（T1027）**。
+*   **收集（TA0009）：** 最终有效载荷的能力对应于**本地系统数据（T1005）**，针对与密码和加密货币资产相关的特定目录。
+*   **命令和控制（TA0011）：** 下载器组件建立了与远程C2服务器的**应用层协议（T1071）**通信，以检索最终阶段。
+
+## 威胁行为者背景
+该活动被归因于朝鲜APT组织Sapphire Sleet，该组织被其他供应商追踪，名称包括Lazarus Group、APT38和TraderTraitor。该组织以财务为动机，有着针对加密货币部门和技术公司的复杂恶意软件活动的历史，这些活动涉及Windows、Linux和macOS。这场活动代表了他们对加密货币盗窃的关注的延续，以及他们对社会工程学诱饵的适应，以针对通常与技术和创业部门相关的macOS用户。
+
+## 缓解措施与建议
+组织和个人，特别是那些在技术和加密货币部门的，应实施以下缓解措施：
+1.  **用户培训：** 教育员工关于社会工程学风险。强调软件更新应该只从官方供应商网站或通过内置更新机制下载，而不是从未经请求的电子邮件或链接中下载。
+2.  **端点保护：** 部署和维护能够监控来自macOS系统的可疑进程执行和网络连接的端点检测和响应（EDR）解决方案。
+3.  **应用程序允许列表：** 在可行的情况下，实施应用程序允许列表策略，以防止未经授权的应用程序的执行，包括从下载的DMG文件中执行的应用程序。
+4.  **系统加固：** 配置macOS Gatekeeper设置，默认情况下阻止来自未知开发者的应用程序，尽管要注意复杂的攻击者可能会使用被盗或伪造的证书签署他们的有效载荷。
+5.  **网络监控：** 监控出站网络流量，以连接到未知或可疑的域名，这可能表明下载器或C2回调。
+
+## 参考资料
+*   CyberSecurity News：[Fake Zoom SDK Update Delivers Sapphire Sleet Malware in New macOS Intrusion Chain](https://cybersecuritynews.com/fake-zoom-sdk-update-delivers-sapphire-sleet-malware/)
