@@ -1,0 +1,59 @@
+---
+title: Tycoon 2FA 钓鱼团伙转向设备代码攻击
+slug: 2026-04-17-tycoon-2fa-phishing-group-shifts-to-device-code-attacks
+date: '2026-04-17'
+excerpt: Tycoon 2FA 钓鱼团伙已经放弃了其标志性工具包，转而采用设备代码钓鱼来绕过多因素认证，并入侵 Microsoft 365 和 Gmail 账户。
+category: threat-intel
+tags:
+  - phishing
+  - mfa-bypass
+  - tycoon
+  - microsoft-365
+  - identity
+language: zh
+source_urls:
+  - >-
+    https://www.darkreading.com/threat-intelligence/tycoon-2fa-hackers-device-code-phishing
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-17-tycoon-2fa-phishing-group-shifts-to-device-code-attacks
+severity: high
+threat_actor: Tycoon 2FA
+affected_sectors:
+  - multiple
+affected_regions:
+  - global
+---
+## 执行摘要
+以财务动机为驱动的威胁组织Tycoon 2FA已经根本性地改变了其攻击方法，放弃了其自定义的网络钓鱼工具包，转而采用设备代码网络钓鱼。这种技术利用OAuth 2.0设备授权授权流程来绕过多因素认证（MFA），并侵入Microsoft 365和Google账户。根据Sekoia的研究人员，该组织的基础设施自2025年底以来一直处于变动状态，2026年初观察到显著的迁移，表明该组织正在积极努力逃避检测并保持对改进的安全控制的有效性。
+
+## 技术分析
+设备代码网络钓鱼是一种颠覆OAuth 2.0流程的技术，该流程为输入受限的设备设计，如智能电视或游戏机。在标准攻击中，威胁行为者向Microsoft等服务商发起设备代码请求。服务商返回一个简短的、面向用户的代码和一个轮询端点。然后攻击者将此代码嵌入到网络钓鱼电子邮件中，敦促受害者访问`microsoft.com/devicelogin`（一个合法的Microsoft域名）并输入代码以验证他们的身份。
+
+当受害者遵从时，他们将看到一个真实的Microsoft同意屏幕，请求攻击者的恶意OAuth应用程序的权限。如果受害者给予同意，攻击者的应用程序将收到一个OAuth令牌，无需处理受害者的密码或触发传统的MFA提示即可访问受害者的账户。该令牌可用于访问邮件、文件和其他资源，具体取决于授予的权限。Sekoia的分析表明，该组织主要针对`offline_access`和`Mail.Read`范围，以保持持久访问并窃取电子邮件数据。
+
+## 入侵指标
+目前没有识别出任何入侵指标。Sekoia的报告没有提供与该组织新基础设施相关的具体哈希值、域名或IP地址。主要的IOC是行为性的：可疑的电子邮件指导用户访问`microsoft.com/devicelogin`或`accounts.google.com/device`，并提示他们输入一个字母数字代码以解决所谓的安全或访问问题。
+
+## 战术、技术与程序
+Sekoia记录的该组织的更新后的TTP遵循一个清晰的模式：
+1. **初始访问（网络钓鱼）：**行为者发送网络钓鱼电子邮件，通常伪装成IT或安全通知，包含一个独特的设备代码。
+2. **凭证访问（OAuth设备代码网络钓鱼 - T1556.002）：**受害者被引导到合法的供应商域名（`microsoft.com/devicelogin`）输入代码，为攻击增添了合法性。
+3. **持久性（账户操纵 - T1098）：**通过请求`offline_access` OAuth范围，攻击者获得一个刷新令牌，即使在初始会话过期后也能长期访问。
+4. **收集（电子邮件收集 - T1114）：**有了`Mail.Read`范围，攻击者的应用程序可以访问并窃取被侵入邮箱的电子邮件内容。
+这代表了从他们之前使用的“Tycoon 2FA”网络钓鱼工具包的显著演变，该工具包使用对手在中间（AiTM）代理来拦截凭证和MFA令牌。
+
+## 威胁行为者背景
+Tycoon 2FA是一个以财务为动机的网络钓鱼即服务（PhaaS）操作，自2023年以来一直活跃。从历史上看，该组织为其他犯罪分子提供复杂的AiTM代理工具包，收取订阅费，专门用于绕过MFA。Sekoia评估认为，该组织转向设备代码网络钓鱼是对越来越多的网络钓鱼抗性MFA（如FIDO2安全密钥）的采用和防御者及电子邮件过滤器对AiTM代理基础设施的改进检测的直接回应。该组织的操作安全性似乎提高了；他们的基础设施迁移涉及放弃旧域名和工具，使跟踪工作变得复杂。他们的目标仍然广泛，专注于使用Microsoft 365和Google Workspace的组织。
+
+## 缓解措施与建议
+为了防御设备代码网络钓鱼攻击，组织应实施分层方法：
+* **条件访问策略：**配置Microsoft Entra ID条件访问策略，以阻止传统认证并限制令牌发行到合规的、混合加入的或批准的设备。策略应明确限制或要求批准“设备代码”授权类型。
+* **OAuth应用程序治理：**定期审计和审查Entra ID门户中同意的OAuth应用程序（`Identity -> Applications -> Enterprise applications`）。只限制用户同意到已验证的发布者或管理员批准的应用程序。
+* **用户培训：**教育用户被引导到合法登录页面（如`microsoft.com`）并不能保证安全。培训他们批判性地审查权限同意屏幕，并报告任何意外的输入设备代码提示。
+* **网络钓鱼抗性MFA：**在可行的情况下，强制执行网络钓鱼抗性认证方法，如FIDO2安全密钥或Windows Hello for Business，这些不受这些基于令牌的攻击的影响。
+* **监控设备代码流程：**安全团队应监控认证日志中设备代码授权类型的使用激增，这在典型的企业用户活动中是不常见的。
+
+## 参考资料
+*   Sekoia.io Threat Intelligence & Detection Research, "Tycoon 2FA group shifts to device code phishing," April 2026. [https://www.sekoia.io/en/blog/tycoon-2fa-group-shifts-to-device-code-phishing/](https://www.sekoia.io/en/blog/tycoon-2fa-group-shifts-to-device-code-phishing/)
+*   Dark Reading, "Tycoon 2FA Phishers Scatter, Adopt Device Code Phishing," April 17, 2026. [https://www.darkreading.com/threat-intelligence/tycoon-2fa-hackers-device-code-phishing](https://www.darkreading.com/threat-intelligence/tycoon-2fa-hackers-device-code-phishing)

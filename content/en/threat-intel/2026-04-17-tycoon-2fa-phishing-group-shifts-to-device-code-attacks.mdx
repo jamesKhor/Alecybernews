@@ -1,0 +1,62 @@
+---
+title: Tycoon 2FA Phishing Group Shifts to Device Code Attacks
+slug: 2026-04-17-tycoon-2fa-phishing-group-shifts-to-device-code-attacks
+date: '2026-04-17'
+excerpt: >-
+  The Tycoon 2FA phishing group has abandoned its namesake toolkit, adopting
+  device code phishing to bypass multi-factor authentication and compromise
+  Microsoft 365 and Gmail accounts.
+category: threat-intel
+tags:
+  - phishing
+  - mfa-bypass
+  - tycoon
+  - microsoft-365
+  - identity
+language: en
+source_urls:
+  - >-
+    https://www.darkreading.com/threat-intelligence/tycoon-2fa-hackers-device-code-phishing
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-17-tycoon-2fa-phishing-group-shifts-to-device-code-attacks
+severity: high
+threat_actor: Tycoon 2FA
+affected_sectors:
+  - multiple
+affected_regions:
+  - global
+---
+## Executive Summary
+The financially motivated threat group known as Tycoon 2FA has fundamentally shifted its attack methodology, abandoning its custom phishing kit in favor of device code phishing. This technique exploits the OAuth 2.0 device authorization grant flow to bypass multi-factor authentication (MFA) and compromise Microsoft 365 and Google accounts. According to researchers at Sekoia, the group's infrastructure has been in a state of flux since late 2025, with a significant migration observed in early 2026, indicating an active effort to evade detection and maintain effectiveness against improved security controls.
+
+## Technical Analysis
+Device code phishing is a technique that subverts a legitimate OAuth 2.0 flow designed for input-constrained devices, such as smart TVs or gaming consoles. In a standard attack, the threat actor initiates a device code request with a service provider like Microsoft. The provider returns a short, user-facing code and a polling endpoint. The attacker then embeds this code into a phishing email, urging the victim to visit `microsoft.com/devicelogin` (a legitimate Microsoft domain) and enter the code to verify their identity.
+
+When the victim complies, they are presented with a genuine Microsoft consent screen requesting permissions for the attacker's malicious OAuth application. If the victim grants consent, the attacker's application receives an OAuth token, granting access to the victim's account without ever handling their password or triggering a traditional MFA prompt. The token can be used to access mail, files, and other resources, depending on the permissions granted. Sekoia's analysis indicates the group is primarily targeting the `offline_access` and `Mail.Read` scopes to maintain persistent access and exfiltrate email data.
+
+## Indicators of Compromise
+None identified at this time. Sekoia's report did not provide specific hashes, domains, or IP addresses associated with the group's new infrastructure. The primary IOCs are behavioral: suspicious emails directing users to `microsoft.com/devicelogin` or `accounts.google.com/device` and prompting them to enter an alphanumeric code to resolve a purported security or access issue.
+
+## Tactics, Techniques & Procedures
+The group's updated TTPs, as documented by Sekoia, follow a clear pattern:
+1.  **Initial Access (Phishing):** The actor sends phishing emails, often masquerading as IT or security notifications, containing a unique device code.
+2.  **Credential Access (OAuth Device Code Phishing - T1556.002):** The victim is directed to a legitimate vendor domain (`microsoft.com/devicelogin`) to enter the code, lending an air of legitimacy to the attack.
+3.  **Persistence (Account Manipulation - T1098):** By requesting the `offline_access` OAuth scope, the attacker secures a refresh token, enabling long-term access even after the initial session expires.
+4.  **Collection (Email Collection - T1114):** With the `Mail.Read` scope, the attacker's application can access and exfiltrate email contents from the compromised mailbox.
+This represents a significant evolution from their previous use of the "Tycoon 2FA" phishing kit, which used adversary-in-the-middle (AiTM) proxies to intercept credentials and MFA tokens.
+
+## Threat Actor Context
+Tycoon 2FA is a financially motivated phishing-as-a-service (PhaaS) operation that has been active since at least 2023. Historically, the group provided a sophisticated AiTM proxy kit to other criminals for a subscription fee, specializing in bypassing MFA. Sekoia assesses that the group's pivot to device code phishing is a direct response to the increasing adoption of phishing-resistant MFA (like FIDO2 security keys) and improved detection of AiTM proxy infrastructure by defenders and email filters. The group's operational security appears heightened; their infrastructure migration involved abandoning old domains and tooling, complicating tracking efforts. Their targeting remains broad, focusing on organizations using Microsoft 365 and Google Workspace.
+
+## Mitigations & Recommendations
+To defend against device code phishing attacks, organizations should implement a layered approach:
+*   **Conditional Access Policies:** Configure Microsoft Entra ID Conditional Access policies to block legacy authentication and restrict token issuance to compliant, hybrid-joined, or approved devices. Policies should explicitly restrict or require approval for the "Device Code" grant type.
+*   **OAuth Application Governance:** Regularly audit and review consented OAuth applications in the Entra ID portal (`Identity -> Applications -> Enterprise applications`). Restrict user consent to verified publishers or admin-approved applications only.
+*   **User Training:** Educate users that being directed to a legitimate login page (like `microsoft.com`) does not guarantee safety. Train them to scrutinize permission consent screens critically and report any unexpected prompts to enter a device code.
+*   **Phishing-Resistant MFA:** Where feasible, mandate phishing-resistant authentication methods such as FIDO2 security keys or Windows Hello for Business, which are not vulnerable to these token-based attacks.
+*   **Monitor for Device Code Flow:** Security teams should monitor authentication logs for spikes in the use of the device code grant type, which is uncommon in typical enterprise user activity.
+
+## References
+*   Sekoia.io Threat Intelligence & Detection Research, "Tycoon 2FA group shifts to device code phishing," April 2026. [https://www.sekoia.io/en/blog/tycoon-2fa-group-shifts-to-device-code-phishing/](https://www.sekoia.io/en/blog/tycoon-2fa-group-shifts-to-device-code-phishing/)
+*   Dark Reading, "Tycoon 2FA Phishers Scatter, Adopt Device Code Phishing," April 17, 2026. [https://www.darkreading.com/threat-intelligence/tycoon-2fa-hackers-device-code-phishing](https://www.darkreading.com/threat-intelligence/tycoon-2fa-hackers-device-code-phishing)
