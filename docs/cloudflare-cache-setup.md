@@ -22,23 +22,27 @@ Cloudflare defaults to "respect origin cache headers" for HTML. That's ✅ now t
 
 ### Step 1 — Verify caching is not being actively bypassed
 
-Cloudflare's UI evolved in 2024 — "Respect Strong ETags" was removed as a
-toggle (it's now default-on behavior). What still matters:
+Cloudflare dashboard → `zcybernews.com` → **Caching** → **Configuration**
 
-1. Cloudflare dashboard → `zcybernews.com` → **Caching** → **Configuration**
-2. Confirm each setting:
-   - **Caching Level** = `Standard`
-     (not "Bypass" or "No query string" — both cripple cache hits)
-   - **Browser Cache TTL** = `Respect Existing Headers`
-     (so Cloudflare honors the browser-side `max-age` we emit)
-   - **Development Mode** = `OFF`
-     (this is a 3-hour timer that bypasses ALL cache — sometimes
-     accidentally left on after debugging)
-   - **Always Online™** = `On` (if visible; optional but nice — serves
-     a cached copy when origin is down)
+Confirmed settings (as of CF UI, April 2026):
 
-If "Respect Strong ETags" isn't visible, that's expected — it's on by
-default now and no longer surfaced in the UI.
+| Setting               | Set to                     | Why                                                                                                                                                                                  |
+| --------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Caching Level**     | `Standard`                 | "No query string" and "Ignore query string" both break filter URLs like `/salary?market=hk`. "Standard" respects query strings as part of the cache key, which is what we want.      |
+| **Browser Cache TTL** | `Respect Existing Headers` | Tells CF to honor the browser-side `max-age` we emit in `next.config.ts`. Without this, CF would override our headers with a fixed default.                                          |
+| **Always Online™**    | `On`                       | Serves a stale cached copy if the VPS is down. Free resilience.                                                                                                                      |
+| **Development Mode**  | `OFF`                      | This is a 3-hour timer that **bypasses all cache**. Sometimes accidentally left on after debugging. Must be OFF in production.                                                       |
+| **Purge Cache**       | —                          | Don't click "Purge Everything" unless you truly need it; 1-click cache wipe. Use the Custom Purge by URL for targeted invalidation, or let our `/api/revalidate` endpoint handle it. |
+
+**Settings NOT to worry about on this page:**
+
+- **CSAM Scanning Tool** — only relevant if you host user-uploaded images. We don't.
+- **Crawler Hints** (Beta) — broadcasts content-freshness to crawlers. Optional; leave off unless SEO team specifically asks.
+- **Enable Query String Sort** — Enterprise-only feature. Ignore.
+
+**About "Respect Strong ETags"**: this toggle was removed from CF's UI in
+2024 (it's now default-on behavior). If you see older guides mentioning it,
+ignore — there's nothing to configure.
 
 ### Step 2 — Create a Cache Rule for HTML pages (the big win)
 
