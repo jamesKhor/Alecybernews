@@ -98,7 +98,7 @@ export default function UnsubscribePage() {
               setEmail(e.target.value);
               if (status !== "idle" && status !== "loading") setStatus("idle");
             }}
-            placeholder="your@email.com"
+            placeholder="you@example.com"
             disabled={isLoading || status === "success"}
             aria-invalid={isError || undefined}
             className="flex-1"

@@ -170,7 +170,7 @@
   "newsletter": {
     "title": "订阅更新",
     "description": "将最新的网络安全资讯直接发送到您的邮箱。",
-    "placeholder": "your@email.com",
+    "placeholder": "you@example.com",
     "subscribe": "订阅",
     "success": "订阅成功！请查看您的邮箱。",
     "alreadySubscribed": "该邮箱已经订阅。",
