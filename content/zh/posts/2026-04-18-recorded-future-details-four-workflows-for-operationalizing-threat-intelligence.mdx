@@ -1,0 +1,60 @@
+---
+title: Recorded Future 详述四种工作流程以实现威胁情报的业务化
+slug: >-
+  2026-04-18-recorded-future-details-four-workflows-for-operationalizing-threat-intelligence
+date: '2026-04-18'
+excerpt: >-
+  Recorded Future 的 Insikt Group
+  概述了四种基本的集成工作流程，将威胁情报从一个孤立的信息源转变为安全运营的自动化组成部分，从而实现从被动防御到主动防御的转变。
+category: tools
+tags:
+  - threat-intelligence
+  - automation
+  - soc
+  - siem
+  - soar
+language: zh
+source_urls:
+  - >-
+    https://www.recordedfuture.com/blog/4-essential-integration-workflows-for-operationalizing-threat-intelligence
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-recorded-future-details-four-workflows-for-operationalizing-threat-intelligence
+severity: informational
+---
+## 执行摘要
+Recorded Future的Insikt Group发布了一个详细的框架，概述了四个关键的集成工作流程，用于操作化威胁情报。分析认为，除非将原始情报馈送系统地整合到安全运营中心（SOC）工具中，如SIEM、SOAR平台和防火墙，否则它们的价值有限。所提出的工作流程旨在自动化威胁的丰富、优先排序和阻断，目标是将安全程序从反应式、依赖分析师的状态转变为更主动、最终自主的姿态。
+
+## 技术分析
+Recorded Future所详细描述的框架建立在四个递增阶段的网络威胁情报（CTI）成熟度模型上：反应式、主动式、操作式和自主式。大多数组织被评估为处于最初的反应式阶段，在此阶段情报是手动消费的，行动是在事件发生后采取的。技术指导的核心集中在达到主动式和操作式阶段所需的技术集成上。
+
+四个关键的集成工作流程是：
+1. **SIEM警报丰富化：** 自动将来自威胁情报平台（TIPs）的上下文注入到SIEM警报中。这包括将对手名称、活动关联、恶意软件哈希值和受害者学等数据附加到原始事件日志中，将一个通用警报转变为具有周围上下文的优先级事件。
+2. **SOAR剧本自动化：** 使用情报触发并指导安全编排、自动化和响应（SOAR）平台内的自动化响应剧本。例如，一个已知勒索软件组织的高置信度的入侵指标（IOC）可以自动触发一个剧本，以隔离受影响的端点，阻断相关网络流量，并打开一个调查工单。
+3. **防火墙黑名单集成：** 将IOCs——特别是基于网络的指标，如恶意IP、域名和URL——直接推送到网络安全控制（防火墙、代理、DNS过滤器）中，以阻止与对手基础设施的通信。这个工作流程需要仔细策划，以避免可能干扰业务运营的误报。
+4. **漏洞管理优先级排序：** 将有关活跃利用的外部威胁情报与内部漏洞扫描数据相关联。这允许安全团队根据证据优先修补工作，即特定漏洞（例如，一个CVE）正在被威胁行为者积极武器化，而不是仅依赖CVSS分数。
+
+Recorded Future强调，这些集成不是顺序的，而应根据组织需求和工具可用性并行实施。自主阶段的最终目标，即系统自我配置和响应威胁，被视为一个理想的目标，而不是大多数近期的现实。
+
+## 入侵指标
+目前没有识别出。
+
+## 战术、技术与程序
+目前没有识别出。
+
+## 威胁行为者背景
+分析没有集中在特定的威胁行为者或活动上。相反，它提供了一种方法论，通过确保有关他们的TTPs和基础设施的情报在防御系统中可操作，来防御广泛的对手。
+
+## 缓解措施与建议
+Recorded Future的出版物本身就是一系列建议。从源材料中得出的关键可操作步骤包括：
+* **评估当前成熟度：** 组织应根据四阶段模型（反应式、主动式、操作式、自主式）评估他们当前的CTI程序，以识别差距。
+* **从丰富化开始：** 优先集成SIEM警报丰富的威胁情报，作为提高分析师效率和事件优先级排序的基础步骤。
+* **利用API：** 利用威胁情报供应商和安全工具（SIEM、SOAR、防火墙）提供的应用程序编程接口（API）构建自动化的双向数据流。
+* **实施IOC生命周期管理：** 建立流程，自动添加和移除IOCs从黑名单中，随着它们相关性的衰减，维护安全控制的健康和有效性。
+* **专注于高价值工作流程：** 将集成工作与最紧迫的安全用例对齐，如勒索软件防御或漏洞修补，而不是试图一网打尽。
+
+报告警告说，成功的操作化需要威胁情报分析师、SOC工程师和网络安全团队之间的密切合作，以设计和维护这些集成的工作流程。
+
+## 参考资料
+* Recorded Future Insikt Group, "4 Essential Integration Workflows for Operationalizing Threat Intelligence," https://www.recordedfuture.com/blog/4-essential-integration-workflows-for-operationalizing-threat-intelligence
