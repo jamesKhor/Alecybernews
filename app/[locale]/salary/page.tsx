@@ -237,7 +237,11 @@ export default async function SalaryPage({ params, searchParams }: PageProps) {
     filterMarket: t("filterMarket"),
     filterRole: t("filterRole"),
     filterAll: t("filterAll"),
-    showingResults: t("showingResults"),
+    // t.raw returns the uncompiled ICU template — SalaryFilterBar does
+    // its own .replace("{count}", …) client-side after filter state
+    // updates. Using t() here would trip next-intl's FORMATTING_ERROR
+    // because the placeholders aren't pre-resolved on server.
+    showingResults: t.raw("showingResults") as string,
   };
   const certLabels = {
     title: t("certTableTitle"),
