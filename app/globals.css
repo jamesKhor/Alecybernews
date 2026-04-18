@@ -121,17 +121,27 @@
    --font-mono-stack    → .font-mono (currency, tabular numbers)
    --font-display-stack → .font-display (cinematic hero only) */
 :root {
+  /* Phase 1 redesign (2026-04-18): Inter replaces Geist Sans for body/UI.
+     Source Serif 4 added for editorial h1/h2 via --font-serif-stack.
+     CJK fallback chain preserved (Noto Sans SC + native Heiti fonts)
+     so Chinese text renders consistently across Windows/macOS/iOS/Android. */
   --font-sans-stack:
-    var(--font-geist-sans), var(--font-noto-sc), "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei",
-    "Noto Sans CJK SC", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    var(--font-inter), var(--font-noto-sc), "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", system-ui,
+    -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif-stack:
+    var(--font-serif), var(--font-noto-sc), "PingFang SC", "Noto Serif CJK SC",
+    Georgia, "Times New Roman", Cambria, serif;
   --font-mono-stack:
     var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
     var(--font-noto-sc), "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei",
     "Noto Sans CJK SC", monospace;
+  /* Cinematic display hero — uses Inter Black at very large sizes.
+     CJK fallback stays Heiti (not serif) so large Chinese display
+     headlines still look bold + clean, not decorated. */
   --font-display-stack:
-    var(--font-geist-sans), var(--font-noto-sc), "PingFang SC",
-    "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+    var(--font-inter), var(--font-noto-sc), "PingFang SC", "Microsoft YaHei",
+    "Noto Sans CJK SC", system-ui, sans-serif;
 }
 
 body {
@@ -153,11 +163,28 @@ body {
 .font-display {
   font-family: var(--font-display-stack) !important;
 }
+/* Phase 1 addition: .font-serif for editorial headlines. Opt-in via
+   className="font-serif" on h1/h2, OR automatic on .prose h1/h2
+   (article body) via the selector rule further down in this file. */
+.font-serif {
+  font-family: var(--font-serif-stack) !important;
+}
 
 /* Prose / MDX article styles */
 .prose {
   color: hsl(var(--foreground));
   max-width: 72ch;
+}
+
+/* Phase 1 — editorial serif headlines in article body content.
+   Applies to MDX-rendered h1/h2 inside .prose containers (article
+   body, threat-intel body). Page-level h1 (article title shown at
+   top of page) is NOT inside .prose, so it stays sans unless the
+   component opts in via className="font-serif". This is deliberate
+   — Phase 2+ will decide on page-title typography separately. */
+.prose h1,
+.prose h2 {
+  font-family: var(--font-serif-stack);
 }
 
 .prose h2 {

@@ -1,15 +1,52 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans_SC } from "next/font/google";
+import {
+  Inter,
+  Source_Serif_4,
+  Geist_Mono,
+  Noto_Sans_SC,
+} from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Script from "next/script";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Inter — body + UI font (Phase 1 redesign, replaces Geist Sans).
+// Rationale per docs/redesign-phase-1-spec.md:
+//   - Designed by Rasmus Andersson specifically for screen UI
+//   - Used by Linear, Stripe docs, Vercel docs, The Verge
+//   - Best-in-class small-size readability (critical for our mobile
+//     audience — XHS funnel pushes 60%+ mobile traffic)
+//   - adjustFontFallback: "Arial" matches Inter's metrics closely,
+//     eliminating CLS during font swap
+//   - preload: true because Inter renders on first paint
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: true,
+  // adjustFontFallback in Next 15+ is boolean (true = auto-compute metric
+  // overrides to match a system fallback; false = disable). Auto-computed
+  // overrides eliminate CLS during the font-swap window.
+  adjustFontFallback: true,
 });
 
+// Source Serif 4 — display headlines only (h1, h2).
+// Why: adds editorial publication-feel to headlines without commercial
+// licensing cost (Tiempos-style at $0). Free via Google Fonts. Not
+// preloaded because it's below-the-fold on most page types — fallback
+// serif (Georgia) displays briefly during swap, negligible CLS.
+const sourceSerif = Source_Serif_4({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  display: "swap",
+  preload: false,
+});
+
+// Geist Mono — kept as-is for tabular data, currency, code blocks.
+// Font family is uniquely well-tuned for tabular numerals + currency
+// symbols, so we keep it here even though we dropped Geist Sans.
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -108,7 +145,7 @@ export default async function RootLayout({
     <html
       lang={lang}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${notoSansSC.variable} h-full antialiased`}
+      className={`${inter.variable} ${sourceSerif.variable} ${geistMono.variable} ${notoSansSC.variable} h-full antialiased`}
     >
       <head>
         {/* Google AdSense — must be in <head> for site verification */}
