@@ -149,7 +149,151 @@ export function VulnCard({
   );
 }
 
-// ─── MalwareCard — Threat actor name is the hero ───────────────────────
+// ─── MalwareCard — Threat actor or malware name is the hero ────────────
+
+/** Known malware family identifiers (tag values & title tokens). These
+    are the broad CATEGORY, not specific names — a tag of "botnet" tells
+    us the family, not which malware. Used to derive the subtitle chip
+    below the hero name. */
+const FAMILY_MAP: Record<string, string> = {
+  ransomware: "RANSOMWARE",
+  apt: "APT",
+  rat: "RAT",
+  "remote-access-trojan": "RAT",
+  trojan: "TROJAN",
+  worm: "WORM",
+  botnet: "BOTNET",
+  stealer: "STEALER",
+  backdoor: "BACKDOOR",
+  wiper: "WIPER",
+  loader: "LOADER",
+  banker: "BANKER",
+  rootkit: "ROOTKIT",
+  dropper: "DROPPER",
+  miner: "MINER",
+  "info-stealer": "STEALER",
+};
+
+/** Generic title words that should NOT be picked as a malware name
+    when falling back to title extraction. */
+const GENERIC_TITLE_WORDS = new Set([
+  "a",
+  "an",
+  "the",
+  "fake",
+  "new",
+  "variant",
+  "campaign",
+  "attack",
+  "attacks",
+  "hidden",
+  "covert",
+  "malicious",
+  "deploys",
+  "exploits",
+  "targets",
+  "uses",
+  "via",
+  "using",
+  "against",
+  "for",
+  "with",
+  "steals",
+  "builds",
+]);
+
+/**
+ * Derive a malware-family chip label (RANSOMWARE / RAT / BOTNET / …)
+ * from the article's tags. Returns null if no family match found.
+ */
+function detectFamily(tags?: string[]): string | null {
+  if (!tags) return null;
+  for (const tag of tags) {
+    const key = tag.toLowerCase();
+    if (FAMILY_MAP[key]) return FAMILY_MAP[key];
+    // Check suffix matches: "lumma-stealer" → STEALER
+    for (const [suffix, family] of Object.entries(FAMILY_MAP)) {
+      if (key.endsWith(`-${suffix}`)) return family;
+    }
+  }
+  return null;
+}
+
+/**
+ * Extract a malware hero name with a cascading strategy:
+ *   1. Explicit `threat_actor` frontmatter field (best — editor-provided)
+ *   2. A "name-like" tag (kebab-case that isn't a pure family word)
+ *      e.g. "lumma-stealer" → "Lumma Stealer", "mirai" → "Mirai"
+ *   3. First capitalized word in title that's not a generic verb
+ *      e.g. "Mirai Variant Nexcorium..." → "Mirai"
+ *   4. Fallback to "Malware"
+ */
+function extractMalwareHero(
+  frontmatter: import("@/lib/types").ArticleFrontmatter,
+): { hero: string; family: string } {
+  // 1. Explicit threat_actor
+  if (frontmatter.threat_actor) {
+    return {
+      hero: frontmatter.threat_actor,
+      family: detectFamily(frontmatter.tags) ?? "MALWARE",
+    };
+  }
+
+  // 2. First name-like tag (not a pure family keyword)
+  const nameTag = (frontmatter.tags ?? []).find((t) => {
+    const key = t.toLowerCase();
+    // Skip pure family keywords and overly-generic tags
+    if (FAMILY_MAP[key]) return false;
+    if (
+      [
+        "malware",
+        "phishing",
+        "credentials",
+        "ddos",
+        "iot",
+        "social-engineering",
+        "mobile-malware",
+        "android",
+        "ios",
+      ].includes(key)
+    ) {
+      return false;
+    }
+    return true;
+  });
+  if (nameTag) {
+    // Transform "lumma-stealer" → "Lumma Stealer", "mirai" → "Mirai"
+    const hero = nameTag
+      .split("-")
+      .map((w) => (w.length > 0 ? w[0].toUpperCase() + w.slice(1) : w))
+      .join(" ");
+    return {
+      hero,
+      family: detectFamily(frontmatter.tags) ?? "MALWARE",
+    };
+  }
+
+  // 3. First non-generic capitalized word in title
+  const titleWords = frontmatter.title.split(/\s+/);
+  const entity = titleWords.find((w) => {
+    if (w.length <= 2) return false;
+    if (!/^[A-Z]/.test(w)) return false;
+    const lower = w.toLowerCase().replace(/[.,!?;:]$/, "");
+    return !GENERIC_TITLE_WORDS.has(lower);
+  });
+  if (entity) {
+    return {
+      hero: entity.replace(/[.,!?;:]$/, ""),
+      family: detectFamily(frontmatter.tags) ?? "MALWARE",
+    };
+  }
+
+  // 4. Last resort
+  return {
+    hero: "Malware",
+    family: detectFamily(frontmatter.tags) ?? "MALWARE",
+  };
+}
 
 export function MalwareCard({
   article,
@@ -157,14 +301,7 @@ export function MalwareCard({
   sourceType,
 }: CardProps & { sourceType: "posts" | "threat-intel" }) {
   const { frontmatter } = article;
-  const actor = frontmatter.threat_actor ?? "—";
-  // "Family" is derived from tags — first match against known family keywords
-  const familyTag = (frontmatter.tags ?? []).find((t) =>
-    /^(ransomware|apt|rat|trojan|worm|botnet|stealer|backdoor|wiper|loader)$/i.test(
-      t,
-    ),
-  );
-  const family = familyTag?.toUpperCase() ?? "MALWARE";
+  const { hero, family } = extractMalwareHero(frontmatter);
 
   return (
     <CardFrame
@@ -177,7 +314,7 @@ export function MalwareCard({
                 fontSize: "clamp(1.5rem, 5vw, 2.25rem)",
               }}
             >
-              {actor}
+              {hero}
             </span>
           </p>
           <p className="mt-3 text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-[hsl(var(--cat-malware))]">
