@@ -364,6 +364,19 @@ jobs:
 
             echo "✅ Deployed $(git rev-parse --short HEAD) at $(TZ='Asia/Singapore' date '+%Y-%m-%d %H:%M:%S SGT')"
 
+      - name: Post-deploy smoke test — prod URL sweep
+        # Added 2026-04-18 after RSC cache-poison SEV1 was detected by the
+        # operator (not by our CI). Runs 10 deterministic curl checks
+        # against prod — asserts 200 + correct content-type for homepages,
+        # salary, articles, categories, sitemap, robots, icon, apple-icon.
+        # Fails the deploy if any returns wrong content-type (e.g.
+        # text/x-component for an HTML route — the RSC poisoning signature).
+        # Script is operator-safe, runs in ~15s, zero external dependencies.
+        # Owner: DevOps Automator. See Eric's 2026-04-18 call in ORG_CHART.
+        run: bash scripts/smoke-test-prod.sh
+        env:
+          BASE_URL: https://zcybernews.com
+
       - name: Notify Telegram — deploy failure
         # Fires if any preceding step failed (build error, OOM, PM2 won't
         # start, health-check 502, etc.). Without this, code deploy
