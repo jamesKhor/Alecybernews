@@ -1,5 +1,11 @@
 import { getAllPosts, getAllCategories } from "@/lib/content";
 import { ArticleCard } from "@/components/articles/ArticleCard";
+import {
+  VulnCard,
+  MalwareCard,
+  IndustryCard,
+  AICard,
+} from "@/components/home/typography-cards";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -10,23 +16,29 @@ import {
 } from "@/lib/types";
 import { Link } from "@/i18n/navigation";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
-import { ArrowLeft, Shield } from "lucide-react";
 
 interface Props {
   params: Promise<{ locale: string; category: string }>;
 }
 
-const CATEGORY_ICONS: Record<string, string> = {
-  "threat-intel": "🛡️",
-  vulnerabilities: "🔓",
-  malware: "🦠",
-  industry: "🏭",
-  tools: "🔧",
-  ai: "🤖",
+// Per-category hue tokens — matches the homepage CategorySection bar so
+// the accent color is consistent whether the reader lands on the
+// homepage or straight into a category listing.
+const CATEGORY_HSL: Record<string, string> = {
+  "threat-intel": "var(--cat-threat-intel)",
+  vulnerabilities: "var(--cat-vulnerabilities)",
+  malware: "var(--cat-malware)",
+  industry: "var(--cat-industry)",
+  tools: "var(--cat-tools)",
+  ai: "var(--cat-ai)",
 };
 
-// ISR: only 12 pages total (6 categories × 2 locales) — pre-render all but
-// still allow regeneration so new articles in a category appear without rebuild
+// Categories whose cards lead with a photograph. The other four
+// (vulnerabilities, malware, industry, ai) use typography-forward hero
+// elements (CVSS score / threat-actor name / entity / provider) because
+// the AI pipeline's featured_image coverage is effectively zero.
+const PHOTO_FORWARD: readonly string[] = ["threat-intel", "tools"];
+
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
@@ -41,7 +53,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, category } = await params;
   const t = await getTranslations({ locale, namespace: "categories" });
 
-  // Safe translation lookup — CategoryEnum.options are valid translation keys
   const label = CategoryEnum.options.includes(category as never)
     ? t(category as Parameters<typeof t>[0])
     : category;
@@ -84,7 +95,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CategoryPage({ params }: Props) {
   const { locale, category } = await params;
 
-  // Validate category
   const parsed = CategoryEnum.safeParse(category);
   if (!parsed.success) notFound();
 
@@ -97,7 +107,6 @@ export default async function CategoryPage({ params }: Props) {
     (a) => a.frontmatter.category === category,
   );
 
-  // Sort by date descending
   combined.sort(
     (a, b) =>
       new Date(b.frontmatter.date).getTime() -
@@ -118,10 +127,72 @@ export default async function CategoryPage({ params }: Props) {
   );
 
   const label = t(category as Parameters<typeof t>[0]);
-  const icon = CATEGORY_ICONS[category] ?? "📁";
+  const catColor = CATEGORY_HSL[category] ?? "var(--primary)";
+  const isPhotoForward = PHOTO_FORWARD.includes(category);
+  const localeTyped = (locale === "zh" ? "zh" : "en") as "en" | "zh";
+
+  // Pick the right card per category. threat-intel and tools use
+  // ArticleCard (photo-forward). vulns/malware/industry/ai use their
+  // typography-forward variants from components/home/typography-cards.tsx.
+  const renderCard = (article: (typeof combined)[number]) => {
+    const sourceType: "posts" | "threat-intel" =
+      article.frontmatter.category === "threat-intel"
+        ? "threat-intel"
+        : "posts";
+
+    if (category === "vulnerabilities") {
+      return (
+        <VulnCard
+          key={article.frontmatter.slug}
+          article={article}
+          locale={localeTyped}
+          sourceType={sourceType}
+        />
+      );
+    }
+    if (category === "malware") {
+      return (
+        <MalwareCard
+          key={article.frontmatter.slug}
+          article={article}
+          locale={localeTyped}
+          sourceType={sourceType}
+        />
+      );
+    }
+    if (category === "industry") {
+      return (
+        <IndustryCard
+          key={article.frontmatter.slug}
+          article={article}
+          locale={localeTyped}
+          sourceType={sourceType}
+        />
+      );
+    }
+    if (category === "ai") {
+      return (
+        <AICard
+          key={article.frontmatter.slug}
+          article={article}
+          locale={localeTyped}
+          sourceType={sourceType}
+        />
+      );
+    }
+    // threat-intel + tools — keep photo-forward ArticleCard
+    return (
+      <ArticleCard
+        key={article.frontmatter.slug}
+        article={article}
+        locale={locale}
+        type={sourceType}
+      />
+    );
+  };
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-12">
+    <main className="max-w-7xl mx-auto px-4 py-8 sm:py-12">
       <Breadcrumbs
         items={[
           { label: locale === "zh" ? "首页" : "Home", href: `/${locale}` },
@@ -129,79 +200,89 @@ export default async function CategoryPage({ params }: Props) {
           { label },
         ]}
       />
-      <div className="mb-8">
-        <div className="flex items-center gap-3">
-          <span className="text-4xl">{icon}</span>
+
+      {/* NYT-style section header — accent bar + serif uppercase headline,
+          matches the homepage CategorySection but scaled larger for a
+          dedicated landing page. */}
+      <header className="flex items-end justify-between gap-4 mb-8 sm:mb-10 pb-4 border-b border-border">
+        <div className="flex items-center gap-4">
+          <span
+            className="h-10 sm:h-12 w-1.5 rounded-sm"
+            style={{ backgroundColor: `hsl(${catColor})` }}
+            aria-hidden
+          />
           <div>
-            <h1 className="text-3xl font-bold">{label}</h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              {combined.length} {combined.length === 1 ? "article" : "articles"}
+            <h1 className="font-serif text-3xl sm:text-4xl font-bold uppercase tracking-tight text-foreground leading-none">
+              {label}
+            </h1>
+            <p className="mt-2 text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
+              {combined.length}{" "}
+              {locale === "zh"
+                ? "篇文章"
+                : combined.length === 1
+                  ? "article"
+                  : "articles"}
             </p>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="flex gap-8">
-        {/* Sidebar — all categories */}
-        <aside className="hidden lg:block w-52 shrink-0">
-          <div className="sticky top-8">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5" />
-              {tNav("categories")}
-            </p>
-            <nav className="space-y-1">
-              {allCategories.map(({ category: cat, count }) => {
-                const isActive = cat === category;
-                return (
-                  <Link
-                    key={cat}
-                    href={`/categories/${cat}`}
-                    className={`flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
-                      isActive
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <span>{CATEGORY_ICONS[cat] ?? "📁"}</span>
-                      {t(cat as Parameters<typeof t>[0])}
-                    </span>
-                    <span
-                      className={`text-xs rounded-full px-1.5 py-0.5 ${isActive ? "bg-primary/20" : "bg-secondary"}`}
-                    >
-                      {count}
-                    </span>
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-        </aside>
+      {/* Category rail — horizontal scroll on mobile, inline on desktop.
+          Replaces the old sidebar; reads top-of-page like NYT section
+          tabs. */}
+      <nav
+        aria-label={tNav("categories")}
+        className="flex gap-1.5 overflow-x-auto scrollbar-thin pb-4 mb-8 border-b border-border/60"
+      >
+        {allCategories.map(({ category: cat, count }) => {
+          const isActive = cat === category;
+          const chipColor = CATEGORY_HSL[cat] ?? "var(--primary)";
+          return (
+            <Link
+              key={cat}
+              href={`/categories/${cat}`}
+              className={`shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-colors ${
+                isActive
+                  ? "bg-foreground text-background border-foreground font-medium"
+                  : "bg-card border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+              }`}
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{
+                  backgroundColor: isActive
+                    ? "currentColor"
+                    : `hsl(${chipColor})`,
+                }}
+                aria-hidden
+              />
+              <span>{t(cat as Parameters<typeof t>[0])}</span>
+              <span
+                className={`font-mono tabular-nums ${isActive ? "opacity-70" : "opacity-60"}`}
+              >
+                {count}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
 
-        {/* Article grid */}
-        <div className="flex-1 min-w-0">
-          {combined.length === 0 ? (
-            <p className="text-muted-foreground py-24 text-center font-mono">
-              {"// No articles in this category yet"}
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {combined.map((post) => (
-                <ArticleCard
-                  key={post.frontmatter.slug}
-                  article={post}
-                  locale={locale}
-                  type={
-                    post.frontmatter.category === "threat-intel"
-                      ? "threat-intel"
-                      : "posts"
-                  }
-                />
-              ))}
-            </div>
-          )}
+      {/* Article grid */}
+      {combined.length === 0 ? (
+        <p className="text-muted-foreground py-24 text-center font-mono">
+          {"// No articles in this category yet"}
+        </p>
+      ) : (
+        <div
+          className={
+            isPhotoForward
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+              : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+          }
+        >
+          {combined.map(renderCard)}
         </div>
-      </div>
+      )}
     </main>
   );
 }

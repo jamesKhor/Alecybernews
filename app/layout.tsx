@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Inter,
   Source_Serif_4,
@@ -74,6 +74,17 @@ const notoSansSC = Noto_Sans_SC({
   display: "swap",
   preload: true,
 });
+
+// Explicit viewport config (Next.js 16 convention — separate from metadata).
+// `width=device-width, initial-scale=1` is the Next default, but declaring
+// it explicitly documents intent and adds viewportFit for iOS safe-area
+// support. No `maximumScale` — users must be allowed to pinch-zoom for
+// accessibility (WCAG 1.4.4).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: {

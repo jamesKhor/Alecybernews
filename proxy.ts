@@ -91,7 +91,10 @@ export const config = {
     // Match all pathnames EXCEPT:
     //   /api, /admin  — bypassed entirely (admin auth lives in layout.tsx)
     //   /_next, /_vercel — internals
+    //   Next.js special routes: icon, apple-icon, opengraph-image,
+    //     twitter-image, sitemap, robots, manifest — these are auto-
+    //     generated at the app root and must NOT be locale-prefixed
     //   files with extensions (images, fonts, etc.)
-    "/((?!api|admin|_next|_vercel|.*\\..*).*)",
+    "/((?!api|admin|_next|_vercel|icon|apple-icon|opengraph-image|twitter-image|sitemap|robots|manifest|.*\\..*).*)",
   ],
 };

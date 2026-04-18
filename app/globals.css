@@ -164,6 +164,17 @@
     "Noto Sans CJK SC", system-ui, sans-serif;
 }
 
+/* Mobile horizontal-overflow guard (2026-04-18).
+   Belt-and-braces: prevent ANY descendant from triggering page-level
+   horizontal scroll on phones. Use `clip` (not `hidden`) so position:
+   fixed/sticky descendants still work against the viewport. Applied at
+   html AND body so the rule survives any component that temporarily
+   sets overflow on body (drawers, dialogs, etc.). */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
