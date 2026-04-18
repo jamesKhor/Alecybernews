@@ -4,6 +4,27 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  // ── Turbopack externalization fix (P0 SEV3, 2026-04-18) ──────────────
+  // Root cause: Next.js 16.2.3 + Turbopack produced a build where
+  // `next-mdx-remote/rsc` was externalized with a hashed alias (e.g.
+  // `next-mdx-remote-bb3b2464f4f590a5/rsc`). At runtime, the server
+  // chunk tried to resolve this hashed package name — but it only
+  // exists as an internal Turbopack alias, not an actual package in
+  // node_modules. Every article detail page 500'd with:
+  //   Error [ERR_MODULE_NOT_FOUND]: Cannot find package
+  //   'next-mdx-remote-bb3b2464f4f590a5' imported from
+  //   .next/server/chunks/ssr/[turbopack]_runtime.js
+  //
+  // Discovered via `npx next start` in foreground (PM2 was swallowing
+  // the error in cluster-mode log redirection). Listings worked because
+  // they don't import compileMDX; only article detail pages did.
+  //
+  // Fix: transpilePackages forces Next.js/Turbopack to INCLUDE the
+  // package in the server bundle instead of externalizing it via a
+  // hashed alias. Since we always want this package resolved at
+  // build-time (not dynamically loaded), bundling it is correct.
+  transpilePackages: ["next-mdx-remote"],
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "fal.media" },
