@@ -1,0 +1,51 @@
+---
+title: QNAP TS-453E QVRPro 暴露方法使远程代码执行成为可能
+slug: 2026-04-18-qnap-ts-453e-qvrpro-exposed-method-enables-remote-code-execution
+date: '2026-04-18'
+excerpt: >-
+  QNAP TS-453E QVRPro 中存在一个关键漏洞（CVE-2026-22898），允许网络相邻的攻击者在未经认证的情况下执行任意代码，从 Zero
+  Day Initiative 获得的 CVSS 评分为 8.8。
+category: vulnerabilities
+tags:
+  - qnap
+  - rce
+  - iot
+  - surveillance
+  - zdi
+language: zh
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-292/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-18-qnap-ts-453e-qvrpro-exposed-method-enables-remote-code-execution
+severity: critical
+cvss_score: 8.8
+cve_ids:
+  - CVE-2026-22898
+---
+## 执行摘要
+QNAP的TS-453E网络附加存储（NAS）设备中存在一个关键漏洞，特别是在其QVRPro监控系统软件中，允许未经身份验证的、网络相邻的攻击者执行任意代码。该漏洞被跟踪为CVE-2026-22898，并由趋势科技的零日计划（ZDI）分配了一个CVSS v3.1基础得分8.8，这个缺陷源于`excpostgres`组件中暴露的一个危险方法。成功利用后，攻击者将能够以底层QTS操作系统上的`admin`用户身份运行命令。
+
+## 技术分析
+根据ZDI咨询（ZDI-26-292），漏洞存在于`excpostgres`服务中，该服务是QVRPro视频管理系统的一部分。具体缺陷是一个“暴露的危险方法”，其中服务不当暴露了一个可以远程调用而无需任何身份验证的函数。网络相邻的攻击者可以向易受攻击的服务发送特别制作的请求，触发以`admin`用户的权限执行操作系统命令。
+
+咨询声明攻击向量是“网络相邻”，这意味着攻击者必须与目标设备在同一本地网络段上；除非设备的管理界面暴露在外，否则该漏洞不能直接从互联网上被利用。缺乏身份验证要求显著降低了利用的障碍。影响是设备被完全破坏，允许攻击者安装恶意软件，转向其他系统，或破坏监控操作。
+
+## 入侵指标
+目前尚未识别出任何入侵指标。网络防御者应监控由`admin`用户生成的意外进程，源自QNAP设备的异常网络连接，或对系统文件和监控配置的未经授权的更改。
+
+## 战术、技术与程序
+在这种漏洞中观察到的主要技术是**远程服务利用（T1210）**。攻击者首先需要执行网络发现以定位运行易受攻击版本的QVRPro的QNAP TS-453E设备。发现后，他们会向`excpostgres`服务中暴露的方法制作网络请求，以实现**命令和脚本解释器：Unix Shell（T1059.004）**，用于远程代码执行。
+
+## 威胁行为者背景
+ZDI咨询没有将这一发现归因于任何特定的威胁行为者或活动。该漏洞是通过其公共漏洞赏金计划向ZDI报告的。然而，网络附加存储（NAS）和视频监控系统中的漏洞历来是勒索软件集团和寻求加密数据以勒索或征召设备进入分布式拒绝服务（DDoS）网络的僵尸网络操作者的有吸引力的目标。鉴于高严重性和缺乏身份验证，很可能会开发出概念验证漏洞利用代码，并集成到自动化扫描工具中，增加了广泛利用的风险。
+
+## 缓解措施与建议
+QNAP已经发布了解决此漏洞的安全更新。最主要的和最关键的缓解措施是**立即更新QTS操作系统和所有安装的应用程序，包括QVRPro，到QNAP提供的最新版本。**
+
+管理员还应实施网络分段，确保QNAP NAS设备和监控系统组件被放置在专用VLAN上，与关键业务和用户网络隔离。必须避免直接将QNAP管理界面暴露在互联网上；应通过VPN限制访问。建议定期审计设备日志，以寻找不寻常的身份验证尝试或进程执行。
+
+作为物联网和嵌入式设备的一般安全实践，禁用任何不是严格需要的操作服务和应用程序。
+
+## 参考资料
+- ZDI Advisory ZDI-26-292 / CVE-2026-22898: [http://www.zerodayinitiative.com/advisories/ZDI-26-292/](http://www.zerodayinitiative.com/advisories/ZDI-26-292/)
