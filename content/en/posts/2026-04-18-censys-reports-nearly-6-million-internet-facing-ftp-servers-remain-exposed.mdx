@@ -1,0 +1,62 @@
+---
+title: Censys Reports Nearly 6 Million Internet-Facing FTP Servers Remain Exposed
+slug: >-
+  2026-04-18-censys-reports-nearly-6-million-internet-facing-ftp-servers-remain-exposed
+date: '2026-04-18'
+excerpt: >-
+  Censys research finds 5.9 million internet-facing FTP servers remain online in
+  2026, a 40% drop from 2024, but still representing a significant attack
+  surface due to the protocol's inherent security weaknesses.
+category: vulnerabilities
+tags:
+  - ftp
+  - exposure
+  - network-security
+  - censys
+language: en
+source_urls:
+  - 'https://cybersecuritynews.com/ftp-servers-exposed/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-censys-reports-nearly-6-million-internet-facing-ftp-servers-remain-exposed
+severity: medium
+---
+## Executive Summary
+A new report from attack surface management firm Censys reveals that approximately 5.9 million internet-facing hosts were still running the File Transfer Protocol (FTP) as of April 2026. While this represents a notable 40% decrease from the 10.1 million servers observed in 2024, the persistent use of the unencrypted, decades-old protocol continues to provide a broad attack surface for credential theft, data exfiltration, and server compromise. The research, conducted by Censys security researcher Himaja Motheram, underscores the slow pace of retiring legacy services despite widespread knowledge of their risks.
+
+## Technical Analysis
+FTP, defined in RFC 959 in 1985, transmits credentials and data in clear text by default, making sessions vulnerable to interception. The protocol's "active" mode can also be abused to conduct port scanning and network proxying attacks against internal systems. While FTPS (FTP over SSL/TLS) and SFTP (SSH File Transfer Protocol) provide encrypted alternatives, the Censys scan specifically detected the legacy, plaintext FTP service.
+
+The 5.9 million figure is derived from Censys's global scanning of IPv4 address space for hosts responding on the standard FTP control port, TCP/21. The 40% reduction over two years suggests some organizations are migrating to more secure file transfer methods or removing unnecessary external access. However, the remaining millions of instances indicate that FTP remains deeply embedded in many network architectures, often supporting business-critical legacy applications or operational technology (OT) systems where upgrades are complex.
+
+Censys did not perform an in-depth analysis of the authentication state or specific software versions running on these servers. Consequently, the proportion of servers that are anonymously accessible, use default credentials, or run vulnerable FTP daemon software is unknown. Historical data and common exploitation patterns suggest a significant subset is likely misconfigured or unpatched.
+
+## Indicators of Compromise
+None identified at this time. This report details a broad exposure risk rather than a specific ongoing campaign.
+
+## Tactics, Techniques & Procedures
+Threat actors historically leverage exposed FTP servers through several common techniques:
+- **Credential Sniffing & Brute-Force (T1110)**: Intercepting plaintext credentials on the network or using automated tools to guess weak passwords.
+- **Unsecured Credentials (T1552.001)**: Exploiting anonymous logins or default credentials often left on devices like cameras, printers, and IoT appliances.
+- **Data Exfiltration (TA0010)**: Using compromised FTP servers as a drop point for stolen data or as a transfer mechanism to move files out of a network.
+- **Server Software Exploitation**: Targeting known vulnerabilities in FTP server software (e.g., vsftpd, ProFTPD) for initial access or privilege escalation.
+- **FTP Bounce Scan (T1595.002)**: Abusing the FTP `PORT` command in active mode to proxy network scans or attacks through the vulnerable server, obscuring the attacker's origin.
+
+## Threat Actor Context
+Exposed FTP servers are not typically associated with a single advanced threat actor but are instead considered a low-hanging-fruit resource exploited by a wide range of malicious cyber entities. This includes automated botnets like Mirai for recruiting IoT devices, ransomware affiliates seeking initial access, and financially motivated actors scanning for accidentally exposed databases or backup files. State-sponsored groups have also been known to use compromised FTP servers as redundant command-and-control (C2) channels or data staging points due to their commonality and the difficulty of distinguishing malicious from legitimate traffic.
+
+## Mitigations & Recommendations
+The primary recommendation is to eliminate internet-facing FTP entirely. Censys's data shows progress, but acceleration is needed.
+1.  **Immediate Retirement**: Identify and decommission any internet-exposed FTP server that is not absolutely business-critical.
+2.  **Secure Alternatives**: For necessary external file transfer, implement SFTP (using SSH) or FTPS (explicit TLS). Ensure strong authentication (e.g., key-based for SFTP) and access controls are configured.
+3.  **Network Segmentation**: If legacy FTP must remain for internal use, ensure it is not accessible from the internet. Place it behind a VPN or a secure file gateway that provides authentication, logging, and encryption.
+4.  **Inventory and Scanning**: Continuously scan your external attack surface for unexpected services on TCP/21 and other legacy ports. Censys, Shodan, and internal network scanners can be used for this purpose.
+5.  **Vendor Devices**: Scrutinize network-connected hardware (IoT, OT, network appliances) that may have FTP enabled by default. Change default credentials and disable FTP if the feature is unused.
+6.  **Monitoring**: For servers that cannot be immediately retired, implement rigorous network monitoring for anomalous login attempts, large data transfers, and the use of FTP active mode commands from untrusted sources.
+
+## References
+- Censys Research Blog: [Nearly 6 Million Internet-Facing FTP Servers Still Exposed in 2026, Censys Warns](https://cybersecuritynews.com/ftp-servers-exposed/)
+- RFC 959: File Transfer Protocol (FTP) Specification
+- MITRE ATT&CK: Technique T1110 - Brute Force
+- MITRE ATT&CK: Technique T1552.001 - Unsecured Credentials: Credentials In Files
