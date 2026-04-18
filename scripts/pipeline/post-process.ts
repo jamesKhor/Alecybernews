@@ -313,10 +313,16 @@ export function postProcessArticle(
   );
   article.iocs = [...verifiedIocs, ...nonRegexedIocs];
 
-  // ── 5. Tags — normalize (lowercase, dedup, strip whitespace) ──────────
+  // ── 5. Tags — normalize (lowercase, hyphenate spaces, dedup, length cap) ──
+  // Space-to-hyphen conversion is critical for URL routing. A tag like
+  // "vulnerability management" produces the URL /en/tags/vulnerability%20management
+  // which returns 404 (see Google Search Console 2026-04-18 — 1 page flagged
+  // 404 for this exact reason). Route slug lookup keys by hyphenated form.
   if (Array.isArray(article.tags)) {
     const cleaned = article.tags
-      .map((t) => String(t).toLowerCase().trim())
+      .map((t) =>
+        String(t).toLowerCase().trim().replace(/\s+/g, "-").replace(/-+/g, "-"),
+      )
       .filter((t) => t.length > 0 && t.length < 40);
     article.tags = Array.from(new Set(cleaned));
   }
