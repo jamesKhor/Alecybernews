@@ -1,0 +1,51 @@
+---
+title: HP DeskJet 2855e Printer Vulnerable to Remote Code Execution
+slug: 2026-04-18-hp-deskjet-2855e-printer-vulnerable-to-remote-code-execution
+date: '2026-04-18'
+excerpt: >-
+  A stack-based buffer overflow vulnerability (CVE-2026-4682) in the HP DeskJet
+  2855e printer allows network-adjacent attackers to execute arbitrary code
+  without authentication, earning a CVSS score of 8.8.
+category: vulnerabilities
+tags:
+  - iot
+  - hardware
+  - rce
+  - pwn2own
+language: en
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-280/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-18-hp-deskjet-2855e-printer-vulnerable-to-remote-code-execution
+severity: high
+cvss_score: 8.8
+cve_ids:
+  - CVE-2026-4682
+---
+## Executive Summary
+A critical stack-based buffer overflow vulnerability in the HP DeskJet 2855e all-in-one printer allows unauthenticated, network-adjacent attackers to execute arbitrary code. Tracked as CVE-2026-4682 and disclosed by the Zero Day Initiative (ZDI), the flaw resides in the printer's handling of `JobStatusEvent` messages and carries a CVSS v3.1 base score of 8.8. The vulnerability was discovered and demonstrated during the Pwn2Own Vancouver 2026 competition, highlighting persistent security risks in consumer and small office Internet of Things (IoT) devices.
+
+## Technical Analysis
+According to ZDI advisory ZDI-26-280, the vulnerability is a classic stack-based buffer overflow within the parsing logic for `JobStatusEvent` data. The flaw exists because the printer's software fails to perform proper bounds checking before copying user-supplied data into a fixed-size stack buffer. A network-adjacent attacker can trigger the overflow by sending a specially crafted `JobStatusEvent` packet to the device's service port.
+
+The ZDI notes that successful exploitation leads to remote code execution in the context of the printer's operating system. No authentication is required, and the attack is feasible from any system on the same local network. The assigned CVSS score of 8.8 reflects the high attack vector (network), low attack complexity, and high impact on confidentiality, integrity, and availability. The vulnerability is specific to the HP DeskJet 2855e model; the impact on other HP printer models is currently unknown.
+
+## Indicators of Compromise
+None identified at this time. Detection would require monitoring network traffic for anomalous or malformed `JobStatusEvent` packets directed at HP printer IP addresses on local networks.
+
+## Tactics, Techniques & Procedures
+The primary technique observed is **Exploitation for Client Execution (T1203)**. An attacker would craft a malicious network packet to exploit the buffer overflow, leveraging **Remote Services (T1210)** to access the vulnerable service without credentials. This aligns with the initial access and execution phases of the MITRE ATT&CK framework for Enterprise, though applied to an IoT device.
+
+## Threat Actor Context
+This vulnerability was disclosed as part of the Pwn2Own 2026 competition, where security researchers demonstrated the exploit in a controlled environment. There is no evidence of active, in-the-wild exploitation at the time of disclosure. However, the public release of technical details increases the likelihood that threat actors will develop and deploy exploit code. Potential actors range from opportunistic attackers seeking to compromise home networks to more advanced groups looking to use vulnerable printers as initial footholds or persistence mechanisms within corporate environments.
+
+## Mitigations & Recommendations
+The primary mitigation is to apply the firmware update provided by HP when it becomes available. Organizations and users should monitor the HP Security Bulletin page for patches addressing CVE-2026-4682. Until a patch is available, network-level controls are critical:
+*   Segment printer networks: Place IoT devices, including printers, on a dedicated VLAN separate from critical business and data networks.
+*   Implement access control lists (ACLs) to restrict communication with printer management interfaces to authorized administrative hosts only.
+*   If remote management is not required, disable the relevant services or network protocols via the printer's configuration settings.
+*   Conduct regular asset inventories to identify and track vulnerable devices within the network environment.
+
+## References
+*   Zero Day Initiative (ZDI) Advisory ZDI-26-280: [http://www.zerodayinitiative.com/advisories/ZDI-26-280/](http://www.zerodayinitiative.com/advisories/ZDI-26-280/)

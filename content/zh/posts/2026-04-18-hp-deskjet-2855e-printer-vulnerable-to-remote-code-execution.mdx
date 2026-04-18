@@ -1,0 +1,50 @@
+---
+title: HP DeskJet 2855e 打印机易受远程代码执行攻击
+slug: 2026-04-18-hp-deskjet-2855e-printer-vulnerable-to-remote-code-execution
+date: '2026-04-18'
+excerpt: >-
+  HP DeskJet 2855e
+  打印机中存在一个基于栈的缓冲区溢出漏洞（CVE-2026-4682），允许网络邻近的攻击者在无需认证的情况下执行任意代码，CVSS 评分为 8.8。
+category: vulnerabilities
+tags:
+  - iot
+  - hardware
+  - rce
+  - pwn2own
+language: zh
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-280/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-18-hp-deskjet-2855e-printer-vulnerable-to-remote-code-execution
+severity: high
+cvss_score: 8.8
+cve_ids:
+  - CVE-2026-4682
+---
+## 执行摘要
+HP DeskJet 2855e 多功能打印机存在一个严重的基于栈的缓冲区溢出漏洞，允许未经身份验证的、网络邻近的攻击者执行任意代码。该漏洞被跟踪为 CVE-2026-4682，由 Zero Day Initiative (ZDI) 披露，漏洞存在于打印机处理 `JobStatusEvent` 消息的方式中，CVSS v3.1 基础得分为 8.8。该漏洞在 2026 年 Pwn2Own Vancouver 竞赛中被发现并演示，突显了消费者和小型企业物联网 (IoT) 设备中持续存在的安全风险。
+
+## 技术分析
+根据 ZDI 咨询报告 ZDI-26-280，该漏洞是一个经典的基于栈的缓冲区溢出，存在于解析 `JobStatusEvent` 数据的逻辑中。漏洞存在是因为打印机软件在将用户提供的数据复制到固定大小的栈缓冲区之前，未能执行正确的边界检查。网络邻近的攻击者可以通过向设备的服务端口发送特制的 `JobStatusEvent` 数据包来触发溢出。
+
+ZDI 指出，成功利用漏洞可以在打印机操作系统的上下文中实现远程代码执行。不需要身份验证，攻击可以从同一本地网络上的任何系统进行。分配的 CVSS 得分 8.8 反映了高攻击向量（网络）、低攻击复杂性以及对机密性、完整性和可用性的高影响。该漏洞特定于 HP DeskJet 2855e 型号；对其他 HP 打印机型号的影响目前尚不清楚。
+
+## 入侵指标
+目前没有识别出任何入侵指标。检测将需要监控网络流量，寻找异常或畸形的 `JobStatusEvent` 数据包，这些数据包针对本地网络上的 HP 打印机 IP 地址。
+
+## 战术、技术与程序
+观察到的主要技术是 **客户端执行的利用 (T1203)**。攻击者将制作一个恶意的网络数据包来利用缓冲区溢出，利用 **远程服务 (T1210)** 在没有凭证的情况下访问易受攻击的服务。这与 MITRE ATT&CK 框架的企业初始访问和执行阶段相一致，尽管应用于 IoT 设备。
+
+## 威胁行为者背景
+作为 2026 年 Pwn2Own 竞赛的一部分，该漏洞被披露，安全研究人员在受控环境中演示了漏洞利用。在披露时没有活跃的、在野外的利用证据。然而，技术细节的公开发布增加了威胁行为者开发和部署漏洞利用代码的可能性。潜在行为者的范围从寻求破坏家庭网络的机会性攻击者到更高级的团体，他们寻求将易受攻击的打印机作为企业环境中的初始立足点或持久性机制。
+
+## 缓解措施与建议
+主要的缓解措施是应用 HP 提供的固件更新，一旦可用。组织和用户应监控 HP 安全公告页面，寻找解决 CVE-2026-4682 的补丁。在补丁可用之前，网络级控制至关重要：
+*   分割打印机网络：将 IoT 设备，包括打印机，放置在与关键业务和数据网络分开的专用 VLAN 上。
+*   实施访问控制列表 (ACL)，将与打印机管理接口的通信限制在仅授权的管理员主机。
+*   如果不需要远程管理，请通过打印机的配置设置禁用相关服务或网络协议。
+*   定期进行资产清点，以识别和跟踪网络环境中的易受攻击设备。
+
+## 参考资料
+*   Zero Day Initiative (ZDI) 咨询报告 ZDI-26-280: [http://www.zerodayinitiative.com/advisories/ZDI-26-280/](http://www.zerodayinitiative.com/advisories/ZDI-26-280/)
