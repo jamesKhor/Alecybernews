@@ -22,7 +22,13 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
       <Header locale={locale} />
-      <div className="flex-1 flex flex-col">{children}</div>
+      {/* flex-1 stretches this wrapper between Header and Footer (body
+          is flex-col). `min-w-0` prevents min-content intrinsic sizing
+          from making main wider than viewport — the ROOT cause of the
+          2026-04-18 SEV2 mobile overflow where main was 788px on a
+          375px viewport. Removed `flex flex-col` because main should
+          use normal block layout, not a flex container. */}
+      <div className="flex-1 min-w-0">{children}</div>
       <Footer locale={locale} />
     </NextIntlClientProvider>
   );

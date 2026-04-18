@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Tailwind v4 content scan — exclude docs/ so design-spec markdown
+   files (which contain example class names in code fences) don't
+   produce invalid generated CSS. Also exclude .next/ build output. */
+@source "./**/*.{ts,tsx,js,jsx,mdx}";
+@source not "./docs/**";
+@source not "./.next/**";
+@source not "./node_modules/**";
+
 @layer base {
   /* ─── Light mode (default) — clean white ─── */
   :root {
@@ -182,6 +190,30 @@ html,
 body {
   overflow-x: clip;
   max-width: 100vw;
+}
+
+/* Flex-item min-width fix (2026-04-18 PM — ROOT CAUSE of salary page
+   mobile overflow).
+   Body is `flex flex-col` (app/layout.tsx). Flex items default to
+   `min-width: auto` meaning min-content. If ANY descendant has
+   intrinsic content wider than the viewport (e.g. a long unbreakable
+   mono string, an SVG with min-width, an iframe, a role title),
+   the flex item grows to fit that descendant — dragging main to
+   788px wide on a 375px viewport. Descendants overflow, users see
+   content off-screen and must pinch-zoom out.
+   Fixing with !important to beat Tailwind preflight specificity —
+   the rule MUST land on body's block-level children regardless of
+   any utility class that might try to reset min-width/max-width. */
+body > main,
+body > header,
+body > footer,
+body > section,
+body > nav,
+body > aside,
+body > article,
+body > div {
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
 /* Resize-lag mitigation (2026-04-18 PM).
