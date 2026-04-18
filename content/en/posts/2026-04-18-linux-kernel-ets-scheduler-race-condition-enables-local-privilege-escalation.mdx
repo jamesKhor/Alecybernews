@@ -1,0 +1,57 @@
+---
+title: Linux Kernel ETS Scheduler Race Condition Enables Local Privilege Escalation
+slug: >-
+  2026-04-18-linux-kernel-ets-scheduler-race-condition-enables-local-privilege-escalation
+date: '2026-04-18'
+excerpt: >-
+  A race condition vulnerability (CVE-2025-71066) in the Linux kernel's ETS
+  scheduler can allow local attackers to escalate privileges to root, earning a
+  CVSS score of 7.5 from the Zero Day Initiative.
+category: vulnerabilities
+tags:
+  - linux-kernel
+  - privilege-escalation
+  - race-condition
+  - zdi
+language: en
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-289/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-linux-kernel-ets-scheduler-race-condition-enables-local-privilege-escalation
+severity: high
+cvss_score: 7.5
+cve_ids:
+  - CVE-2025-71066
+---
+## Executive Summary
+A race condition vulnerability in the Linux kernel's Earliest Eligible Virtual Deadline First (EEVDF) scheduler, specifically within its Earliest Transmission Selection (ETS) bandwidth management component, can be exploited by a local attacker to escalate privileges to root. Tracked as CVE-2025-71066 and assigned a CVSS v3.1 base score of 7.5 by Trend Micro's Zero Day Initiative (ZDI), the flaw requires an attacker to first obtain the ability to execute high-privileged code on the target. Successful exploitation grants full control of the affected system.
+
+## Technical Analysis
+The vulnerability resides in the `ets_qdisc_change()` function within the kernel's queuing discipline (`qdisc`) subsystem for traffic control. According to the ZDI advisory, the flaw is a classic time-of-check to time-of-use (TOCTOU) race condition. The function fails to properly hold necessary locks while manipulating internal scheduler structures, creating a window where concurrent operations can corrupt kernel memory.
+
+Specifically, the function retrieves a pointer to a scheduler class structure but does not ensure the integrity of that pointer remains valid during subsequent operations. A malicious actor with sufficient local access can race the kernel's own operations, potentially replacing the intended class pointer with one pointing to attacker-controlled data. This corruption can lead to arbitrary code execution in kernel context, bypassing all user-space security mechanisms. The ZDI notes the attack complexity is high, as winning the race requires precise timing, but the impact is a complete compromise of the operating system's security boundary.
+
+## Indicators of Compromise
+None identified at this time. Exploitation of this local privilege escalation (LPE) vulnerability would not generate distinct network indicators. Detection would rely on kernel integrity monitoring, anomaly detection in privilege escalation events, or forensic analysis of kernel memory corruption.
+
+## Tactics, Techniques & Procedures
+Based on the ZDI disclosure, the primary Tactics, Techniques, and Procedures (TTPs) for exploiting this flaw align with the MITRE ATT&CK framework:
+*   **TA0004: Privilege Escalation** – The core objective of the exploit.
+*   **T1068: Exploitation for Privilege Escalation** – Exploiting the race condition in the kernel scheduler.
+*   **T1055: Process Injection** (specifically, sub-techniques related to executing code in kernel space) – The likely result of successful memory corruption.
+*   **Pre-requisite: T1548: Abuse Elevation Control Mechanism** – The attacker must already have some level of elevated (but not root) code execution capability to initiate the race condition attack.
+
+## Threat Actor Context
+The ZDI advisory does not attribute this vulnerability discovery to any specific threat actor, nor does it indicate active exploitation in the wild. The bug was reported to the ZDI program through coordinated vulnerability disclosure. The technical nature of the flaw—requiring local access and a complex race condition—makes it most attractive to sophisticated attackers who have already breached a system and are seeking to consolidate control, or potentially in container escape scenarios where an attacker has compromised a containerized process.
+
+## Mitigations & Recommendations
+The primary mitigation is to apply kernel updates from your Linux distribution vendor once patches are available. The ZDI states the vulnerability was reported to the vendor on 2025-10-30. As of the advisory publication date, the vendor status is listed as "Patch Available." System administrators should:
+1.  Monitor for and apply stable kernel updates from their respective distribution (e.g., Red Hat, Ubuntu, SUSE, Debian).
+2.  Implement strict access controls to limit local user privileges, adhering to the principle of least privilege, to reduce the attack surface for the initial access required to trigger the bug.
+3.  Consider kernel security modules and hardening features that can make exploitation of race conditions more difficult, though these are not substitutes for patching.
+4.  Deploy security tools capable of detecting anomalous privilege escalation attempts or kernel memory manipulation.
+
+## References
+*   Zero Day Initiative Advisory ZDI-26-289: [Linux Kernel ETS Scheduler Race Condition Local Privilege Escalation Vulnerability](http://www.zerodayinitiative.com/advisories/ZDI-26-289/)

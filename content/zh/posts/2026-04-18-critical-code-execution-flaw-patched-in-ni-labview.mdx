@@ -1,0 +1,57 @@
+---
+title: NI LabVIEW中的关键代码执行漏洞已修复
+slug: 2026-04-18-critical-code-execution-flaw-patched-in-ni-labview
+date: '2026-04-18'
+excerpt: >-
+  NI
+  LabVIEW中存在一个关键漏洞（CVE-2026-32861），允许远程攻击者通过诱使用户打开恶意的LVCLASS文件来执行任意代码，CVSS得分为7.8。
+category: vulnerabilities
+tags:
+  - industrial
+  - rce
+  - ni
+  - labview
+language: zh
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-291/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-18-critical-code-execution-flaw-patched-in-ni-labview
+severity: critical
+cvss_score: 7.8
+cve_ids:
+  - CVE-2026-32861
+affected_sectors:
+  - industrial
+  - research
+  - academia
+---
+## 执行摘要
+NI LabVIEW中存在一个严重的远程代码执行（RCE）漏洞，编号为CVE-2026-32861，允许攻击者通过诱使用户打开恶意制作的LVCLASS文件，在目标系统上执行任意代码。这个漏洞由趋势科技的零日计划（ZDI）发现并披露，其CVSS v3.1基础得分为7.8（高）。成功利用此漏洞可以赋予攻击者对受影响工作站的完全控制权，对工业、研究和学术环境构成重大风险，在这些环境中LabVIEW被广泛用于测试、测量和控制系统。
+
+## 技术分析
+该漏洞存在于LabVIEW类文件（`.lvclass`）的解析逻辑中。根据ZDI咨询（ZDI-26-291），具体漏洞是当应用程序处理一个特别制作的文件时发生的内存损坏问题。这种损坏是由于缺乏对用户提供的数据进行适当验证，可能导致写入超出分配缓冲区的界限。
+
+这种越界写入条件可以被利用来以一种方式损坏内存，允许攻击者在当前用户的环境中执行代码。该漏洞不需要认证或提升权限即可利用；唯一需要的用户交互是打开恶意文件，该文件可以通过电子邮件、被破坏的网站或网络共享传递。ZDI咨询指出，该漏洞于2025-11-19由ZDI报告给NI，并由供应商在随后的更新中修补。
+
+## 入侵指标
+目前没有识别出任何入侵指标。主要的初始向量是一个恶意的`.lvclass`文件。防御者应监控意外的LabVIEW进程崩溃或从`LabVIEW.exe`生成的可疑子进程的执行。
+
+## 战术、技术与程序
+可能的利用链遵循客户端攻击的标准模式。对手将采用**T1204.002：用户执行-恶意文件**，依赖社会工程学来说服目标打开武器化的LVCLASS文件。成功利用后，技术将转向**T1059：命令和脚本解释器**来执行有效载荷并建立持久性。初始访问可能是针对工程和工业控制系统（ICS）环境的更广泛活动的一部分。
+
+## 威胁行为者背景
+在披露时，没有公开证据表明CVE-2026-32861在野外被积极利用。然而，漏洞的性质——一个广泛部署的工程应用程序中的客户端RCE——使其成为针对工业间谍活动和供应链破坏的高级持续威胁（APT）团体的有吸引力的目标。历史上，工程软件中的类似漏洞被TEMP.Veles（由Mandiant追踪）等团体和其他针对关键基础设施和制造业部门的国家对齐行为者利用。
+
+## 缓解措施与建议
+主要的缓解措施是应用National Instruments提供的安全更新。用户和管理员应升级到包含CVE-2026-32861修复的LabVIEW版本。NI的安全咨询详细说明了受影响的版本和补丁，应查阅以获取特定版本的指导。
+
+组织应实施防御措施以补充修补：
+- **应用程序控制**：使用策略限制LabVIEW的执行到受信任的、必要的用户和系统，特别是在连接到运营技术（OT）网络的工程工作站上。
+- **用户培训**：教育工程师和技术员工了解打开未经请求或意外的项目文件的风险，即使是来自看似受信任的来源。
+- **网络分割**：确保在通常使用LabVIEW的工程设计环境和生产OT网络之间进行严格的分割，以限制横向移动的潜力。
+- **监控**：在工程工作站上部署端点检测和响应（EDR）工具，并监控源自LabVIEW的异常进程行为。
+
+## 参考资料
+- 零日计划咨询ZDI-26-291：[http://www.zerodayinitiative.com/advisories/ZDI-26-291/](http://www.zerodayinitiative.com/advisories/ZDI-26-291/)
+- National Instruments安全咨询（用户应咨询NI的官方门户以获取与CVE-2026-32861相关的具体咨询）。

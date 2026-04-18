@@ -1,0 +1,56 @@
+---
+title: Linux Kernel ETS Scheduler 竞态条件漏洞使本地权限提升成为可能
+slug: >-
+  2026-04-18-linux-kernel-ets-scheduler-race-condition-enables-local-privilege-escalation
+date: '2026-04-18'
+excerpt: >-
+  Linux 内核的 ETS 调度器中存在一个竞态条件漏洞（CVE-2025-71066），允许本地攻击者将权限提升至 root，从 Zero Day
+  Initiative 获得的 CVSS 评分为 7.5。
+category: vulnerabilities
+tags:
+  - linux-kernel
+  - privilege-escalation
+  - race-condition
+  - zdi
+language: zh
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-289/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-linux-kernel-ets-scheduler-race-condition-enables-local-privilege-escalation
+severity: high
+cvss_score: 7.5
+cve_ids:
+  - CVE-2025-71066
+---
+## 执行摘要
+Linux内核的最早合格虚拟截止时间优先（EEVDF）调度器中存在一个竞态条件漏洞，特别是在其最早传输选择（ETS）带宽管理组件内，可以被本地攻击者利用以提升权限至root。该漏洞被跟踪为CVE-2025-71066，并由趋势科技的零日计划（ZDI）分配了一个CVSS v3.1基础得分7.5，该缺陷要求攻击者首先获得在目标上执行高权限代码的能力。成功利用将授予对受影响系统的完全控制。
+
+## 技术分析
+该漏洞存在于内核的队列规则（`qdisc`）子系统中的`ets_qdisc_change()`函数内，用于流量控制。根据ZDI咨询，该缺陷是一个经典的检查时间到使用时间（TOCTOU）竞态条件。该函数在操作内部调度器结构时未能正确持有必要的锁，从而创建了一个并发操作可以破坏内核内存的窗口。
+
+具体来说，该函数检索指向调度器类结构的指针，但并未确保该指针在后续操作中的完整性保持有效。具有足够本地访问权限的恶意行为者可以与内核自身的操作竞赛，可能将预期的类指针替换为指向攻击者控制的数据的指针。这种破坏可能导致在内核上下文中执行任意代码，绕过所有用户空间安全机制。ZDI指出，攻击复杂性高，因为赢得竞赛需要精确的时间，但影响是操作系统安全边界的完全破坏。
+
+## 入侵指标
+目前未识别出任何入侵指标。利用这种本地权限提升（LPE）漏洞不会产生独特的网络指标。检测将依赖于内核完整性监控、权限提升事件中的异常检测，或对内核内存破坏的取证分析。
+
+## 战术、技术与程序
+根据ZDI披露，利用这一缺陷的主要战术、技术和程序（TTPs）与MITRE ATT&CK框架一致：
+*   **TA0004: 权限提升** – 漏洞利用的核心目标。
+*   **T1068: 权限提升的利用** – 利用内核调度器中的竞态条件。
+*   **T1055: 进程注入**（特别是，与在内核空间执行代码相关的子技术） – 成功内存破坏的可能结果。
+*   **先决条件：T1548: 滥用提升控制机制** – 攻击者必须已经具备一定程度的提升（但不是root）代码执行能力，以启动竞态条件攻击。
+
+## 威胁行为者背景
+ZDI咨询没有将这一漏洞的发现归因于任何特定的威胁行为者，也没有表明在野外有活跃的利用。该错误是通过协调漏洞披露程序报告给ZDI计划的。缺陷的技术性质——需要本地访问和复杂的竞态条件——使其最吸引已经突破系统并寻求巩固控制的复杂攻击者，或者可能在容器逃逸场景中，攻击者已经破坏了容器化进程。
+
+## 缓解措施与建议
+主要的缓解措施是一旦补丁可用，就从您的Linux发行版供应商那里应用内核更新。ZDI指出，该漏洞已于2025-10-30报告给供应商。截至咨询发布日期，供应商状态被列为“补丁可用”。系统管理员应：
+1.  监控并应用各自发行版（例如，Red Hat、Ubuntu、SUSE、Debian）的稳定内核更新。
+2.  实施严格的访问控制，限制本地用户权限，遵循最小权限原则，以减少触发漏洞所需的初始访问的攻击面。
+3.  考虑可以使利用竞态条件更困难的内核安全模块和加固功能，尽管这些不是补丁的替代品。
+4.  部署能够检测异常权限提升尝试或内核内存操作的安全工具。
+
+## 参考资料
+*   零日计划咨询ZDI-26-289：[Linux Kernel ETS Scheduler Race Condition Local Privilege Escalation Vulnerability](http://www.zerodayinitiative.com/advisories/ZDI-26-289/)
