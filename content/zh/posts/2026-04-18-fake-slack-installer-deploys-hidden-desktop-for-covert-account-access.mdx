@@ -1,0 +1,57 @@
+---
+title: Fake Slack Installer Deploys Hidden Desktop for Covert Account Access
+slug: >-
+  2026-04-18-fake-slack-installer-deploys-hidden-desktop-for-covert-account-access
+date: '2026-04-18'
+excerpt: 一个木马化的 Slack 安装程序提供了一个远程访问工具，该工具创建了一个隐藏的桌面，允许攻击者绕过多因素认证并悄无声息地控制受害者的机器。
+category: malware
+tags:
+  - malware
+  - social-engineering
+  - remote-access-trojan
+  - initial-access
+language: zh
+source_urls:
+  - >-
+    https://www.malwarebytes.com/blog/threat-intel/2026/04/a-fake-slack-download-is-giving-attackers-a-hidden-desktop-on-your-machine
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-fake-slack-installer-deploys-hidden-desktop-for-covert-account-access
+severity: high
+---
+## 执行摘要
+一个复杂的恶意软件活动正在分发Slack桌面应用的木马化版本，该版本安装了一个远程访问工具（RAT），能够创建一个隐藏的、由攻击者控制的桌面。根据Malwarebytes研究人员的说法，这种技术允许威胁行为者绕过视觉检测，并直接与受害者机器上的合法应用程序进行交互，对账户安全和数据保密性构成严重风险。攻击链始于一个恶意搜索引擎广告，模仿官方Slack下载页面。
+
+## 技术分析
+当用户搜索“Slack下载”并点击出现在合法搜索结果上方的恶意广告时，攻击就开始了。广告链接到一个看似可信但伪造的网页，旨在模仿Slack的官方网站。受害者被提示下载Windows安装程序可执行文件`slack.msi`。虽然安装程序确实在`C:\Program Files\Slack`部署了一个合法、可操作的Slack应用程序副本，但它同时在后台执行了一个恶意负载。
+
+主要负载是一个被Malwarebytes识别为开源`RustDesk`软件变种的远程访问工具，配置为充当隐蔽后门。恶意软件通过创建一个名为`SlackUpdate`的Windows计划任务来建立持久性，该任务每分钟运行一次，确保RAT保持活跃。RAT客户端连接到一个硬编码的命令和控制（C2）服务器，授予攻击者对受感染系统的完全远程控制。
+
+这次攻击最关键的特点是RAT能够创建一个隐藏的桌面。使用Windows API函数，恶意软件生成一个新的、不可见的桌面会话，与用户的可见会话分开。然后攻击者可以在该隐藏桌面上打开像网络浏览器这样的应用程序。由于这些浏览器在与现有cookie、会话令牌和存储的密码相同的用户会话中运行，攻击者可以绕过多因素认证（MFA），在不触发受害者主屏幕上的任何可见提示或窗口的情况下访问账户。
+
+## 入侵指标
+目前未识别出任何入侵指标。
+
+## 战术、技术与程序
+*   **初始访问 (T1583.001, T1583.002):** 威胁行为者购买“Slack下载”的搜索引擎广告，以毒化搜索结果，并将流量引导至假冒下载页面。
+*   **执行 (T1204.002):** 用户被社会工程学诱导下载并执行恶意的`slack.msi`安装程序。
+*   **持久性 (T1053.005):** 创建了一个名为`SlackUpdate`的Windows计划任务，每分钟运行RAT负载。
+*   **防御绕过 (T1070.004, T1564.010):** 使用隐藏桌面会话（`CreateDesktopA` API）允许恶意活动完全在受害者的视野之外发生。
+*   **命令和控制 (T1219):** 恶意软件使用合法`RustDesk`远程桌面软件的修改版本，建立一个隐蔽的C2通道。
+*   **凭证访问 (T1555.003):** 通过在隐藏桌面上下文中启动浏览器，攻击者可以从受害者的配置文件中收集cookie和会话令牌，实现MFA绕过和账户接管。
+
+## 威胁行为者背景
+Malwarebytes没有识别出这次活动背后的特定威胁行为者。使用搜索引擎广告中毒（malvertising）是一种由广泛的网络犯罪集团采用的常见技术，从基于联盟的操作到更复杂的行为者。选择Slack作为诱饵表明广泛针对商业和专业用户。使用修改过的合法工具（`RustDesk`）的操作安全和隐藏桌面的技术实现表明，旨在隐蔽和长期访问的中等至高水平的复杂性。
+
+## 缓解措施与建议
+组织和个人应采取以下步骤来缓解这一威胁：
+1.  **验证下载来源：** 始终直接从官方供应商的网站下载软件。不要使用搜索引擎广告作为主要下载来源。为关键业务软件收藏官方供应商页面。
+2.  **实施应用程序允许列表：** 使用支持应用程序控制或允许列表的端点安全解决方案，以防止未经授权的软件执行，包括恶意安装程序。
+3.  **监控不寻常的计划任务：** 定期审计Windows计划任务，寻找可疑条目，特别是那些模仿合法软件更新的名称。
+4.  **网络监控：** 监控出站网络流量，寻找连接到未知远程桌面软件协议或意外目的地的连接。
+5.  **用户培训：** 教育员工了解malvertising的风险以及在下载软件前验证URL的重要性。
+6.  **端点检测和响应（EDR）：** 部署能够检测隐藏桌面对象创建和与远程访问工具相关的异常进程行为的EDR解决方案。
+
+## 参考资料
+*   Malwarebytes Labs, "A fake Slack download is giving attackers a hidden desktop on your machine," April 2026. https://www.malwarebytes.com/blog/threat-intel/2026/04/a-fake-slack-download-is-giving-attackers-a-hidden-desktop-on-your-machine

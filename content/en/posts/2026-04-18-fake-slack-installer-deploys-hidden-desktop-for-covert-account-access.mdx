@@ -1,0 +1,60 @@
+---
+title: Fake Slack Installer Deploys Hidden Desktop for Covert Account Access
+slug: >-
+  2026-04-18-fake-slack-installer-deploys-hidden-desktop-for-covert-account-access
+date: '2026-04-18'
+excerpt: >-
+  A trojanized Slack installer delivers a remote access tool that creates a
+  hidden desktop, allowing attackers to bypass multi-factor authentication and
+  silently control victim machines.
+category: malware
+tags:
+  - malware
+  - social-engineering
+  - remote-access-trojan
+  - initial-access
+language: en
+source_urls:
+  - >-
+    https://www.malwarebytes.com/blog/threat-intel/2026/04/a-fake-slack-download-is-giving-attackers-a-hidden-desktop-on-your-machine
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-fake-slack-installer-deploys-hidden-desktop-for-covert-account-access
+severity: high
+---
+## Executive Summary
+A sophisticated malware campaign is distributing a trojanized version of the Slack desktop application that installs a remote access tool (RAT) capable of creating a hidden, attacker-controlled desktop. According to Malwarebytes researchers, this technique allows threat actors to bypass visual detection and interact directly with legitimate applications on a victim's machine, posing a severe risk to account security and data confidentiality. The attack chain begins with a malicious search engine advertisement mimicking an official Slack download page.
+
+## Technical Analysis
+The attack begins when a user searches for "Slack download" and clicks on a malicious advertisement that appears above legitimate search results. The ad leads to a convincing but fraudulent webpage designed to mimic Slack's official site. Victims are prompted to download a Windows installer executable, `slack.msi`. While the installer does deploy a legitimate, functional copy of the Slack application to `C:\Program Files\Slack`, it simultaneously executes a malicious payload in the background.
+
+The primary payload is a remote access tool identified by Malwarebytes as a variant of the open-source `RustDesk` software, configured to act as a covert backdoor. The malware establishes persistence by creating a Windows Scheduled Task named `SlackUpdate` that runs every minute, ensuring the RAT remains active. The RAT client connects to a hardcoded command-and-control (C2) server, granting the attacker full remote control over the infected system.
+
+The most critical feature of this attack is the RAT's ability to create a hidden desktop. Using Windows API functions, the malware spawns a new, invisible desktop session separate from the user's visible one. The attacker can then open applications like web browsers on this hidden desktop. Because these browsers run in the same user session and have access to existing cookies, session tokens, and stored passwords, the attacker can bypass multi-factor authentication (MFA) and access accounts without triggering any visible prompts or windows on the victim's primary screen.
+
+## Indicators of Compromise
+None identified at this time.
+
+## Tactics, Techniques & Procedures
+*   **Initial Access (T1583.001, T1583.002):** Threat actors purchase search engine ads for "Slack download" to poison search results and drive traffic to a fake download page.
+*   **Execution (T1204.002):** Users are socially engineered into downloading and executing the malicious `slack.msi` installer.
+*   **Persistence (T1053.005):** A Windows Scheduled Task named `SlackUpdate` is created to run the RAT payload every minute.
+*   **Defense Evasion (T1070.004, T1564.010):** The use of a hidden desktop session (`CreateDesktopA` API) allows malicious activity to occur entirely out of the victim's view.
+*   **Command and Control (T1219):** The malware uses a modified version of the legitimate `RustDesk` remote desktop software to establish a covert C2 channel.
+*   **Credential Access (T1555.003):** By launching browsers in the hidden desktop context, attackers can harvest cookies and session tokens from the victim's profile, enabling MFA bypass and account takeover.
+
+## Threat Actor Context
+The specific threat actor behind this campaign is not identified by Malwarebytes. The use of search engine advertisement poisoning (malvertising) is a common technique employed by a wide range of cybercriminal groups, from affiliate-based operations to more sophisticated actors. The choice of Slack as a lure suggests a broad targeting of business and professional users. The operational security of using a modified legitimate tool (`RustDesk`) and the technical implementation of the hidden desktop indicate a moderate to high level of sophistication aimed at stealth and long-term access.
+
+## Mitigations & Recommendations
+Organizations and individuals should take the following steps to mitigate this threat:
+1.  **Verify Download Sources:** Always download software directly from the official vendor's website. Do not use search engine ads as a primary download source. Bookmark official vendor pages for critical business software.
+2.  **Implement Application Allowlisting:** Use endpoint security solutions that support application control or allowlisting to prevent the execution of unauthorized software, including malicious installers.
+3.  **Monitor for Unusual Scheduled Tasks:** Regularly audit Windows Scheduled Tasks for suspicious entries, particularly those with names mimicking legitimate software updates.
+4.  **Network Monitoring:** Monitor outbound network traffic for connections to unknown remote desktop software protocols or unexpected destinations.
+5.  **User Training:** Educate employees on the risks of malvertising and the importance of verifying URLs before downloading software.
+6.  **Endpoint Detection and Response (EDR):** Deploy EDR solutions capable of detecting the creation of hidden desktop objects and anomalous process behavior associated with remote access tools.
+
+## References
+*   Malwarebytes Labs, "A fake Slack download is giving attackers a hidden desktop on your machine," April 2026. https://www.malwarebytes.com/blog/threat-intel/2026/04/a-fake-slack-download-is-giving-attackers-a-hidden-desktop-on-your-machine
