@@ -1,0 +1,143 @@
+{
+  "_comment": "Curated list of known threat actors / malware families / APT groups. Used by scripts/pipeline/post-process.ts to deterministically populate the `threat_actor` frontmatter field when the LLM missed it. Extend over time as new groups emerge. Keep names in their most-common public form (e.g. 'LockBit' not 'lockbit' — comparison is case-insensitive). Aliases grouped via subarrays so variations map to a canonical name.",
+  "_version": "2026-04-18",
+  "actors": [
+    {
+      "canonical": "LockBit",
+      "aliases": ["LockBit", "LockBit 4.0", "LockBit 3.0", "LockBit Black"]
+    },
+    { "canonical": "BlackCat", "aliases": ["BlackCat", "ALPHV", "Noberus"] },
+    { "canonical": "Cl0p", "aliases": ["Cl0p", "Clop", "TA505"] },
+    { "canonical": "Conti", "aliases": ["Conti", "Wizard Spider"] },
+    { "canonical": "Royal", "aliases": ["Royal", "DEV-0569", "Blacksuit"] },
+    { "canonical": "Play", "aliases": ["Play", "Balloonfly"] },
+    { "canonical": "Akira", "aliases": ["Akira", "Howling Scorpius"] },
+    { "canonical": "BianLian", "aliases": ["BianLian"] },
+    { "canonical": "Hive", "aliases": ["Hive"] },
+    { "canonical": "Vice Society", "aliases": ["Vice Society"] },
+    { "canonical": "BlackBasta", "aliases": ["Black Basta", "BlackBasta"] },
+    { "canonical": "Rhysida", "aliases": ["Rhysida"] },
+    { "canonical": "Medusa", "aliases": ["Medusa"] },
+    { "canonical": "DragonForce", "aliases": ["DragonForce"] },
+    { "canonical": "RansomHub", "aliases": ["RansomHub"] },
+    { "canonical": "Qilin", "aliases": ["Qilin", "Agenda"] },
+    { "canonical": "ShinyHunters", "aliases": ["ShinyHunters"] },
+    { "canonical": "Lapsus$", "aliases": ["Lapsus$", "Lapsus"] },
+    {
+      "canonical": "Scattered Spider",
+      "aliases": ["Scattered Spider", "UNC3944", "Muddled Libra", "0ktapus"]
+    },
+    {
+      "canonical": "Volt Typhoon",
+      "aliases": ["Volt Typhoon", "Bronze Silhouette"]
+    },
+    {
+      "canonical": "Salt Typhoon",
+      "aliases": ["Salt Typhoon", "Earth Estries"]
+    },
+    { "canonical": "Flax Typhoon", "aliases": ["Flax Typhoon"] },
+    { "canonical": "Silk Typhoon", "aliases": ["Silk Typhoon", "HAFNIUM"] },
+    {
+      "canonical": "APT28",
+      "aliases": [
+        "APT28",
+        "Fancy Bear",
+        "Forest Blizzard",
+        "Sofacy",
+        "Sednit",
+        "Strontium"
+      ]
+    },
+    {
+      "canonical": "APT29",
+      "aliases": [
+        "APT29",
+        "Cozy Bear",
+        "Midnight Blizzard",
+        "NOBELIUM",
+        "The Dukes"
+      ]
+    },
+    { "canonical": "APT33", "aliases": ["APT33", "Elfin", "Peach Sandstorm"] },
+    { "canonical": "APT34", "aliases": ["APT34", "OilRig", "Hazel Sandstorm"] },
+    {
+      "canonical": "APT41",
+      "aliases": ["APT41", "Winnti", "Barium", "Double Dragon", "Brass Typhoon"]
+    },
+    {
+      "canonical": "APT40",
+      "aliases": ["APT40", "Leviathan", "MUDCARP", "Kryptonite Panda"]
+    },
+    {
+      "canonical": "Lazarus",
+      "aliases": ["Lazarus", "Lazarus Group", "HIDDEN COBRA", "Diamond Sleet"]
+    },
+    { "canonical": "Kimsuky", "aliases": ["Kimsuky", "Emerald Sleet"] },
+    { "canonical": "Andariel", "aliases": ["Andariel", "Onyx Sleet"] },
+    { "canonical": "BlueNoroff", "aliases": ["BlueNoroff", "Sapphire Sleet"] },
+    { "canonical": "MuddyWater", "aliases": ["MuddyWater", "Mango Sandstorm"] },
+    {
+      "canonical": "Charming Kitten",
+      "aliases": ["Charming Kitten", "APT35", "Mint Sandstorm"]
+    },
+    {
+      "canonical": "Mustang Panda",
+      "aliases": ["Mustang Panda", "Twill Typhoon"]
+    },
+    { "canonical": "Aquatic Panda", "aliases": ["Aquatic Panda"] },
+    {
+      "canonical": "Sandworm",
+      "aliases": ["Sandworm", "Seashell Blizzard", "Voodoo Bear"]
+    },
+    {
+      "canonical": "Turla",
+      "aliases": ["Turla", "Secret Blizzard", "Snake", "Venomous Bear"]
+    },
+    { "canonical": "Storm-1977", "aliases": ["Storm-1977"] },
+    { "canonical": "REF6598", "aliases": ["REF6598"] },
+    {
+      "canonical": "Mirai",
+      "aliases": ["Mirai", "Mirai botnet", "Mirai variant"]
+    },
+    { "canonical": "Emotet", "aliases": ["Emotet"] },
+    { "canonical": "TrickBot", "aliases": ["TrickBot"] },
+    { "canonical": "QakBot", "aliases": ["QakBot", "Qbot"] },
+    { "canonical": "IcedID", "aliases": ["IcedID"] },
+    { "canonical": "Cobalt Strike", "aliases": ["Cobalt Strike"] },
+    { "canonical": "Brute Ratel", "aliases": ["Brute Ratel"] },
+    { "canonical": "Sliver", "aliases": ["Sliver"] },
+    {
+      "canonical": "Lumma Stealer",
+      "aliases": ["Lumma Stealer", "Lumma", "LummaC2"]
+    },
+    {
+      "canonical": "RedLine Stealer",
+      "aliases": ["RedLine Stealer", "RedLine"]
+    },
+    { "canonical": "Vidar", "aliases": ["Vidar Stealer", "Vidar"] },
+    {
+      "canonical": "Raccoon Stealer",
+      "aliases": ["Raccoon Stealer", "Raccoon"]
+    },
+    { "canonical": "StealC", "aliases": ["StealC"] },
+    { "canonical": "Meduza", "aliases": ["Meduza Stealer", "Meduza"] },
+    { "canonical": "Rhadamanthys", "aliases": ["Rhadamanthys"] },
+    { "canonical": "Atomic Stealer", "aliases": ["Atomic Stealer", "AMOS"] },
+    { "canonical": "DanaBot", "aliases": ["DanaBot"] },
+    { "canonical": "BumbleBee", "aliases": ["BumbleBee"] },
+    { "canonical": "Nitrogen", "aliases": ["Nitrogen"] },
+    { "canonical": "PhantomPulse", "aliases": ["PhantomPulse"] },
+    {
+      "canonical": "Sectop RAT",
+      "aliases": ["Sectop RAT", "Sectop", "ArechClient2"]
+    },
+    { "canonical": "AsyncRAT", "aliases": ["AsyncRAT"] },
+    { "canonical": "NjRAT", "aliases": ["NjRAT", "Bladabindi"] },
+    { "canonical": "DarkGate", "aliases": ["DarkGate"] },
+    { "canonical": "Remcos", "aliases": ["Remcos", "Remcos RAT"] },
+    {
+      "canonical": "NetSupport RAT",
+      "aliases": ["NetSupport RAT", "FakeUpdates"]
+    }
+  ]
+}

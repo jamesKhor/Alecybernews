@@ -331,17 +331,90 @@ export function MalwareCard({
 
 // ─── IndustryCard — Entity/company name is the hero ────────────────────
 
-/** Extract the first proper-noun-like phrase from an article title.
-    Works well for industry titles like "McGraw-Hill Data Breach..." →
-    "McGraw-Hill", or "Google Tightens..." → "Google". Falls back to
-    category name if nothing extractable. */
-function extractEntity(title: string): string {
-  // Match: capitalized words at start, up to 2 of them, stopping at a
-  // verb-like lowercase word. Handles "UK ICO" (2 caps) and "McGraw-Hill"
-  // (hyphen) and "Google" (1 word).
-  const match = title.match(/^((?:[A-Z][\w'-]*\s?){1,3})/);
-  if (!match) return title.split(" ").slice(0, 2).join(" ");
-  return match[1].trim();
+const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
+
+/** Turn a kebab-case tag into a readable label: "supply-chain" →
+    "Supply Chain", "ai-security" → "AI Security". */
+function titleCaseTag(tag: string): string {
+  return tag
+    .split("-")
+    .map((w) => {
+      if (w.length === 0) return w;
+      // Keep known acronyms uppercase
+      if (
+        /^(ai|api|iot|rat|apt|soc|dns|rce|cve|xss|sql|ml|llm|ttp)$/i.test(w)
+      ) {
+        return w.toUpperCase();
+      }
+      return w[0].toUpperCase() + w.slice(1);
+    })
+    .join(" ");
+}
+
+/** Skip overly-generic tags for entity fallback — we want SOMETHING
+    distinctive, not "malware" or "industry". */
+const GENERIC_TAGS = new Set([
+  "industry",
+  "news",
+  "security",
+  "cybersecurity",
+  "malware",
+  "phishing",
+  "ransomware",
+  "data-breach",
+  "vulnerabilities",
+  "attack",
+  "hacking",
+  "cyber",
+]);
+
+/**
+ * Extract a hero label for IndustryCard with cascading strategy:
+ *   1. First capitalized proper-noun phrase in title (works for English)
+ *   2. If title is CJK or extraction yields nothing distinctive: first
+ *      non-generic tag, title-cased
+ *   3. Fallback to category name
+ *
+ * Returns {hero, angleTag}. angleTag is always derived from the first
+ * non-hero tag so the chip shows context distinct from the hero.
+ */
+function extractIndustryHero(
+  frontmatter: import("@/lib/types").ArticleFrontmatter,
+): { hero: string; angleTag: string } {
+  const { title, tags } = frontmatter;
+  const tagList = tags ?? [];
+
+  // Step 1 — English title extraction (only when title starts with a Latin capital)
+  if (/^[A-Z]/.test(title) && !CJK_RE.test(title)) {
+    const match = title.match(/^((?:[A-Z][\w'-]*\s?){1,3})/);
+    if (match) {
+      const hero = match[1].trim();
+      // Sanity: if extracted "entity" is 3+ words AND longer than half the
+      // title, it's probably the whole title being captured → fall through.
+      const wordCount = hero.split(/\s+/).length;
+      if (wordCount < 4 && hero.length < title.length * 0.6) {
+        const angleTag =
+          tagList
+            .find((t) => t.toLowerCase() !== hero.toLowerCase())
+            ?.toUpperCase() ?? "INDUSTRY";
+        return { hero, angleTag: angleTag.replace(/-/g, " ") };
+      }
+    }
+  }
+
+  // Step 2 — First non-generic tag as hero
+  const distinctive = tagList.find((t) => !GENERIC_TAGS.has(t.toLowerCase()));
+  if (distinctive) {
+    return {
+      hero: titleCaseTag(distinctive),
+      angleTag: (tagList.find((t) => t !== distinctive) ?? "INDUSTRY")
+        .toUpperCase()
+        .replace(/-/g, " "),
+    };
+  }
+
+  // Step 3 — Category fallback
+  return { hero: "Industry", angleTag: "NEWS" };
 }
 
 export function IndustryCard({
@@ -350,8 +423,7 @@ export function IndustryCard({
   sourceType,
 }: CardProps & { sourceType: "posts" | "threat-intel" }) {
   const { frontmatter } = article;
-  const entity = extractEntity(frontmatter.title);
-  const angleTag = frontmatter.tags?.[0]?.toUpperCase() ?? "INDUSTRY";
+  const { hero, angleTag } = extractIndustryHero(frontmatter);
 
   return (
     <CardFrame
@@ -359,19 +431,19 @@ export function IndustryCard({
       hero={
         <div className="text-center">
           <p
-            className="font-serif font-bold leading-[1.05] tracking-tight text-foreground"
+            className="font-serif font-bold leading-[1.05] tracking-tight text-foreground break-words"
             style={{
               fontSize: "clamp(1.5rem, 5vw, 2.25rem)",
             }}
           >
-            {entity}
+            {hero}
           </p>
           <p className="mt-3 text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-[hsl(var(--cat-industry))]">
             {angleTag}
           </p>
         </div>
       }
-      title={frontmatter.title.slice(entity.length).trim() || frontmatter.title}
+      title={frontmatter.title}
       meta={`${new Date(frontmatter.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · ${frontmatter.severity?.toUpperCase() ?? "INFO"}`}
       tags={frontmatter.tags ?? []}
     />
@@ -404,19 +476,38 @@ const AI_ATTACK_CLASSES = [
   "Exfiltration",
 ] as const;
 
-function extractAIHero(title: string): { hero: string; role: string } {
-  // Try provider first
+function extractAIHero(frontmatter: import("@/lib/types").ArticleFrontmatter): {
+  hero: string;
+  role: string;
+} {
+  const { title, tags } = frontmatter;
+  const tagList = tags ?? [];
+
+  // Step 1 — provider name anywhere in title (works on ZH titles too —
+  // Chinese articles still spell "Anthropic" in Latin letters)
   for (const p of AI_PROVIDERS) {
     if (title.includes(p)) return { hero: p, role: "PROVIDER" };
   }
-  // Try attack class
-  for (const c of AI_ATTACK_CLASSES) {
-    if (title.toLowerCase().includes(c.toLowerCase())) {
-      return { hero: c, role: "ATTACK VECTOR" };
+
+  // Step 2 — attack class by title match (English-only substring)
+  if (!CJK_RE.test(title) || /[A-Z]/.test(title)) {
+    for (const c of AI_ATTACK_CLASSES) {
+      if (title.toLowerCase().includes(c.toLowerCase())) {
+        return { hero: c, role: "ATTACK VECTOR" };
+      }
     }
   }
-  // Fallback: first word
-  return { hero: title.split(" ")[0], role: "AI SECURITY" };
+
+  // Step 3 — First non-generic tag, title-cased
+  const distinctive = tagList.find(
+    (t) => !GENERIC_TAGS.has(t.toLowerCase()) && t.toLowerCase() !== "ai",
+  );
+  if (distinctive) {
+    return { hero: titleCaseTag(distinctive), role: "AI SECURITY" };
+  }
+
+  // Step 4 — Last resort
+  return { hero: "AI Security", role: "RESEARCH" };
 }
 
 export function AICard({
@@ -425,7 +516,7 @@ export function AICard({
   sourceType,
 }: CardProps & { sourceType: "posts" | "threat-intel" }) {
   const { frontmatter } = article;
-  const { hero, role } = extractAIHero(frontmatter.title);
+  const { hero, role } = extractAIHero(frontmatter);
 
   return (
     <CardFrame
@@ -433,7 +524,7 @@ export function AICard({
       hero={
         <div className="text-center">
           <p
-            className="font-serif font-bold leading-[1.05] tracking-tight text-foreground"
+            className="font-serif font-bold leading-[1.05] tracking-tight text-foreground break-words"
             style={{
               fontSize: "clamp(1.5rem, 5vw, 2.25rem)",
             }}

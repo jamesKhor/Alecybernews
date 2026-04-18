@@ -81,6 +81,29 @@ CVE ID RULES (CRITICAL):
 - Leave the "cve_ids" JSON array EMPTY if no confirmed CVE IDs exist in the sources
 - A wrong CVE ID is far worse than no CVE ID — when in doubt, omit it
 
+STRUCTURED FIELD EXTRACTION RULES (CRITICAL — the homepage relies on these):
+Before writing the body prose, SCAN the sources for these fields and populate the
+corresponding JSON fields whenever the sources contain them:
+
+- "cvss_score": number 0.0-10.0. Look for "CVSS 9.8", "CVSSv3.1: 9.8", "base
+  score of 9.8", "severity 9.8". If multiple candidates, use the highest from a
+  credible source. If genuinely absent from sources, leave as null.
+- "cve_ids": list every CVE ID that appears in sources (format CVE-YYYY-NNNNN).
+  Do not invent — but DO include every real one. A vuln article without cve_ids
+  should be rare.
+- "threat_actor": canonical name of the group/actor/malware family. Examples:
+  "LockBit", "BlackCat", "APT29", "Cozy Bear", "Scattered Spider", "Lazarus",
+  "Lumma Stealer", "Mirai". For ransomware articles, always name the group if
+  sources do. For malware articles, name the family. Null only if truly unknown.
+- "affected_sectors": e.g. ["healthcare", "financial services", "government"].
+  If the article describes a specific incident, list the victim's sector(s).
+- "affected_regions": e.g. ["North America", "EU", "Netherlands"]. Name the
+  country or broad region named by sources.
+
+Think of these fields as a scorecard for your article's research quality.
+An article with 4 of 5 filled is stronger than 1 of 5. Populate everything
+sources support — don't play it safe by leaving fields null when evidence exists.
+
 OUTPUT FORMAT — respond with ONLY valid JSON, no markdown fences:
 {
   "title": "Present-tense headline, max 80 chars, no specific past Month YYYY",

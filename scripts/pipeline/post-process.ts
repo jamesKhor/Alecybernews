@@ -14,6 +14,8 @@
  *
  * Idempotent — safe to run multiple times.
  */
+import fs from "node:fs";
+import path from "node:path";
 import type { GeneratedArticle } from "../ai/schemas/article-schema.js";
 import type { Story } from "../utils/dedup.js";
 
@@ -25,6 +27,32 @@ const SHA1_REGEX = /\b[a-fA-F0-9]{40}\b/g;
 const SHA256_REGEX = /\b[a-fA-F0-9]{64}\b/g;
 const IPV4_REGEX =
   /\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b/g;
+
+// CVSS score extraction — matches "CVSS 9.8", "CVSS score of 9.8",
+// "CVSSv3.1: 9.8", "base score 9.8", etc. Captures just the number.
+const CVSS_REGEX =
+  /CVSS(?:\s*v?[234]\.?[01]?)?\s*(?:score|base(?:\s*score)?)?\s*(?:of|:|=|is|at|hit|reached|carries|rated)?\s*(\d+(?:\.\d+)?)/gi;
+
+// ── Known threat actors (loaded once, lazy) ──────────────────────────────
+
+type ThreatActorEntry = { canonical: string; aliases: string[] };
+let THREAT_ACTORS: ThreatActorEntry[] | null = null;
+
+function loadThreatActors(): ThreatActorEntry[] {
+  if (THREAT_ACTORS) return THREAT_ACTORS;
+  try {
+    const filePath = path.resolve(
+      process.cwd(),
+      "data/known-threat-actors.json",
+    );
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(raw) as { actors?: ThreatActorEntry[] };
+    THREAT_ACTORS = parsed.actors ?? [];
+  } catch {
+    THREAT_ACTORS = [];
+  }
+  return THREAT_ACTORS;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -65,6 +93,126 @@ function buildSourceCorpus(sources: Story[]): string {
   return sources.map((s) => `${s.title} ${s.excerpt ?? ""}`).join("\n");
 }
 
+/**
+ * Extract a CVSS score from article body + cross-check against sources.
+ * Returns the numeric score (0.0-10.0) if found in BOTH body and source
+ * text, else null. Cross-checking prevents the LLM from inventing a score
+ * that doesn't appear in the real reporting.
+ */
+export function extractCvssScore(
+  body: string,
+  sourceText: string,
+): number | null {
+  const scores = new Set<number>();
+  let match;
+  // Reset regex state (global + /g regexes are stateful)
+  CVSS_REGEX.lastIndex = 0;
+  while ((match = CVSS_REGEX.exec(body)) !== null) {
+    const n = parseFloat(match[1]);
+    if (!isNaN(n) && n >= 0 && n <= 10) scores.add(n);
+  }
+  if (scores.size === 0) return null;
+
+  // Cross-check: for each candidate score found in body, confirm it also
+  // appears in source text (same regex). Otherwise we'd accept LLM's
+  // hallucinated score.
+  const sourceScores = new Set<number>();
+  CVSS_REGEX.lastIndex = 0;
+  while ((match = CVSS_REGEX.exec(sourceText)) !== null) {
+    const n = parseFloat(match[1]);
+    if (!isNaN(n) && n >= 0 && n <= 10) sourceScores.add(n);
+  }
+
+  // Return the highest body-score that's verified by sources
+  const verified = [...scores].filter((s) => sourceScores.has(s));
+  if (verified.length === 0) return null;
+  return Math.max(...verified);
+}
+
+/**
+ * Aliases that collide with common English words. Matching these requires
+ * a nearby threat-intel context word in the same sentence; otherwise we
+ * get false positives like "play" (verb) → "Play" (ransomware).
+ */
+const AMBIGUOUS_ALIASES = new Set([
+  "play",
+  "hive",
+  "medusa",
+  "akira",
+  "royal",
+  "conti",
+  "agenda",
+  "muddled libra",
+]);
+
+/**
+ * Keywords that signal the surrounding sentence is about a threat actor.
+ * Used to validate matches against AMBIGUOUS_ALIASES.
+ */
+const ACTOR_CONTEXT_WORDS = [
+  "ransomware",
+  "ransom",
+  "gang",
+  "group",
+  "actor",
+  "apt",
+  "threat",
+  "campaign",
+  "operator",
+  "affiliate",
+  "exfiltrat",
+  "encrypt",
+  "deploy",
+  "targets",
+  "claimed",
+  "attribut",
+  "adversary",
+  "syndicate",
+];
+
+/**
+ * Extract the canonical threat-actor name from article body using the
+ * curated list in `data/known-threat-actors.json`. Case-insensitive
+ * whole-phrase match. Returns the canonical form (e.g. "LockBit 4.0" in
+ * body → "LockBit" canonical) or null if no known actor is found.
+ *
+ * For ambiguous aliases that collide with common English words (see
+ * AMBIGUOUS_ALIASES), requires a threat-actor context keyword within
+ * ±120 chars of the match. This prevents "play" in a sentence like
+ * "users play video" from matching the Play ransomware group.
+ *
+ * Why whole-phrase not substring: avoids false positives like "APT" matching
+ * inside "ADAPTAVIST". Each alias match requires word boundaries.
+ */
+export function extractThreatActor(body: string): string | null {
+  const actors = loadThreatActors();
+  if (actors.length === 0) return null;
+
+  for (const entry of actors) {
+    for (const alias of entry.aliases) {
+      const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const isAmbiguous = AMBIGUOUS_ALIASES.has(alias.toLowerCase());
+      // Ambiguous aliases (collide with common English words) require an
+      // exact-case match AND a threat-context word within ±60 chars.
+      // Non-ambiguous aliases use case-insensitive match.
+      const re = new RegExp(`\\b${escaped}\\b`, isAmbiguous ? "" : "i");
+      const m = re.exec(body);
+      if (!m) continue;
+
+      if (isAmbiguous) {
+        const start = Math.max(0, m.index - 60);
+        const end = Math.min(body.length, m.index + alias.length + 60);
+        const window = body.slice(start, end).toLowerCase();
+        const hasContext = ACTOR_CONTEXT_WORDS.some((w) => window.includes(w));
+        if (!hasContext) continue;
+      }
+
+      return entry.canonical;
+    }
+  }
+  return null;
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────
 
 /**
@@ -93,6 +241,29 @@ export function postProcessArticle(
   const bodyCves = uniqueMatches(article.body, CVE_REGEX);
   const sourceCves = uniqueMatches(sourceText.toUpperCase(), CVE_REGEX);
   article.cve_ids = bodyCves.filter((c) => sourceCves.includes(c));
+
+  // ── 2b. cvss_score — derive from body + verify against sources ────────
+  // Phase P-A enrichment (2026-04-18). Previously the LLM emitted
+  // cvss_score on only ~7% of articles even when sources clearly named
+  // a score. Body-regex + source cross-check is script-cheap and reliable.
+  // Only overrides LLM value if we found a higher-confidence match.
+  const scriptedCvss = extractCvssScore(article.body, sourceText);
+  if (scriptedCvss !== null) {
+    // If LLM didn't provide one, set from script.
+    // If LLM provided one, prefer the script's value since it's cross-
+    // checked against sources.
+    article.cvss_score = scriptedCvss;
+  }
+
+  // ── 2c. threat_actor — derive from body using known-actors list ───────
+  // Phase P-A enrichment. LLM emits threat_actor on ~17% of articles.
+  // The known-actors JSON lists ~70 canonical actors + aliases. If the
+  // body mentions any known alias, we set the canonical name. Frontend
+  // MalwareCard will show this big instead of guessing from title.
+  if (!article.threat_actor) {
+    const scripted = extractThreatActor(article.body);
+    if (scripted) article.threat_actor = scripted;
+  }
 
   // ── 4. IOCs — rebuild from body + cross-check with sources ─────────────
   // Only include hashes/IPs that appear in the body AND in source text.

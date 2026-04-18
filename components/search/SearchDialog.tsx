@@ -147,31 +147,40 @@ export function SearchDialog({
         ai: "AI Security",
       };
 
+  // When the parent controls `open`, it's also providing its own trigger
+  // (e.g. HomeGreeting's pill button). Skip our internal triggers so the
+  // page doesn't render duplicate search entry points.
+  const isControlled = controlledOpen !== undefined;
+
   return (
     <>
-      {/* Desktop trigger */}
-      <button
-        onClick={handleOpen}
-        className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary/50 text-muted-foreground text-sm hover:bg-secondary hover:text-foreground transition-colors"
-      >
-        <Search className="w-3.5 h-3.5" />
-        <span className="text-xs">{isZh ? "搜索" : "Search"}</span>
-        <kbd className="ml-1 text-xs border border-border rounded px-1 py-0.5 bg-background">
-          {typeof navigator !== "undefined" &&
-          /Mac|iPhone|iPad/.test(navigator.userAgent)
-            ? "⌘K"
-            : "Ctrl+K"}
-        </kbd>
-      </button>
+      {!isControlled && (
+        <>
+          {/* Desktop trigger */}
+          <button
+            onClick={handleOpen}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-secondary/50 text-muted-foreground text-sm hover:bg-secondary hover:text-foreground transition-colors"
+          >
+            <Search className="w-3.5 h-3.5" />
+            <span className="text-xs">{isZh ? "搜索" : "Search"}</span>
+            <kbd className="ml-1 text-xs border border-border rounded px-1 py-0.5 bg-background">
+              {typeof navigator !== "undefined" &&
+              /Mac|iPhone|iPad/.test(navigator.userAgent)
+                ? "⌘K"
+                : "Ctrl+K"}
+            </kbd>
+          </button>
 
-      {/* Mobile icon */}
-      <button
-        onClick={handleOpen}
-        className="md:hidden p-2 rounded hover:bg-secondary transition-colors text-muted-foreground"
-        aria-label="Search"
-      >
-        <Search className="w-5 h-5" />
-      </button>
+          {/* Mobile icon */}
+          <button
+            onClick={handleOpen}
+            className="md:hidden p-2 rounded hover:bg-secondary transition-colors text-muted-foreground"
+            aria-label="Search"
+          >
+            <Search className="w-5 h-5" />
+          </button>
+        </>
+      )}
 
       {/* Modal */}
       {open && (
