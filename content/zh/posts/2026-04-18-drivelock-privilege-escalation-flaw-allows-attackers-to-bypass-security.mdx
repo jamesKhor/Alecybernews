@@ -1,0 +1,53 @@
+---
+title: DriveLock 权限提升漏洞允许攻击者绕过安全
+slug: >-
+  2026-04-18-drivelock-privilege-escalation-flaw-allows-attackers-to-bypass-security
+date: '2026-04-18'
+excerpt: 根据零日计划，DriveLock 终端安全软件中的关键SQL注入漏洞（CVE-2026-5490）允许经过身份验证的攻击者提升权限并绕过产品自身的安全控制。
+category: vulnerabilities
+tags:
+  - endpoint-security
+  - privilege-escalation
+  - sql-injection
+language: zh
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-286/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-drivelock-privilege-escalation-flaw-allows-attackers-to-bypass-security
+severity: high
+cvss_score: 8.8
+cve_ids:
+  - CVE-2026-5490
+---
+## 执行摘要
+DriveLock终端安全平台中存在一个高严重性的权限提升漏洞，可能允许经过身份验证的攻击者绕过软件的核心安全功能。该漏洞被跟踪为CVE-2026-5490，由Zero Day Initiative (ZDI)分配了8.8的CVSS得分，源于缺乏适当的输入验证，使得SQL注入攻击成为可能，从而获得管理权限。这一漏洞尤其令人担忧，因为它针对的是旨在执行终端控制的安全产品，可能允许攻击者在被入侵的机器上禁用保护措施。
+
+## 技术分析
+该漏洞存在于DriveLock应用程序处理用户提供的数据中。根据ZDI咨询(ZDI-26-286)，软件在使用输入进行SQL查询之前未能正确清理输入。这种缺乏验证允许经过身份验证的攻击者——意味着他们已经对系统有一定程度的访问权限——注入恶意SQL命令。
+
+成功利用这个SQL注入漏洞使攻击者能够操纵后端数据库操作。具体来说，这个漏洞可以被用来在DriveLock管理框架内提升攻击者的权限。有了提升的权限，攻击者理论上可以修改安全策略，禁用设备控制功能（如USB端口阻塞或应用程序白名单），甚至在应用其他安全措施后仍可能在终端上保持持久性。ZDI指出，利用这个漏洞需要身份验证，这限制了但并未消除威胁，因为它可以与被盗的凭证结合使用，或在入侵后的场景中使用。
+
+## 入侵指标
+目前没有识别出任何入侵指标。ZDI的咨询是一个协调的漏洞披露；截至发布之日，没有公开信息表明在野外有活跃的利用。
+
+## 战术、技术与程序
+根据漏洞细节，攻击者可能会遵循以下程序：
+1.  **初始访问：** 获取受DriveLock保护的系统的合法用户凭证。这可以通过网络钓鱼、凭证盗窃或其他方式实现。
+2.  **执行：** 向易受攻击的DriveLock组件进行身份验证。
+3.  **权限提升（T1068）：** 通过易受攻击的参数制作并提交恶意SQL查询，以修改他们在DriveLock数据库中的权限级别，从一个标准用户提升到管理员。
+4.  **防御绕过：** 使用DriveLock内新获得的管理员访问权限禁用安全策略，例如阻止执行未授权软件或阻止外部媒体的策略，从而削弱终端的防御。
+
+## 威胁行为者背景
+没有特定的威胁行为者归因与此漏洞披露相关。该漏洞是通过ZDI计划报告给供应商的。然而，漏洞的性质使其成为寻求在攻击链中禁用终端安全控制的财务驱动网络犯罪分子和勒索软件行为者的可能目标。它也可能被高级持续性威胁（APT）团体用于目标攻击，以实现对安全环境的持久、隐蔽访问。
+
+## 缓解措施与建议
+主要的缓解措施是应用供应商提供的安全更新。DriveLock的用户和管理员应立即与供应商联系，很可能是Centreon（Centreon收购了DriveLock），以获取补丁指导。在补丁可以应用之前，组织应考虑以下补偿控制措施：
+*   **最小权限原则：** 严格实施最小权限访问模型，限制具有对DriveLock管理界面身份验证访问权限的用户账户数量。
+*   **网络分割：** 将对DriveLock管理服务器的网络访问限制在仅授权的管理工作站。
+*   **凭证卫生：** 实施强大、独特的密码，并考虑为所有可以访问终端管理系统的账户启用多因素认证（MFA）。
+*   **监控：** 审计日志，以监测DriveLock平台内不寻常的身份验证事件或权限变更活动。
+
+## 参考资料
+*   Zero Day Initiative Advisory ZDI-26-286: [DriveLock SQL Injection Privilege Escalation Vulnerability](http://www.zerodayinitiative.com/advisories/ZDI-26-286/)

@@ -1,0 +1,50 @@
+---
+title: GStreamer qtdemux 缺陷使远程代码执行成为可能
+slug: 2026-04-18-gstreamer-qtdemux-flaw-enables-remote-code-execution
+date: '2026-04-18'
+excerpt: >-
+  GStreamer 多媒体框架的 qtdemux
+  组件存在基于栈的缓冲区溢出漏洞（CVE-2026-5056），允许远程攻击者执行任意代码，给众多媒体处理应用程序带来风险。
+category: vulnerabilities
+tags:
+  - gstreamer
+  - rce
+  - patch
+  - multimedia
+language: zh
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-283/'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-18-gstreamer-qtdemux-flaw-enables-remote-code-execution
+severity: high
+cvss_score: 7.8
+cve_ids:
+  - CVE-2026-5056
+---
+## 执行摘要
+GStreamer多媒体框架的QuickTime解复用器（`qtdemux`）组件中存在一个严重的漏洞，可以被利用来实现远程代码执行（RCE）。这个跟踪为CVE-2026-5056的基于栈的缓冲区溢出漏洞CVSS得分为7.8，由趋势科技的零日计划（ZDI）披露。该漏洞的影响范围广泛，因为GStreamer是许多Linux发行版、媒体播放器和视频处理应用程序的核心组件，尽管利用需要用户交互，例如打开恶意媒体文件。
+
+## 技术分析
+该漏洞存在于`qtdemux`插件中，该插件负责解析和解复用QuickTime（`.mov`, `.mp4`）容器文件。根据ZDI咨询ZDI-26-283，这个缺陷是一个经典的基于栈的缓冲区溢出。当插件处理一个畸形QuickTime文件中的特制`stco`（块偏移）原子时，问题就发生了。原子数据处理不当导致内存损坏，将比固定大小的栈缓冲区能容纳的数据更多的数据复制到其中。
+
+这种损坏可以覆盖栈上的关键数据，包括函数的返回地址。远程未经身份验证的攻击者可以利用这一点劫持使用GStreamer的应用程序的执行流。成功利用将允许攻击者在处理文件的应用程序的上下文中执行任意代码。ZDI指出，尽管需要交互（用户必须打开恶意文件），攻击向量是多样的，取决于具体的实现——从桌面媒体播放器和视频编辑器到处理上传媒体的网络服务。
+
+## 入侵指标
+目前没有识别出任何指标。检测将需要监控与`libgstreamer`或其插件相关的进程崩溃，特别是在处理媒体文件时。由于攻击向量的本地文件处理特性，基于网络的利用尝试检测不太可能。
+
+## 战术、技术与程序
+主要技术是**T1204.002: 用户执行：恶意文件**，因为利用需要受害者打开一个特制的媒体文件。该漏洞属于**T1587.001: 开发能力：恶意软件**的漏洞开发阶段，并将作为**T1588.002: 获取能力：工具**的一部分，为威胁行为者武器化。该漏洞本身构成了**T1203: 利用客户端执行**，利用软件漏洞在目标系统上实现代码执行。
+
+## 威胁行为者背景
+在披露时，没有公开证据表明在野外有活跃的利用。该漏洞是通过ZDI的协调披露计划报告给GStreamer维护者的。鉴于GStreamer的广泛使用和基于栈缓冲区溢出的可靠性质，用于实现代码执行，评估认为这个缺陷是目标和广泛的网络犯罪活动的一个高价值目标，一旦概念验证（PoC）细节变得更加广泛可用。
+
+## 缓解措施与建议
+主要的缓解措施是立即应用供应商补丁。GStreamer项目已在其稳定版本中解决了这个漏洞。系统管理员和软件开发人员应该：
+1.  更新GStreamer包和所有相关插件（`gstreamer1.0-plugins-good`, `gstreamer1.0-plugins-bad`）到他们的Linux发行版或软件供应商提供的最新的修补版本。
+2.  审计使用GStreamer进行媒体处理的应用程序，并确保它们链接到更新的库。
+3.  在打开来自不受信任来源的媒体文件时要小心，特别是在已知使用GStreamer的应用程序中。
+4.  考虑为媒体处理应用程序实施应用程序允许列表或沙箱，以限制潜在漏洞的影响。
+
+## 参考资料
+- 零日计划咨询ZDI-26-283：[GStreamer qtdemux基于栈的缓冲区溢出远程代码执行漏洞](http://www.zerodayinitiative.com/advisories/ZDI-26-283/)

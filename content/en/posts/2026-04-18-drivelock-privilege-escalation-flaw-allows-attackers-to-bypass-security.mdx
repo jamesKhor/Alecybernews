@@ -1,0 +1,57 @@
+---
+title: DriveLock Privilege Escalation Flaw Allows Attackers to Bypass Security
+slug: >-
+  2026-04-18-drivelock-privilege-escalation-flaw-allows-attackers-to-bypass-security
+date: '2026-04-18'
+excerpt: >-
+  A critical SQL injection vulnerability (CVE-2026-5490) in DriveLock endpoint
+  security software allows authenticated attackers to escalate privileges and
+  bypass the product's own security controls, according to the Zero Day
+  Initiative.
+category: vulnerabilities
+tags:
+  - endpoint-security
+  - privilege-escalation
+  - sql-injection
+language: en
+source_urls:
+  - 'http://www.zerodayinitiative.com/advisories/ZDI-26-286/'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-18-drivelock-privilege-escalation-flaw-allows-attackers-to-bypass-security
+severity: high
+cvss_score: 8.8
+cve_ids:
+  - CVE-2026-5490
+---
+## Executive Summary
+A high-severity privilege escalation vulnerability in the DriveLock endpoint security platform could allow authenticated attackers to bypass the software's core security functions. Tracked as CVE-2026-5490 and assigned a CVSS score of 8.8 by the Zero Day Initiative (ZDI), the flaw stems from a lack of proper input validation, enabling SQL injection attacks that can grant administrative privileges. This vulnerability is particularly concerning as it targets a security product designed to enforce endpoint control, potentially allowing an attacker to disable protections on a compromised machine.
+
+## Technical Analysis
+The vulnerability resides within the DriveLock application's handling of user-supplied data. According to the ZDI advisory (ZDI-26-286), the software fails to properly sanitize input before using it in SQL queries. This lack of validation allows an authenticated attacker—meaning they already have some level of access to the system—to inject malicious SQL commands.
+
+The successful exploitation of this SQL injection flaw enables an attacker to manipulate backend database operations. Specifically, the flaw can be leveraged to escalate the attacker's privileges within the DriveLock management framework. With elevated privileges, an attacker could theoretically modify security policies, disable device control features (like USB port blocking or application whitelisting), and potentially maintain persistence on the endpoint even after other security measures are applied. The ZDI notes that authentication is required to exploit this vulnerability, which limits but does not eliminate the threat, as it could be combined with stolen credentials or used in post-compromise scenarios.
+
+## Indicators of Compromise
+None identified at this time. The advisory from ZDI is a coordinated vulnerability disclosure; there is no public information indicating active exploitation in the wild as of publication.
+
+## Tactics, Techniques & Procedures
+Based on the vulnerability details, an attacker would likely follow these procedures:
+1.  **Initial Access:** Obtain valid user credentials for a system protected by DriveLock. This could be achieved through phishing, credential theft, or other means.
+2.  **Execution:** Authenticate to the vulnerable DriveLock component.
+3.  **Privilege Escalation (T1068):** Craft and submit a malicious SQL query via the vulnerable parameter to modify their privilege level in the DriveLock database from a standard user to an administrator.
+4.  **Defense Evasion:** Use the newly acquired administrative access within DriveLock to disable security policies, such as those preventing execution of unauthorized software or blocking external media, thereby weakening the endpoint's defenses.
+
+## Threat Actor Context
+There is no specific threat actor attribution associated with this vulnerability disclosure. The flaw was reported to the vendor through the ZDI program. However, the nature of the vulnerability makes it a likely target for financially motivated cybercriminals and ransomware actors seeking to disable endpoint security controls during an attack chain. It could also be leveraged in targeted attacks by advanced persistent threat (APT) groups for persistent, stealthy access to secured environments.
+
+## Mitigations & Recommendations
+The primary mitigation is to apply the vendor-provided security update. Users and administrators of DriveLock should immediately consult with the vendor, likely Centreon (which acquired DriveLock), for patching guidance. Until a patch can be applied, organizations should consider the following compensating controls:
+*   **Principle of Least Privilege:** Strictly enforce least-privilege access models to limit the number of user accounts with authentication access to the DriveLock management interface.
+*   **Network Segmentation:** Restrict network access to the DriveLock management server to only authorized administrative workstations.
+*   **Credential Hygiene:** Implement strong, unique passwords and consider multi-factor authentication (MFA) for all accounts that can access endpoint management systems.
+*   **Monitoring:** Audit logs for unusual authentication events or privilege change activities within the DriveLock platform.
+
+## References
+*   Zero Day Initiative Advisory ZDI-26-286: [DriveLock SQL Injection Privilege Escalation Vulnerability](http://www.zerodayinitiative.com/advisories/ZDI-26-286/)
