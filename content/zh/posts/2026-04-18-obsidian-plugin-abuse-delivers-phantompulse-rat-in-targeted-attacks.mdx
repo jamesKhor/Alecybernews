@@ -1,0 +1,57 @@
+---
+title: Obsidian 插件滥用在定向攻击中投递 PHANTOMPULSE RAT
+slug: 2026-04-18-obsidian-plugin-abuse-delivers-phantompulse-rat-in-targeted-attacks
+date: '2026-04-18'
+excerpt: >-
+  威胁行为者滥用 Obsidian 笔记应用通过恶意插件投递新型 PHANTOMPULSE RAT，针对金融和加密货币领域的个人进行攻击，此次行动被追踪为
+  REF6598。
+category: malware
+tags:
+  - rat
+  - social-engineering
+  - initial-access
+  - financial
+language: zh
+source_urls:
+  - 'https://thehackernews.com/2026/04/obsidian-plugin-abuse-delivers.html'
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-18-obsidian-plugin-abuse-delivers-phantompulse-rat-in-targeted-attacks
+severity: high
+affected_sectors:
+  - financial-services
+  - cryptocurrency
+---
+## 执行摘要
+一种新颖的社会工程学活动正在滥用流行的Obsidian笔记应用程序的可扩展性，以投递一种以前未记录的Windows远程访问木马（RAT），被称为PHANTOMPULSE。根据追踪此活动为REF6598的Elastic Security Labs的说法，攻击者正在分发恶意的Obsidian插件以获得初始访问权限，主要针对金融和加密货币领域的个人。该活动代表了初始访问技术的显著演变，利用受信任的开发工具和软件供应链来绕过传统的安全控制。
+
+## 技术分析
+攻击链始于社会工程学，目标被引导下载并安装一个恶意的Obsidian插件，通常被呈现为笔记或生产力的有用工具。Obsidian插件通常是基于JavaScript的，并以Obsidian应用程序本身的权限运行。一旦安装，恶意插件执行一个多阶段的有效载荷检索过程。根据Elastic的分析，插件从攻击者控制的基础设施中获取后续阶段，最终导致在受害者的Windows系统上部署PHANTOMPULSE RAT。
+
+PHANTOMPULSE是一个功能齐全的RAT，能够进行远程shell访问、文件系统操作和数据泄露。其能力表明，它更注重持久访问和情报收集，而不是破坏性行动。恶意软件采用了逃避检测的技术，包括使用本地二进制文件（LOLBins）进行执行，可能还有对其命令和控制（C2）流量的混淆。恶意插件的确切初始分发向量——无论是通过非官方仓库、直接链接还是被破坏的社区渠道——仍然不清楚，尽管这是攻击成功的关键组成部分。
+
+## 入侵指标
+目前没有识别出任何入侵指标。
+
+## 战术、技术与程序
+该活动采用了与MITRE ATT&CK框架一致的一套独特的战术、技术和程序（TTPs）。
+- **TA0001: 初始访问** – 技术T1566.001（钓鱼：鱼叉式钓鱼附件）被用来传递恶意Obsidian插件的链接。
+- **TA0002: 执行** – 攻击者滥用受信任的Obsidian应用程序（T1204.002: 用户执行：恶意文件）来执行插件的恶意代码。
+- **TA0005: 防御绕过** – 使用一个合法的、签名的应用程序（Obsidian）作为加载器提供了一种伪装（T1036）。恶意软件可能采用混淆和LOLBin使用（T1218）。
+- **TA0011: 命令和控制** – 恶意软件建立C2通道（TA0011）用于远程访问和数据泄露。
+- **TA0009: 收集** – PHANTOMPULSE RAT的功能使能够从受害者的系统中收集数据（T1005, T1074）。
+
+## 威胁行为者背景
+活动REF6598背后的威胁行为者仍然不明。针对金融和加密货币专业人士表明，这是一个以财务为动机的行为者，可能涉及网络间谍活动以获得市场优势或直接窃取资产。所展示的操作安全——使用一个新颖的向量和一个未记录的RAT——表明这是一个复杂和足智多谋的团体。目前没有证据将此活动与已知的高级持续威胁（APT）团体联系起来，但这种交易技巧与目标入侵集一致。选择Obsidian，一个技术专业人士喜欢的工具，表明了仔细的受害者画像。
+
+## 缓解措施与建议
+组织和个人，特别是在目标领域，应实施以下缓解措施：
+- **软件限制：** 执行限制安装未经授权的插件或附加组件的政策，例如Obsidian等生产力工具。在可能的情况下使用应用程序允许列表。
+- **用户培训：** 教育员工，特别是那些处于高风险角色的员工，了解从未经验证的来源下载软件或插件的风险，即使是受信任的应用程序。
+- **网络监控：** 监控出站网络流量，以寻找连接到未知或可疑域名的连接，这可能表明RAT的C2通信。
+- **端点检测：** 部署能够检测合法应用程序异常行为的端点检测和响应（EDR）解决方案，例如Obsidian生成不寻常的子进程或向可疑IP地址发起网络请求。
+- **供应链验证：** 仅从官方、经过审查的市场或仓库安装插件，并验证发布者的真实性。
+- **事件响应：** 假设如果执行了恶意插件就存在妥协，并启动事件响应程序，包括隔离受影响的主机和进行全面的取证调查。
+
+## 参考资料
+- https://thehackernews.com/2026/04/obsidian-plugin-abuse-delivers.html
