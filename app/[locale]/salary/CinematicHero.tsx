@@ -102,11 +102,20 @@ export function CinematicHero({ labels }: Props) {
             - Desktop (>= 640px): 88vh — full cinematic moment.
           Padding + gap also shrunk on mobile so the 4-line wordmark
           doesn't squeeze the body copy off-screen on narrow devices. */}
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-8 py-10 sm:py-24 md:py-32 min-h-[62vh] sm:min-h-[88vh] flex flex-col justify-between gap-6 sm:gap-12">
-        {/* TOP: wordmark, 4 lines, alternating opacity */}
-        <div aria-hidden className="flex flex-col">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-8 py-10 sm:py-24 md:py-32 min-h-[62vh] sm:min-h-[88vh] flex flex-col justify-between gap-6 sm:gap-12 overflow-hidden">
+        {/* TOP: wordmark, 4 lines, alternating opacity.
+            Overflow containment: the outer section already has
+            overflow-hidden, but we belt-and-braces here with overflow-hidden
+            again + w-full so any vw-sized text that spills gets clipped
+            rather than scroll-bleeding the page. */}
+        <div aria-hidden className="flex flex-col w-full overflow-hidden">
           {[
             { text: labels.w1, strong: false, align: "text-left" },
+            // Mobile overflow fix (2026-04-18): alignment offsets `pl-[8%]`
+            // and `pr-[4%]` pushed text past the 375px viewport on phones
+            // when combined with -0.035em letter-spacing + wide CJK glyphs
+            // (加速, 你的, 网安 etc. render ~1.4× wider than Latin in mono
+            // fonts). Scoped to sm+ so mobile uses straight left/right.
             { text: labels.w2, strong: true, align: "text-left sm:pl-[8%]" },
             { text: labels.w3, strong: true, align: "text-right sm:pr-[4%]" },
             { text: labels.w4, strong: false, align: "text-right" },
@@ -115,22 +124,25 @@ export function CinematicHero({ labels }: Props) {
               key={i}
               // font-display routes through the CJK-safe stack. font-black
               // (900) gives short display words the weight the Pixel Street
-              // episode prescribes: "if stylized text is just a few words,
-              // make the font weight heavy or it loses impact."
-              // Mobile: 17vw on a 375px phone ≈ 64px, "CAREER" at 6
-              // chars still fits inside px-4 content width with breathing
-              // room (was 18vw — ran tight on 320px phones).
-              className={`font-display font-black leading-[0.86] tracking-tight uppercase
-                text-[17vw] sm:text-[16vw] md:text-[14vw] lg:text-[13rem] xl:text-[15rem]
+              // framework prescribes.
+              // Mobile vw sizing fix (2026-04-18): dropped 17vw → 14vw on
+              // phones (iPhone SE 320px × 14vw = 44px, iPhone 15 393px ×
+              // 14vw = 55px — fits 6-char Latin and 2-char CJK comfortably
+              // with headroom for letter-spacing + alignment nudges).
+              // leading-[0.9] gives a bit more vertical breathing room than
+              // 0.86 — CJK glyphs need more height to avoid clipping their
+              // top/bottom strokes.
+              className={`font-display font-black leading-[0.9] sm:leading-[0.86] tracking-tight uppercase
+                text-[14vw] sm:text-[16vw] md:text-[14vw] lg:text-[13rem] xl:text-[15rem]
                 ${line.align}
                 ${line.strong ? "text-white" : "text-white/[0.14]"}
-                ${i > 0 ? "-mt-[0.08em]" : ""}`}
+                ${i > 0 ? "-mt-[0.06em] sm:-mt-[0.08em]" : ""}`}
               style={{
                 // Tighten letter-spacing at display sizes so the word
-                // looks crafted, not defaulted. The font-display class
-                // above already sets font-family via CSS.
-                letterSpacing: "-0.035em",
-                // Subtle text-shadow on strong lines for cinematic glow
+                // looks crafted, not defaulted. Less aggressive on mobile
+                // because CJK glyphs overlap more than Latin at the same
+                // negative tracking.
+                letterSpacing: "-0.02em",
                 textShadow: line.strong
                   ? "0 0 40px rgba(6, 182, 212, 0.15)"
                   : undefined,

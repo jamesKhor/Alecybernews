@@ -263,20 +263,26 @@ export function HeroStats({ records, locale, labels }: Props) {
               (900) + tracking-tighter so it reads as a crafted trademark,
               not a system numeral. Leading stays at 1 so stacked digits
               don't orphan. */}
-          <p className="text-4xl sm:text-5xl md:text-[3.25rem] font-black font-mono tabular-nums leading-none tracking-tighter text-foreground mb-3">
+          <p className="text-4xl sm:text-5xl md:text-[3.25rem] font-black font-mono tabular-nums leading-none tracking-tighter text-foreground mb-3 break-words [overflow-wrap:anywhere]">
             {slot.peak.display}
           </p>
           {/* Context line — "body / nanny" role: feed info readably.
               Bumped from text-xs → text-sm so it remains legible on
-              phone without needing to pinch-zoom. */}
-          <p className="text-sm text-muted-foreground leading-snug mb-3">
+              phone without needing to pinch-zoom. Added break-words so
+              long CJK role names (e.g. "中国一线 · Senior Engineer / 首席
+              ...") wrap within the narrow card. */}
+          <p className="text-sm text-muted-foreground leading-snug mb-3 break-words [overflow-wrap:anywhere]">
             {slot.peak.context}
           </p>
-          <div className="mt-auto pt-3 border-t border-border/40">
+          <div className="mt-auto pt-3 border-t border-border/40 min-w-0">
             <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80 font-semibold mb-1">
               {slot.deltaLabel}
             </p>
-            <p className="text-xs font-mono tabular-nums text-foreground/85 leading-snug">
+            {/* Delta line carries the long reference: "≈ $325k · HKD
+                1,800,000–2,500,000+ (regional CISO / Bank Security Head
+                / Big 4 ex-partner)" — this MUST wrap cleanly on 375px
+                phones where the card is only ~330px wide minus padding. */}
+            <p className="text-xs font-mono tabular-nums text-foreground/85 leading-snug break-words [overflow-wrap:anywhere]">
               {slot.peak.delta}
             </p>
           </div>

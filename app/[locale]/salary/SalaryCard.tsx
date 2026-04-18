@@ -175,7 +175,14 @@ export function SalaryCard({ record, locale, labels }: Props) {
                     b.raw,
                   );
                 return (
-                  <p className="text-[15px] sm:text-base font-semibold font-mono text-foreground tabular-nums leading-tight">
+                  // Mobile overflow fix (2026-04-18): break-words +
+                  // min-w-0 allow the wrapping parent flex/grid to actually
+                  // shrink this line. Without min-w-0, mono strings with
+                  // CJK chars + slashes + arrows (e.g. "网安: 42,000-60,000
+                  // / SWE: 48,000-72,000") stay on one unwrapped line and
+                  // blow out the card width. leading-snug (not tight) gives
+                  // wrapped lines enough breathing room.
+                  <p className="text-[15px] sm:text-base font-semibold font-mono text-foreground tabular-nums leading-snug break-words [overflow-wrap:anywhere] min-w-0">
                     {!hasEmbeddedCurrency && (
                       <span className="text-muted-foreground/70 mr-1 font-normal">
                         {symbol}
@@ -227,11 +234,11 @@ export function SalaryCard({ record, locale, labels }: Props) {
               {labels.topEarnersNote}
             </p>
           </div>
-          <p className="text-[15px] sm:text-base font-semibold font-mono text-foreground/95 tabular-nums leading-tight">
+          <p className="text-[15px] sm:text-base font-semibold font-mono text-foreground/95 tabular-nums leading-snug break-words [overflow-wrap:anywhere] min-w-0">
             {record.top_tier_salary}
           </p>
           {record.top_tier_note && (
-            <p className="text-xs text-muted-foreground/80 leading-relaxed">
+            <p className="text-xs text-muted-foreground/80 leading-relaxed break-words [overflow-wrap:anywhere]">
               {record.top_tier_note}
             </p>
           )}
@@ -248,7 +255,7 @@ export function SalaryCard({ record, locale, labels }: Props) {
             {record.top_hiring.slice(0, 6).map((co) => (
               <span
                 key={co}
-                className="inline-block text-[11px] leading-snug px-2 py-0.5 rounded-sm border border-border/50 bg-background/30 text-foreground/80"
+                className="inline-block text-[11px] leading-snug px-2 py-0.5 rounded-sm border border-border/50 bg-background/30 text-foreground/80 max-w-full break-words [overflow-wrap:anywhere]"
               >
                 {co}
               </span>
