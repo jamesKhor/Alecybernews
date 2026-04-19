@@ -21,16 +21,16 @@ export function Header({ locale }: Props) {
   // Build the same path in the other locale
   const switchHref = `/${otherLocale}${pathname}`;
 
-  // Nav trimmed 2026-04-19: "Articles" and "Threat Intel" removed
-  // because they're redundant with "Categories" (which lists every
-  // topic including threat-intel). Keeps the header uncluttered and
-  // pushes users toward category-first browsing, which matches the
-  // NYT-style redesign. Both `/articles` and `/threat-intel` still
-  // resolve — just not surfaced in the top nav.
+  // Nav trimmed 2026-04-19: top nav is now only the main browsing
+  // surfaces. "Articles" and "Threat Intel" were redundant with
+  // "Categories" (which lists every topic). "Salaries" moved to the
+  // footer — it's an evergreen destination page, not a navigation
+  // hub, and belongs with other "resources" links. All three routes
+  // still resolve; the XHS funnel's deep links to /zh/salary continue
+  // to work unchanged.
   const links = [
     { href: `/${locale}`, label: t("home") },
     { href: `/${locale}/categories`, label: t("categories") },
-    { href: `/${locale}/salary`, label: t("salaries") },
   ];
 
   return (

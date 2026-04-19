@@ -27,12 +27,26 @@ export function Footer({ locale }: Props) {
             </p>
           </div>
 
-          {/* Quick links */}
+          {/* Quick links — moved from top nav to footer as part of the
+              2026-04-19 nav slim (top nav now just Home + Categories).
+              /articles and /threat-intel remain in the footer as
+              escape-hatch routes for users who want the flat feed;
+              /salary is the evergreen career-data destination that
+              was in the top nav and belongs here with the other
+              "resources" links. */}
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">
               {t("quickLinks")}
             </h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link
+                  href={`/${locale}/salary`}
+                  className="hover:text-primary transition-colors"
+                >
+                  {t("salaries")}
+                </Link>
+              </li>
               <li>
                 <Link
                   href={`/${locale}/articles`}
