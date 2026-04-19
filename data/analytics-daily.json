@@ -1,0 +1,133 @@
+[
+  {
+    "event": "analytics_daily",
+    "timestamp": "2026-04-19T01:42:52.440Z",
+    "totals": {
+      "en_posts": 219,
+      "en_threat_intel": 107,
+      "zh_posts": 217,
+      "zh_threat_intel": 105,
+      "total": 648
+    },
+    "published_in_last": {
+      "24h": 35,
+      "7d": 322,
+      "30d": 326
+    },
+    "translation_parity": {
+      "missing_zh": 4,
+      "missing_en": 0,
+      "parity_ratio": "0.988"
+    },
+    "top_categories": [
+      {
+        "value": "threat-intel",
+        "count": 109
+      },
+      {
+        "value": "vulnerabilities",
+        "count": 96
+      },
+      {
+        "value": "industry",
+        "count": 44
+      },
+      {
+        "value": "malware",
+        "count": 40
+      },
+      {
+        "value": "ai",
+        "count": 22
+      },
+      {
+        "value": "tools",
+        "count": 15
+      }
+    ],
+    "top_tags": [
+      {
+        "value": "supply-chain",
+        "count": 44
+      },
+      {
+        "value": "social-engineering",
+        "count": 33
+      },
+      {
+        "value": "phishing",
+        "count": 32
+      },
+      {
+        "value": "ai-security",
+        "count": 32
+      },
+      {
+        "value": "microsoft",
+        "count": 31
+      },
+      {
+        "value": "zero-day",
+        "count": 23
+      },
+      {
+        "value": "malware",
+        "count": 19
+      },
+      {
+        "value": "ai",
+        "count": 17
+      },
+      {
+        "value": "ransomware",
+        "count": 17
+      },
+      {
+        "value": "rce",
+        "count": 16
+      },
+      {
+        "value": "windows",
+        "count": 16
+      },
+      {
+        "value": "data-breach",
+        "count": 16
+      },
+      {
+        "value": "patch-tuesday",
+        "count": 15
+      },
+      {
+        "value": "privilege-escalation",
+        "count": 14
+      },
+      {
+        "value": "privacy",
+        "count": 13
+      }
+    ],
+    "severity_breakdown": [
+      {
+        "value": "high",
+        "count": 162
+      },
+      {
+        "value": "medium",
+        "count": 59
+      },
+      {
+        "value": "informational",
+        "count": 55
+      },
+      {
+        "value": "critical",
+        "count": 42
+      },
+      {
+        "value": "low",
+        "count": 1
+      }
+    ]
+  }
+]

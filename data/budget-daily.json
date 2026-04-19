@@ -1,0 +1,23 @@
+[
+  {
+    "event": "budget_daily",
+    "timestamp": "2026-04-19T01:42:53.754Z",
+    "month_to_date": {
+      "articles_published": 326,
+      "days_elapsed": 19,
+      "llm_cost_usd": 9.78,
+      "vps_cost_usd": 4.75,
+      "total_cost_usd": 14.53,
+      "cost_per_article_usd": 0.045
+    },
+    "projection_full_month": {
+      "articles": 515,
+      "llm_cost_usd": 15.45,
+      "vps_cost_usd": 7.5,
+      "total_cost_usd": 22.95,
+      "percent_of_budget": null
+    },
+    "budget_usd": 0,
+    "alert_triggered": true
+  }
+]
