@@ -241,6 +241,21 @@ async function main() {
       `   ✓ generated ${row.actualWords}w, fact-check=${fc.passed ? "PASS" : "FAIL"} (${row.factCheckHigh}h/${row.factCheckMedium}m), hedges=${row.bannedHedges.length}, closers=${row.bannedClosers.length + (row.marketingCloser ? 1 : 0)}`,
     );
 
+    // Print every HIGH and MEDIUM issue so the operator can judge whether
+    // each is (a) a real hallucination (LLM invented a CVE / IP / hash not
+    // in source) or (b) a false positive in our fact-check regex.
+    if (!fc.passed || fc.issues.length > 0) {
+      for (const issue of fc.issues) {
+        if (issue.severity === "low") continue;
+        const badge = issue.severity === "high" ? "  🔴 HIGH" : "  🟡 MED ";
+        console.log(
+          `${badge} ${issue.type}: ${issue.message}${
+            issue.value ? `  [value: ${issue.value}]` : ""
+          }`,
+        );
+      }
+    }
+
     results.push(row);
   }
 
