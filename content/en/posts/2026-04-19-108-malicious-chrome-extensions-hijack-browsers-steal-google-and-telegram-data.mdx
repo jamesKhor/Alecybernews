@@ -1,0 +1,47 @@
+---
+title: >-
+  108 Malicious Chrome Extensions Hijack Browsers, Steal Google and Telegram
+  Data
+slug: >-
+  2026-04-19-108-malicious-chrome-extensions-hijack-browsers-steal-google-and-telegram-data
+date: '2026-04-19'
+excerpt: >-
+  Socket identified 108 malicious Chrome extensions that infected 20,000 users,
+  stealing Google and Telegram session cookies and injecting ads via a shared
+  command-and-control server.
+category: malware
+tags:
+  - chrome
+  - supply-chain
+  - session-hijacking
+  - browser-security
+  - socket
+language: en
+source_urls:
+  - 'https://thehackernews.com/2026/04/108-malicious-chrome-extensions-steal.html'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-19-108-malicious-chrome-extensions-hijack-browsers-steal-google-and-telegram-data
+severity: high
+---
+## Executive Summary
+Cybersecurity firm Socket has identified a cluster of 108 malicious Google Chrome extensions that infected approximately 20,000 users, according to a technical analysis published April 18, 2026. The extensions, which communicated with a shared command-and-control (C2) infrastructure, were designed to steal sensitive user data—including Google and Telegram session cookies—and perform browser-level abuse by injecting advertisements and arbitrary JavaScript into every visited webpage.
+
+## Technical Analysis
+The malicious extensions operated by establishing a WebSocket connection to a C2 server at `wss://sock[.]yuna[.]pe`. Upon installation, each extension would immediately initiate this persistent connection, awaiting commands. The primary payload was a JavaScript file, `inject.js`, which the C2 server could push to the infected browser at any time. This script executed with the permissions of the extension, allowing it to manipulate the Document Object Model (DOM) of any webpage the user visited. The extensions' core functionality was twofold: data exfiltration and ad injection. They specifically targeted authentication cookies for Google (`accounts.google.com`) and Telegram (`web.telegram.org`), harvesting these tokens to enable session hijacking and account takeover. Concurrently, the `inject.js` script would insert arbitrary advertisements into webpages, generating fraudulent ad revenue for the operators. Socket's analysis noted the extensions were designed to be stealthy, with no obvious malicious behavior visible to the end-user, and they could dynamically update their malicious code via the WebSocket channel.
+
+## Indicators of Compromise
+None identified in source material.
+
+## Tactics, Techniques & Procedures
+The campaign's TTPs centered on supply chain compromise and browser extension abuse. The threat actors uploaded the malicious extensions to the Chrome Web Store, leveraging its legitimacy to bypass user suspicion. Once installed, the extensions established a covert C2 channel using WebSockets (T1071.001 - Application Layer Protocol: Web Protocols). They then employed credential access techniques (T1555.003 - Credentials from Web Browsers) to steal session cookies from targeted domains. For execution and persistence, the extensions used JavaScript injection (T1059.007 - JavaScript) into all browser tabs, facilitating both ad fraud and further data collection. The ability to push updated `inject.js` payloads via the WebSocket connection represents a form of dynamic resolution (T1102 - Web Service), allowing the attackers to change functionality post-infection without requiring a store update.
+
+## Threat Actor Context
+The source material does not attribute this campaign to a known threat actor group. The operation's focus on widespread, low-profile data theft and ad injection suggests a financially motivated actor rather than a state-sponsored one. The use of the Chrome Web Store as a distribution vector indicates the actors are exploiting the trust and automation of official software repositories, a common tactic in broader supply chain attacks.
+
+## Mitigations & Recommendations
+Socket recommends that users and organizations conduct an immediate audit of installed Chrome extensions. Extensions should be removed if they are not essential or from a trusted developer. The company advises checking the extension's permissions critically; extensions requesting access to "read and change all your data on the websites you visit" or similar broad permissions without a clear, legitimate need pose a significant risk. Organizations should enforce policies restricting the installation of browser extensions not vetted by internal security teams. Developers publishing extensions should implement code signing and review processes to prevent their accounts from being compromised and used to push malicious updates. Google has been notified of the malicious extensions; users should rely on the Chrome Web Store's subsequent takedown actions but not assume it provides proactive, comprehensive security screening.
+
+## References
+- https://thehackernews.com/2026/04/108-malicious-chrome-extensions-steal.html

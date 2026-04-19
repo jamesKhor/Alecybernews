@@ -1,0 +1,56 @@
+---
+title: Proofpoint 发现 FIFA 世界杯 2026 合作伙伴易受电子邮件欺骗攻击
+slug: >-
+  2026-04-19-proofpoint-finds-fifa-world-cup-2026-partners-vulnerable-to-email-spoofing
+date: '2026-04-19'
+excerpt: >-
+  Proofpoint 报告称，36% 的 FIFA 世界杯 2026 商业合作伙伴未能实施 DMARC，使球迷面临伪造电子邮件欺诈的风险。对 39
+  家官方合作伙伴的分析发现，有 14 家缺乏基本的电子邮件认证。
+category: threat-intel
+tags:
+  - email-security
+  - phishing
+  - brand-impersonation
+  - dmarc
+  - proofpoint
+language: zh
+source_urls:
+  - >-
+    https://www.proofpoint.com/us/newsroom/press-releases/fifa-world-cup-2026-more-one-third-official-partners-expose-public-risk
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-19-proofpoint-finds-fifa-world-cup-2026-partners-vulnerable-to-email-spoofing
+severity: medium
+affected_sectors:
+  - sports
+  - hospitality
+  - consumer goods
+  - financial services
+  - telecommunications
+  - automotive
+affected_regions:
+  - global
+---
+## 执行摘要
+即将到来的2026年FIFA世界杯的官方商业合作伙伴中，超过三分之一尚未实施基于域的消息认证、报告和合规性（DMARC）标准，这使得全球公众容易受到电子邮件欺骗和品牌冒充攻击的威胁。根据Proofpoint Threat Insight的研究，在分析的39个合作伙伴中，有14个缺乏DMARC记录，而只有15个实施了阻止未经认证电子邮件的政策。随着比赛预计将吸引全球的广泛关注，这一安全漏洞为冒充可信品牌的网络钓鱼和欺诈活动创造了一个理想的环境。
+
+## 技术分析
+Proofpoint在2026年3月进行的分析评估了FIFA的39个全球合作伙伴、国家支持者和地区赞助商的电子邮件域安全。核心问题在于缺少或错误配置DMARC，这是一个使用发送者策略框架（SPF）和域密钥识别邮件（DKIM）来验证电子邮件来源并指导接收邮件服务器如何处理未通过认证的消息的标准。
+
+研究发现，36%（14个合作伙伴）在他们的域名系统（DNS）中没有发布DMARC记录。另外26%（10个合作伙伴）有DMARC记录，但政策设置为`p=none`，这只监控和报告认证失败，而不阻止欺诈性消息。只有38%（15个合作伙伴）实施了强制执行的DMARC政策（`p=quarantine`或`p=reject`），积极保护免受欺骗。Proofpoint指出，没有强制执行DMARC政策的组织在电子邮件钓鱼攻击中被冒充的可能性要高出4.5倍。
+
+## 入侵指标
+源材料中未识别出任何入侵指标。
+
+## 战术、技术与程序
+这一安全漏洞主要使T1586.002（入侵账户：电子邮件账户）和T1585.002（建立账户：电子邮件账户）技术得以实现，这些技术来自MITRE ATT&CK框架，特别是通过域欺骗。威胁行为者可以发送看似来自世界杯合作伙伴合法域的电子邮件。这些电子邮件可能用于商业电子邮件入侵（BEC）、凭证钓鱼活动或提供假票、商品或促销的骗局。缺乏执行使得这些欺骗性消息能够直接进入收件人的收件箱，绕过基本的电子邮件安全过滤器。
+
+## 威胁行为者背景
+源材料没有将这种暴露归因于特定的活跃威胁组织。然而，背景创造了一个广泛的机会主义威胁环境。像世界杯这样的大型全球事件一直受到以财务为动机的网络犯罪分子和黑客主义者的攻击。涉及的合作伙伴跨越高价值行业，包括银行、汽车、电信和消费品，使他们的品牌成为冒充以窃取资金、凭证和个人数据的有吸引力的目标，这些数据来自一个庞大、情感投入的全球观众。
+
+## 缓解措施与建议
+Proofpoint的主要建议是所有组织，特别是高调品牌，实施强制执行的DMARC政策（`p=quarantine`或`p=reject`）。实施过程涉及首先部署SPF和DKIM，然后将DMARC政策设置为`p=none`以收集数据并监控可能未通过认证的合法电子邮件来源，最后转向强制执行的政策。对于特定识别的合作伙伴，需要立即采取行动，在比赛开始前发布和强制执行DMARC记录。组织还应考虑更广泛的电子邮件安全策略，包括在高调活动期间对用户进行有关网络钓鱼的意识培训。
+
+## 参考资料
+- https://www.proofpoint.com/us/newsroom/press-releases/fifa-world-cup-2026-more-one-third-official-partners-expose-public-risk

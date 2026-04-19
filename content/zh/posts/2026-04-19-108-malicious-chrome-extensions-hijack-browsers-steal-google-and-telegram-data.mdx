@@ -1,0 +1,43 @@
+---
+title: 108款恶意Chrome扩展劫持浏览器，窃取Google和Telegram数据
+slug: >-
+  2026-04-19-108-malicious-chrome-extensions-hijack-browsers-steal-google-and-telegram-data
+date: '2026-04-19'
+excerpt: >-
+  Socket识别出108款恶意Chrome扩展，感染了20,000名用户，窃取Google和Telegram会话cookie，并通过共享的命令和控制服务器注入广告。
+category: malware
+tags:
+  - chrome
+  - supply-chain
+  - session-hijacking
+  - browser-security
+  - socket
+language: zh
+source_urls:
+  - 'https://thehackernews.com/2026/04/108-malicious-chrome-extensions-steal.html'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-19-108-malicious-chrome-extensions-hijack-browsers-steal-google-and-telegram-data
+severity: high
+---
+## 执行摘要
+网络安全公司Socket在2026年4月18日发布的技术分析中识别出108个恶意的Google Chrome扩展程序，这些扩展程序感染了大约20,000名用户。这些扩展程序与共享的命令和控制（C2）基础设施通信，旨在窃取敏感用户数据——包括Google和Telegram会话cookie——并通过在每个访问的网页中注入广告和任意JavaScript来执行浏览器级别的滥用。
+
+## 技术分析
+这些恶意扩展通过建立到C2服务器的WebSocket连接来运作，服务器地址为`wss://sock[.]yuna[.]pe`。安装后，每个扩展会立即启动这个持久连接，等待命令。主要有效载荷是一个JavaScript文件`inject.js`，C2服务器可以随时将其推送到受感染的浏览器。该脚本以扩展程序的权限执行，允许它操作用户访问的任何网页的文档对象模型（DOM）。扩展的核心功能有两个：数据泄露和广告注入。它们特别针对Google（`accounts.google.com`）和Telegram（`web.telegram.org`）的认证cookie，收集这些令牌以实现会话劫持和账户接管。同时，`inject.js`脚本会在网页中插入任意广告，为操作者生成欺诈性广告收入。Socket的分析指出，这些扩展被设计为隐蔽性高，对最终用户来说没有明显的恶意行为，它们可以通过WebSocket通道动态更新其恶意代码。
+
+## 入侵指标
+源材料中未识别出任何入侵指标。
+
+## 战术、技术与程序
+该活动的主要战术、技术和程序集中在供应链破坏和浏览器扩展滥用上。威胁行为者将恶意扩展上传到Chrome Web Store，利用其合法性来绕过用户的怀疑。一旦安装，这些扩展就使用WebSockets（T1071.001 - 应用层协议：Web协议）建立了一个隐蔽的C2通道。然后他们采用凭证访问技术（T1555.003 - 来自Web浏览器的凭证）来窃取目标域的会话cookie。为了执行和持久性，这些扩展使用JavaScript注入（T1059.007 - JavaScript）到所有浏览器标签页，促进广告欺诈和进一步的数据收集。通过WebSocket连接推送更新的`inject.js`有效载荷的能力代表了一种动态解析（T1102 - Web服务），允许攻击者在感染后更改功能，而无需商店更新。
+
+## 威胁行为者背景
+源材料没有将此次活动归因于已知的威胁行为者群体。该行动专注于广泛、低调的数据盗窃和广告注入，表明这是一个以财务为动机的行为者，而不是国家支持的。使用Chrome Web Store作为分发向量表明，这些行为者正在利用官方软件存储库的信任和自动化，这是更广泛的供应链攻击中的常见策略。
+
+## 缓解措施与建议
+Socket建议用户和组织立即对安装的Chrome扩展进行审计。如果扩展程序不是必需的或来自可信的开发者，应该将其移除。公司建议仔细检查扩展程序的权限；请求访问“阅读和更改您访问的所有网站的所有数据”或类似广泛权限的扩展程序，如果没有明确、合法的需求，就构成了重大风险。组织应该执行政策，限制未经内部安全团队审查的浏览器扩展的安装。发布扩展的开发者应该实施代码签名和审查流程，以防止他们的账户被破坏并被用来推送恶意更新。Google已被告知这些恶意扩展；用户应该依赖Chrome Web Store随后的下架行动，但不要假设它提供了主动、全面的安全筛查。
+
+## 参考资料
+- https://thehackernews.com/2026/04/108-malicious-chrome-extensions-steal.html
