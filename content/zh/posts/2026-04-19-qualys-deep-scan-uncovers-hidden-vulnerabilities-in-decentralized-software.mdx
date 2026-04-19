@@ -1,0 +1,48 @@
+---
+title: Qualys 深度扫描揭示去中心化软件中隐藏的漏洞
+slug: >-
+  2026-04-19-qualys-deep-scan-uncovers-hidden-vulnerabilities-in-decentralized-software
+date: '2026-04-19'
+excerpt: >-
+  Qualys
+  威胁研究揭示，30-40%的企业软件安装在受管理目录之外，造成了扫描器遗漏的关键可见性差距。新的深度扫描功能能够识别便携式应用程序和自定义安装中的漏洞。
+category: vulnerabilities
+tags:
+  - vulnerability-management
+  - asset-discovery
+  - qualys
+  - threat-research
+language: zh
+source_urls:
+  - >-
+    https://blog.qualys.com/product-tech/2026/04/13/deep-scan-expanding-vulnerability-detection-beyond-traditional-boundaries
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-19-qualys-deep-scan-uncovers-hidden-vulnerabilities-in-decentralized-software
+severity: medium
+---
+## 执行摘要
+Qualys Threat Research 发现企业安全中存在一个持续的可见性差距，发现大量安装的软件位于标准、受管理目录之外。这种去中心化的安装实践，由便携式应用程序和自定义用户安装驱动，使得这些资产对传统漏洞扫描器不可见，为安全团队创造了一个重大的盲点。
+
+## 技术分析
+根据 Qualys 发布的研究，安全团队估计有 30% 到 40% 的企业软件安装在非标准位置。这些包括辅助驱动器、用户配置文件目录（例如 `AppData\Local`、`AppData\Roaming`）以及安装过程中创建的自定义文件夹。主要查询 Windows Management Instrumentation (WMI)、Windows 注册表和标准系统目录（如 `C:\Program Files`）的传统漏洞扫描器无法检测到这些未受管理位置的软件。
+
+研究识别了这些“影子”安装的几个常见来源。不需要正式安装，可以从 USB 驱动器或网络共享运行的便携式应用程序是一个主要贡献者。没有管理员权限的用户安装的软件，默认会使用特定于用户的目录，是另一个来源。此外，通过非标准企业软件管理工具或指定自定义安装路径的脚本部署的应用程序也逃避了传统发现。
+
+Qualys 的回应是一项名为“Deep Scan”的新功能，集成在其 Vulnerability Management, Detection, and Response (VMDR) 和 External Attack Surface Management (EASM) 产品中。这项技术采用多阶段方法：首先，它执行广泛的文件系统枚举，以编目所有可执行文件（`.exe`、`.dll`、`.msi`）和软件清单。然后，它将这些原始文件数据与不断更新的软件指纹数据库相关联，包括文件哈希、版本元数据和数字签名，以识别特定产品和版本。最后，它将识别出的软件与漏洞情报映射起来，以评估风险。
+
+## 入侵指标
+源材料中未识别出任何入侵指标。
+
+## 战术、技术与程序
+这个可见性差距被利用的核心技术不是威胁行为者的直接行动，而是防御姿态的固有弱点。对手可能会利用这个盲点，故意将恶意工具或易受攻击的合法软件安装到这些未扫描的目录中，以建立持久性或利用已知但未修补的漏洞，这些漏洞是安全团队无法看到的。
+
+## 威胁行为者背景
+源材料没有将这个可见性挑战归因于特定命名的威胁行为者或团体的活动。它被呈现为企业 IT 管理和安全工具的系统性弱点，任何了解扫描限制的对手都可能利用这一点。
+
+## 缓解措施与建议
+Qualys 建议组织采用能够超越传统注册表和 WMI 查询进行文件系统级枚举的扫描技术，以关闭这个可见性差距。公司的 Deep Scan 功能就是这样的解决方案之一。总体而言，安全团队应该审计他们的漏洞扫描覆盖范围，以了解他们的工具是否能够检测到用户目录、网络共享和辅助驱动器中的软件。应审查政策，尽可能限制在未受管理的位置执行便携式应用程序，并应强制执行软件安装标准，使用受管理的目录。
+
+## 参考资料
+- https://blog.qualys.com/product-tech/2026/04/13/deep-scan-expanding-vulnerability-detection-beyond-traditional-boundaries

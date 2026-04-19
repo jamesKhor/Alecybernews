@@ -1,0 +1,50 @@
+---
+title: Qualys Deep Scan Uncovers Hidden Vulnerabilities in Decentralized Software
+slug: >-
+  2026-04-19-qualys-deep-scan-uncovers-hidden-vulnerabilities-in-decentralized-software
+date: '2026-04-19'
+excerpt: >-
+  Qualys Threat Research reveals that 30-40% of enterprise software is installed
+  outside managed directories, creating critical visibility gaps that scanners
+  miss. The new Deep Scan capability identifies vulnerabilities in portable apps
+  and custom installs.
+category: vulnerabilities
+tags:
+  - vulnerability-management
+  - asset-discovery
+  - qualys
+  - threat-research
+language: en
+source_urls:
+  - >-
+    https://blog.qualys.com/product-tech/2026/04/13/deep-scan-expanding-vulnerability-detection-beyond-traditional-boundaries
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-19-qualys-deep-scan-uncovers-hidden-vulnerabilities-in-decentralized-software
+severity: medium
+---
+## Executive Summary
+Qualys Threat Research has quantified a persistent visibility gap in enterprise security, finding that a significant portion of installed software resides outside standard, managed directories. This decentralized installation practice, driven by portable applications and custom user installs, renders these assets invisible to traditional vulnerability scanners, creating a substantial blind spot for security teams.
+
+## Technical Analysis
+According to research published by Qualys, security teams estimate that between 30% and 40% of enterprise software is installed in non-standard locations. These include secondary drives, user profile directories (e.g., `AppData\Local`, `AppData\Roaming`), and custom folders created during installation. Traditional vulnerability scanners, which primarily query Windows Management Instrumentation (WMI), the Windows Registry, and standard system directories like `C:\Program Files`, fail to detect software in these unmanaged locations.
+
+The research identifies several common sources of these "shadow" installations. Portable applications, which require no formal installation and can run from USB drives or network shares, are a primary contributor. Software installed by users without administrative privileges, which defaults to user-specific directories, is another. Furthermore, applications deployed via non-standard enterprise software management tools or scripts that specify custom installation paths also evade conventional discovery.
+
+Qualys's response is a new capability named "Deep Scan," integrated into its Vulnerability Management, Detection, and Response (VMDR) and External Attack Surface Management (EASM) products. The technology employs a multi-phase approach: first, it performs a broad filesystem enumeration to catalog all executable files (`.exe`, `.dll`, `.msi`) and software manifests. It then correlates this raw file data with a continuously updated database of software fingerprints—including file hashes, version metadata, and digital signatures—to identify specific products and versions. Finally, it maps the identified software against vulnerability intelligence to assess risk.
+
+## Indicators of Compromise
+None identified in source material.
+
+## Tactics, Techniques & Procedures
+The core technique exploited by this visibility gap is not a direct action by a threat actor but an inherent weakness in defensive postures. Adversaries could potentially leverage this blind spot by deliberately installing malicious tools or vulnerable legitimate software into these unscanned directories to establish persistence or exploit known, but unpatched, vulnerabilities that the security team cannot see.
+
+## Threat Actor Context
+The source material does not attribute this visibility challenge to the activity of a specific named threat actor or group. It is presented as a systemic weakness in enterprise IT management and security tooling that could be exploited by any adversary aware of the scanning limitations.
+
+## Mitigations & Recommendations
+Qualys recommends organizations adopt scanning technologies capable of filesystem-level enumeration beyond traditional registry and WMI queries to close this visibility gap. The company's Deep Scan feature is presented as one such solution. Broadly, security teams should audit their vulnerability scanning coverage to understand if their tools can detect software in user directories, network shares, and secondary drives. Policies should be reviewed to restrict the execution of portable applications from unmanaged locations where possible, and software installation standards should enforce the use of managed directories.
+
+## References
+- https://blog.qualys.com/product-tech/2026/04/13/deep-scan-expanding-vulnerability-detection-beyond-traditional-boundaries
