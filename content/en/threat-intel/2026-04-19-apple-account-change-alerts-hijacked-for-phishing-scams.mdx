@@ -1,0 +1,50 @@
+---
+title: Apple Account Change Alerts Hijacked for Phishing Scams
+slug: 2026-04-19-apple-account-change-alerts-hijacked-for-phishing-scams
+date: '2026-04-19'
+excerpt: >-
+  Threat actors are abusing Apple's legitimate notification system to send
+  iPhone purchase phishing emails from Apple's own servers, bypassing spam
+  filters and targeting millions of Apple ID users.
+category: threat-intel
+tags:
+  - phishing
+  - apple
+  - social-engineering
+  - email-security
+language: en
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/apple-account-change-alerts-abused-to-send-phishing-emails/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-19-apple-account-change-alerts-hijacked-for-phishing-scams
+severity: high
+affected_sectors:
+  - technology
+  - consumer
+affected_regions:
+  - global
+---
+## Executive Summary
+Threat actors are exploiting Apple's legitimate account change notification system to deliver highly convincing phishing emails directly from Apple's servers. The scam, which impersonates an iPhone purchase confirmation, leverages Apple's own `noreply@email.apple.com` address and trusted domain infrastructure to bypass email security filters and trick users into calling a fake support number to steal financial information.
+
+## Technical Analysis
+The attack chain begins when a threat actor uses stolen credentials or other means to access a victim's Apple ID account. Once inside, the attacker changes the account's primary email address to one they control. This action triggers an automated, legitimate notification email from Apple to the account's *previous* email address, alerting the user to the change. Crucially, Apple's system allows a custom message to be included in this notification.
+
+The attackers insert a phishing message formatted to appear as an iPhone 15 Pro purchase receipt, complete with Apple branding, a fake order number, and a fraudulent customer support phone number. Because the email's `From:` header, SPF, DKIM, and DMARC alignments are all valid for `email.apple.com`, it passes standard email authentication checks. The email body contains a hidden HTML comment (`<!-- -->`) that separates the legitimate account change alert text from the injected phishing content, which is displayed to the user.
+
+## Indicators of Compromise
+None identified in source material.
+
+## Tactics, Techniques & Procedures
+The primary technique is the abuse of a legitimate notification mechanism (T1588.002 *Obtain Capabilities: Tool*) to establish a trusted communication channel. The attackers use social engineering (T1589.001 *Gather Victim Identity Information: Credentials*) to first compromise an Apple ID, then leverage the platform's own functionality for lateral phishing (T1534 *Internal Spearphishing*). The scam relies on pressure tactics, stating the fake purchase is "non-refundable" unless the victim calls the provided number within 12 hours, creating a sense of urgency (T1660 *Financial Theft*).
+
+## Threat Actor Context
+The source material does not attribute this campaign to a known threat group. The technique is low-cost and scalable, suggesting it could be adopted by a wide range of cybercriminal actors focused on financial fraud. The prerequisite of needing initial access to an Apple ID indicates the actors may be using credentials obtained from prior data breaches or credential stuffing attacks.
+
+## Mitigations & Recommendations
+Apple users should treat unexpected purchase confirmation emails with extreme skepticism, even if they appear to come from a legitimate Apple address. Do not call any phone number provided in such an email. Instead, log in directly to the official Apple ID website (`appleid.apple.com`) or the Apple Store app to review actual account activity and purchase history. Enable two-factor authentication (2FA) for Apple ID to prevent unauthorized account changes. Organizations should consider that traditional email gateway security may not flag these messages, necessitating user awareness training focused on this specific vector. Apple has not yet commented on whether it will modify its notification system to prevent custom message injection.
+
+## References
+- https://www.bleepingcomputer.com/news/security/apple-account-change-alerts-abused-to-send-phishing-emails/

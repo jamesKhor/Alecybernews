@@ -1,0 +1,47 @@
+---
+title: Apple账户变更提醒被劫持用于网络钓鱼诈骗
+slug: 2026-04-19-apple-account-change-alerts-hijacked-for-phishing-scams
+date: '2026-04-19'
+excerpt: 威胁行为者滥用苹果的合法通知系统，从苹果自己的服务器发送iPhone购买网络钓鱼邮件，绕过垃圾邮件过滤器，针对数百万Apple ID用户。
+category: threat-intel
+tags:
+  - phishing
+  - apple
+  - social-engineering
+  - email-security
+language: zh
+source_urls:
+  - >-
+    https://www.bleepingcomputer.com/news/security/apple-account-change-alerts-abused-to-send-phishing-emails/
+author: ZCyberNews
+draft: false
+locale_pair: 2026-04-19-apple-account-change-alerts-hijacked-for-phishing-scams
+severity: high
+affected_sectors:
+  - technology
+  - consumer
+affected_regions:
+  - global
+---
+## 执行摘要
+威胁行为者正在利用苹果公司的合法账户变更通知系统，直接从苹果服务器发送极具说服力的网络钓鱼邮件。这种诈骗行为冒充iPhone购买确认，利用苹果自己的`noreply@email.apple.com`地址和受信任的域名基础设施来绕过电子邮件安全过滤器，并诱骗用户拨打假冒支持号码以窃取财务信息。
+
+## 技术分析
+攻击链始于威胁行为者使用被盗凭证或其他手段访问受害者的Apple ID账户。一旦进入，攻击者将账户的主电子邮件地址更改为他们控制的一个。这一行动触发了苹果公司向账户的*先前*电子邮件地址发送的自动化、合法通知电子邮件，提醒用户更改。至关重要的是，苹果系统允许在此通知中包含自定义消息。
+
+攻击者插入了一个网络钓鱼消息，格式化为看起来像iPhone 15 Pro购买收据，包括苹果品牌、假订单号和欺诈客户支持电话号码。因为电子邮件的`From:`头部、SPF、DKIM和DMARC对齐都是对`email.apple.com`有效的，所以它通过了标准的电子邮件认证检查。电子邮件正文包含一个隐藏的HTML注释（`<!-- -->`），将合法的账户变更提醒文本与注入的网络钓鱼内容分开，显示给用户。
+
+## 入侵指标
+源材料中未识别出任何入侵指标。
+
+## 战术、技术与程序
+主要技术是滥用合法通知机制（T1588.002 *获取能力：工具*）以建立一个受信任的通信渠道。攻击者使用社会工程学（T1589.001 *收集受害者身份信息：凭证*）首先破坏Apple ID，然后利用平台自身的功能进行横向网络钓鱼（T1534 *内部鱼叉式网络钓鱼*）。这种诈骗依赖于压力战术，声明假购买是“不可退款”的，除非受害者在12小时内拨打提供的号码，从而制造紧迫感（T1660 *金融盗窃*）。
+
+## 威胁行为者背景
+源材料没有将这一活动归因于已知的威胁组织。这种技术成本低且可扩展，表明它可能被专注于金融欺诈的广泛网络犯罪分子采用。需要初步访问Apple ID的先决条件表明，行为者可能正在使用从前的数据泄露或凭证填充攻击中获得的凭证。
+
+## 缓解措施与建议
+苹果用户应对意外的购买确认电子邮件持极度怀疑态度，即使它们看起来来自合法的苹果地址。不要拨打此类电子邮件中提供的任何电话号码。相反，直接登录到官方Apple ID网站（`appleid.apple.com`）或Apple Store应用程序，以查看实际账户活动和购买历史。为Apple ID启用双因素认证（2FA）以防止未经授权的账户更改。组织应考虑传统的电子邮件网关安全可能不会标记这些消息，需要针对这一特定向量的用户意识培训。苹果尚未就是否会修改其通知系统以防止自定义消息注入发表评论。
+
+## 参考资料
+- https://www.bleepingcomputer.com/news/security/apple-account-change-alerts-abused-to-send-phishing-emails/
