@@ -195,6 +195,18 @@ async function main() {
   let skippedDuplicate = 0;
   let skippedFactCheck = 0;
   let translationWarnings = 0;
+  // Sub-categories for the `failed` bucket — makes the daily digest
+  // actionable instead of opaque. Previously "Per-article failures: 28"
+  // told us nothing about whether to tune the prompt, retry the API,
+  // or fix the writer. Now we know.
+  //
+  //   failedGeneration: LLM returned null (timeout, 5xx, JSON parse,
+  //                     schema reject in the output parser)
+  //   failedException:  anything else thrown in the article promise —
+  //                     post-process bug, non-duplicate write error,
+  //                     translate call crash
+  let failedGeneration = 0;
+  let failedException = 0;
 
   // Load titles published in the last 48h to pass as context to the AI prompt.
   // The AI uses this list to self-reject stories it has already covered (e.g.
@@ -207,149 +219,183 @@ async function main() {
   const results = await Promise.allSettled(
     batches.map((batch) =>
       limit(async () => {
-        const storyUrls = batch.map((s) => s.url).filter(Boolean);
-        const startTime = Date.now();
-        console.log(`[pipeline] Generating: "${batch[0]?.title}"…`);
-
-        // Generate EN article — pass recent titles so the AI can self-reject
-        // stories that are off-topic or already covered (prompt-level guard).
-        const result = await generateArticle(batch, recentTitles);
-        if (result === null) {
-          console.warn("[pipeline] ⚠️  Generation failed, skipping.");
-          return null;
-        }
-        if (result === "reject") {
-          // AI determined off-topic or already covered — counts as off-topic
-          skippedOffTopic++;
-          markProcessedBatch(storyUrls);
-          return null;
-        }
-        const article = result;
-
-        // Post-generation content relevance filter — belt-and-suspenders check
-        // in case the AI didn't reject but still produced off-topic output.
-        if (!isCyberSecurityRelevant(article.title, article.category)) {
-          console.warn(
-            `[pipeline] ⚠️  Off-topic article rejected: "${article.title}" (category: ${article.category})`,
-          );
-          skippedOffTopic++;
-          markProcessedBatch(storyUrls); // Still mark as processed to avoid retrying
-          return null;
-        }
-
-        // Post-process — script overrides LLM output for structured fields
-        // (slug, date, cve_ids, iocs). Script-derived = deterministic = no
-        // hallucination possible on these fields. "LLM writes prose, script
-        // extracts structured data."
-        postProcessArticle(article, batch);
-
-        // Fact-check — regex-based cross-validation of claims against source
-        // material. HIGH severity issues block publish. MEDIUM/LOW logged
-        // but allowed through. Runs after post-process because post-process
-        // may have fixed some issues by filtering invented CVEs.
-        const fc = await factCheckArticle(article, batch);
-        console.log(`[pipeline] ${formatFactCheckLog(fc)}`);
-        if (!fc.passed) {
-          console.warn(
-            `[pipeline] ❌ Fact-check rejected "${article.title}" — ${fc.issues.filter((i) => i.severity === "high").length} high-severity issues`,
-          );
-          skippedFactCheck++;
-          markProcessedBatch(storyUrls);
-          return null;
-        }
-
-        // Translate to ZH
-        console.log(`[pipeline] Translating: "${article.title}"…`);
-        let zhMeta = await translateArticle(article);
-
-        // Translation quality gate
-        if (zhMeta) {
-          const bodyRatio = zhMeta.body.length / article.body.length;
-          const hasMainlyChinese = /[\u4e00-\u9fff]/.test(zhMeta.body);
-          const tooShort = zhMeta.body.length < 100;
-
-          if (tooShort || !hasMainlyChinese || bodyRatio < 0.3) {
-            console.warn(
-              `[pipeline] ⚠️  Translation quality check failed (ratio=${bodyRatio.toFixed(2)}, chinese=${hasMainlyChinese}, len=${zhMeta.body.length}). Publishing EN only.`,
-            );
-            zhMeta = null;
-            translationWarnings++;
-          }
-        }
-
-        // Write MDX files (with shift-right duplicate check)
-        let paths: { en: string; zh: string | null };
+        // Outer try/catch so any uncaught exception in the article pipeline
+        // (post-process crash, non-duplicate write error, translate crash,
+        // Zod reject on the AI output) counts as `failedException` instead
+        // of disappearing into the undifferentiated `failed` bucket.
+        // Returns null on failure to keep `succeeded` counting correct.
         try {
-          paths = writeArticlePair(article, zhMeta, storyUrls);
-        } catch (err) {
-          if (err instanceof DuplicateArticleError) {
-            // SHIFT-RIGHT TRIPPED: article passed RSS-side dedup but the
-            // generated output matches an existing article on disk. Skip
-            // write, mark sources as processed (so we don't retry next
-            // run), and emit a structured log so we can monitor frequency.
-            console.warn(
-              `[pipeline] 🛡️  DUPLICATE BLOCKED: "${article.title}" — ${err.message}`,
-            );
+          const storyUrls = batch.map((s) => s.url).filter(Boolean);
+          const startTime = Date.now();
+          console.log(`[pipeline] Generating: "${batch[0]?.title}"…`);
+
+          // Generate EN article — pass recent titles so the AI can self-reject
+          // stories that are off-topic or already covered (prompt-level guard).
+          const result = await generateArticle(batch, recentTitles);
+          if (result === null) {
+            console.warn("[pipeline] ⚠️  Generation failed, skipping.");
+            failedGeneration++;
             console.log(
               JSON.stringify({
-                event: "article_blocked_duplicate",
-                attempted_slug: err.attemptedSlug,
-                attempted_title: err.attemptedTitle,
-                matched_slug: err.duplicate.matchedSlug,
-                matched_title: err.duplicate.matchedTitle,
-                match_type: err.duplicate.matchType,
-                similarity: err.duplicate.similarity,
+                event: "article_failed",
+                reason: "generation_null",
+                source_title: batch[0]?.title,
+                source_url: batch[0]?.url,
               }),
             );
-            skippedDuplicate++;
+            return null;
+          }
+          if (result === "reject") {
+            // AI determined off-topic or already covered — counts as off-topic
+            skippedOffTopic++;
             markProcessedBatch(storyUrls);
             return null;
           }
-          throw err;
-        }
+          const article = result;
 
-        const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+          // Post-generation content relevance filter — belt-and-suspenders check
+          // in case the AI didn't reject but still produced off-topic output.
+          if (!isCyberSecurityRelevant(article.title, article.category)) {
+            console.warn(
+              `[pipeline] ⚠️  Off-topic article rejected: "${article.title}" (category: ${article.category})`,
+            );
+            skippedOffTopic++;
+            markProcessedBatch(storyUrls); // Still mark as processed to avoid retrying
+            return null;
+          }
 
-        // Structured log line
-        console.log(
-          JSON.stringify({
-            event: "article_written",
-            slug: article.slug,
-            category: article.category,
-            locale: zhMeta ? "en+zh" : "en",
-            duration_s: duration,
-            word_count: article.body.split(/\s+/).length,
-          }),
-        );
+          // Post-process — script overrides LLM output for structured fields
+          // (slug, date, cve_ids, iocs). Script-derived = deterministic = no
+          // hallucination possible on these fields. "LLM writes prose, script
+          // extracts structured data."
+          postProcessArticle(article, batch);
 
-        console.log(`[pipeline] ✅  Written: ${paths.en} (${duration}s)`);
-        if (paths.zh) console.log(`[pipeline] ✅  Written: ${paths.zh}`);
+          // Fact-check — regex-based cross-validation of claims against source
+          // material. HIGH severity issues block publish. MEDIUM/LOW logged
+          // but allowed through. Runs after post-process because post-process
+          // may have fixed some issues by filtering invented CVEs.
+          const fc = await factCheckArticle(article, batch);
+          console.log(`[pipeline] ${formatFactCheckLog(fc)}`);
+          if (!fc.passed) {
+            console.warn(
+              `[pipeline] ❌ Fact-check rejected "${article.title}" — ${fc.issues.filter((i) => i.severity === "high").length} high-severity issues`,
+            );
+            skippedFactCheck++;
+            markProcessedBatch(storyUrls);
+            return null;
+          }
 
-        // Discord notification — fire-and-forget. Posts to #en-news-feed
-        // (and #zh-news-feed if ZH translation shipped). Silent skip if
-        // DISCORD_WEBHOOK_{EN,ZH} env vars aren't set. Never blocks or
-        // fails the pipeline on Discord errors.
-        const section: "posts" | "threat-intel" =
-          article.category === "threat-intel" ? "threat-intel" : "posts";
-        notifyDiscord(article, "en", section).catch((e) =>
-          console.warn("[discord] en unexpected error:", e),
-        );
-        if (zhMeta && paths.zh) {
-          // Build a ZH-titled version for the ZH channel
-          const zhArticle = {
-            ...article,
-            title: zhMeta.title || article.title,
-            excerpt: zhMeta.excerpt || article.excerpt,
-          };
-          notifyDiscord(zhArticle, "zh", section).catch((e) =>
-            console.warn("[discord] zh unexpected error:", e),
+          // Translate to ZH
+          console.log(`[pipeline] Translating: "${article.title}"…`);
+          let zhMeta = await translateArticle(article);
+
+          // Translation quality gate
+          if (zhMeta) {
+            const bodyRatio = zhMeta.body.length / article.body.length;
+            const hasMainlyChinese = /[\u4e00-\u9fff]/.test(zhMeta.body);
+            const tooShort = zhMeta.body.length < 100;
+
+            if (tooShort || !hasMainlyChinese || bodyRatio < 0.3) {
+              console.warn(
+                `[pipeline] ⚠️  Translation quality check failed (ratio=${bodyRatio.toFixed(2)}, chinese=${hasMainlyChinese}, len=${zhMeta.body.length}). Publishing EN only.`,
+              );
+              zhMeta = null;
+              translationWarnings++;
+            }
+          }
+
+          // Write MDX files (with shift-right duplicate check)
+          let paths: { en: string; zh: string | null };
+          try {
+            paths = writeArticlePair(article, zhMeta, storyUrls);
+          } catch (err) {
+            if (err instanceof DuplicateArticleError) {
+              // SHIFT-RIGHT TRIPPED: article passed RSS-side dedup but the
+              // generated output matches an existing article on disk. Skip
+              // write, mark sources as processed (so we don't retry next
+              // run), and emit a structured log so we can monitor frequency.
+              console.warn(
+                `[pipeline] 🛡️  DUPLICATE BLOCKED: "${article.title}" — ${err.message}`,
+              );
+              console.log(
+                JSON.stringify({
+                  event: "article_blocked_duplicate",
+                  attempted_slug: err.attemptedSlug,
+                  attempted_title: err.attemptedTitle,
+                  matched_slug: err.duplicate.matchedSlug,
+                  matched_title: err.duplicate.matchedTitle,
+                  match_type: err.duplicate.matchType,
+                  similarity: err.duplicate.similarity,
+                }),
+              );
+              skippedDuplicate++;
+              markProcessedBatch(storyUrls);
+              return null;
+            }
+            throw err;
+          }
+
+          const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+          // Structured log line
+          console.log(
+            JSON.stringify({
+              event: "article_written",
+              slug: article.slug,
+              category: article.category,
+              locale: zhMeta ? "en+zh" : "en",
+              duration_s: duration,
+              word_count: article.body.split(/\s+/).length,
+            }),
           );
+
+          console.log(`[pipeline] ✅  Written: ${paths.en} (${duration}s)`);
+          if (paths.zh) console.log(`[pipeline] ✅  Written: ${paths.zh}`);
+
+          // Discord notification — fire-and-forget. Posts to #en-news-feed
+          // (and #zh-news-feed if ZH translation shipped). Silent skip if
+          // DISCORD_WEBHOOK_{EN,ZH} env vars aren't set. Never blocks or
+          // fails the pipeline on Discord errors.
+          const section: "posts" | "threat-intel" =
+            article.category === "threat-intel" ? "threat-intel" : "posts";
+          notifyDiscord(article, "en", section).catch((e) =>
+            console.warn("[discord] en unexpected error:", e),
+          );
+          if (zhMeta && paths.zh) {
+            // Build a ZH-titled version for the ZH channel
+            const zhArticle = {
+              ...article,
+              title: zhMeta.title || article.title,
+              excerpt: zhMeta.excerpt || article.excerpt,
+            };
+            notifyDiscord(zhArticle, "zh", section).catch((e) =>
+              console.warn("[discord] zh unexpected error:", e),
+            );
+          }
+
+          // Mark source URLs as processed
+          markProcessedBatch(storyUrls);
+
+          return { article, paths };
+        } catch (err) {
+          // Any unhandled exception in article processing — post-process
+          // crash, translate call throw, write error that isn't
+          // DuplicateArticleError, Discord/fetch rejection that escaped.
+          // Categorized separately so the daily digest surfaces a real
+          // cause instead of a mystery "failed" count.
+          failedException++;
+          console.error("[pipeline] ❌ Unhandled article error:", err);
+          console.log(
+            JSON.stringify({
+              event: "article_failed",
+              reason: "exception",
+              source_title: batch[0]?.title,
+              source_url: batch[0]?.url,
+              error: err instanceof Error ? err.message : String(err),
+            }),
+          );
+          return null;
         }
-
-        // Mark source URLs as processed
-        markProcessedBatch(storyUrls);
-
-        return { article, paths };
       }),
     ),
   );
@@ -358,15 +404,25 @@ async function main() {
   const succeeded = results.filter(
     (r) => r.status === "fulfilled" && r.value,
   ).length;
-  const failed =
+  // `failed` is the total of the two explicit buckets (generation-null
+  // and uncaught exception) plus any residual promise rejections that
+  // escaped the outer try/catch (should be zero now, but kept for
+  // forward-compat so the math still balances if a new failure mode
+  // sneaks in without classification).
+  const classifiedFailed = failedGeneration + failedException;
+  const unclassifiedFailed = Math.max(
+    0,
     results.length -
-    succeeded -
-    skippedOffTopic -
-    skippedDuplicate -
-    skippedFactCheck;
+      succeeded -
+      skippedOffTopic -
+      skippedDuplicate -
+      skippedFactCheck -
+      classifiedFailed,
+  );
+  const failed = classifiedFailed + unclassifiedFailed;
 
   console.log(
-    `\n📊 Pipeline complete: ${succeeded} written, ${skippedDuplicate} duplicates blocked, ${skippedOffTopic} off-topic rejected, ${skippedFactCheck} fact-check rejected, ${translationWarnings} translation warnings, ${failed} failed\n`,
+    `\n📊 Pipeline complete: ${succeeded} written, ${skippedDuplicate} duplicates blocked, ${skippedOffTopic} off-topic rejected, ${skippedFactCheck} fact-check rejected, ${translationWarnings} translation warnings, ${failed} failed (gen=${failedGeneration} exc=${failedException} unk=${unclassifiedFailed})\n`,
   );
 
   // Write run summary as JSON
@@ -382,6 +438,10 @@ async function main() {
       fact_check_rejected: skippedFactCheck,
       translation_warnings: translationWarnings,
       failed,
+      // Sub-category breakdown — surfaced in daily digest for debugging.
+      failed_generation: failedGeneration,
+      failed_exception: failedException,
+      failed_unclassified: unclassifiedFailed,
     }),
   );
 

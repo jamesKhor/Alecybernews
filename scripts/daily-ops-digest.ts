@@ -63,6 +63,14 @@ type PipelineCompleteEvent = {
   fact_check_rejected?: number; // Added 2026-04-15 — older events don't have this
   translation_warnings: number;
   failed: number;
+  // Added 2026-04-19 — sub-category breakdown of the `failed` bucket.
+  // Previously the digest showed an opaque "Per-article failures: 28"
+  // with no indication of cause. These three fields split that number
+  // into actionable categories. Older events won't have these (?? 0
+  // fallback on the aggregation side).
+  failed_generation?: number; // LLM returned null — timeout, 5xx, JSON parse, schema reject
+  failed_exception?: number; // uncaught throw in article pipeline — post-process, write, translate crash
+  failed_unclassified?: number; // residual bucket — forward-compat for new failure modes
 };
 
 type Digest = {
@@ -81,6 +89,9 @@ type Digest = {
     factCheckRejected: number;
     translationWarnings: number;
     failed: number;
+    failedGeneration: number;
+    failedException: number;
+    failedUnclassified: number;
   };
   health: "green" | "yellow" | "red";
   failedRunUrls: string[];
@@ -257,6 +268,9 @@ function buildDigest(windowHours: number): Digest {
   let factCheckRejected = 0;
   let translationWarnings = 0;
   let failedArticlesInRuns = 0;
+  let failedGeneration = 0;
+  let failedException = 0;
+  let failedUnclassified = 0;
 
   const successfulRuns = runs.filter((r) => r.conclusion === "success");
   for (const run of successfulRuns) {
@@ -272,6 +286,9 @@ function buildDigest(windowHours: number): Digest {
     factCheckRejected += event.fact_check_rejected ?? 0;
     translationWarnings += event.translation_warnings ?? 0;
     failedArticlesInRuns += event.failed ?? 0;
+    failedGeneration += event.failed_generation ?? 0;
+    failedException += event.failed_exception ?? 0;
+    failedUnclassified += event.failed_unclassified ?? 0;
   }
 
   // Health stoplight — only REAL problems trigger yellow/red.
@@ -310,6 +327,9 @@ function buildDigest(windowHours: number): Digest {
       factCheckRejected,
       translationWarnings,
       failed: failedArticlesInRuns,
+      failedGeneration,
+      failedException,
+      failedUnclassified,
     },
     health,
     failedRunUrls,
@@ -357,7 +377,31 @@ function renderMessage(d: Digest): string {
   lines.push(`• Fact-check rejected: ${d.counters.factCheckRejected}`);
   lines.push(`• Translation warnings: ${d.counters.translationWarnings}`);
   if (d.counters.failed > 0) {
-    lines.push(`• Per-article failures: ${d.counters.failed}`);
+    // Show breakdown when we have sub-category data (new events from
+    // 2026-04-19+). For older aggregated periods where all events
+    // predate the split, only the total is meaningful.
+    const hasBreakdown =
+      d.counters.failedGeneration +
+        d.counters.failedException +
+        d.counters.failedUnclassified >
+      0;
+    if (hasBreakdown) {
+      const parts: string[] = [];
+      if (d.counters.failedGeneration > 0) {
+        parts.push(`${d.counters.failedGeneration} LLM/JSON`);
+      }
+      if (d.counters.failedException > 0) {
+        parts.push(`${d.counters.failedException} exception`);
+      }
+      if (d.counters.failedUnclassified > 0) {
+        parts.push(`${d.counters.failedUnclassified} unclassified`);
+      }
+      lines.push(
+        `• Per-article failures: ${d.counters.failed} (${parts.join(", ")})`,
+      );
+    } else {
+      lines.push(`• Per-article failures: ${d.counters.failed}`);
+    }
   }
 
   if (d.failedRunUrls.length > 0) {

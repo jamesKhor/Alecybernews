@@ -115,7 +115,15 @@ async function main() {
 
   const totalSoFar = llmCostSoFar + vpsCostSoFar;
   const projectedTotal = projectedLlmCost + projectedVpsCost;
-  const percentOfBudget = (projectedTotal / MONTHLY_BUDGET_USD) * 100;
+  // Budget guard (2026-04-19): if MONTHLY_BUDGET_USD is 0 or negative,
+  // percent-of-budget is meaningless — division produced `Infinity`
+  // which then triggered the `>= 80` alert threshold, sending a noisy
+  // "% of $0 budget: Infinity%" Telegram message. Treat unconfigured
+  // budget as null; skip percent-based alerting.
+  const budgetConfigured = MONTHLY_BUDGET_USD > 0;
+  const percentOfBudget: number | null = budgetConfigured
+    ? (projectedTotal / MONTHLY_BUDGET_USD) * 100
+    : null;
 
   const snapshot = {
     event: "budget_daily",
@@ -136,10 +144,11 @@ async function main() {
       llm_cost_usd: Number(projectedLlmCost.toFixed(2)),
       vps_cost_usd: Number(projectedVpsCost.toFixed(2)),
       total_cost_usd: Number(projectedTotal.toFixed(2)),
-      percent_of_budget: Number(percentOfBudget.toFixed(1)),
+      percent_of_budget:
+        percentOfBudget !== null ? Number(percentOfBudget.toFixed(1)) : null,
     },
     budget_usd: MONTHLY_BUDGET_USD,
-    alert_triggered: percentOfBudget >= 80,
+    alert_triggered: percentOfBudget !== null && percentOfBudget >= 80,
   };
 
   console.log(JSON.stringify(snapshot));
@@ -161,6 +170,11 @@ async function main() {
   }
 
   if (snapshot.alert_triggered && !DRY_RUN) {
+    // Guaranteed non-null inside this branch because alert_triggered
+    // can only be true when percentOfBudget !== null (see snapshot
+    // computation above). TypeScript narrowing doesn't pick that up
+    // through the snapshot object, so we assert here.
+    const pct = percentOfBudget as number;
     const alert = [
       "⚠️ <b>ZCyberNews budget alert</b>",
       "",
@@ -172,7 +186,7 @@ async function main() {
       `<b>Projected full month</b>`,
       `• Articles: ${projectedArticles}`,
       `• Total cost: $${projectedTotal.toFixed(2)}`,
-      `• % of $${MONTHLY_BUDGET_USD} budget: ${percentOfBudget.toFixed(1)}%`,
+      `• % of $${MONTHLY_BUDGET_USD} budget: ${pct.toFixed(1)}%`,
       "",
       "<i>Run /budget-optimize with Eric to review.</i>",
     ].join("\n");
