@@ -1,0 +1,51 @@
+---
+title: 'Mirax Android RAT Infects 220,000 Users via Meta Ads, Creates SOCKS5 Proxy'
+slug: >-
+  2026-04-19-mirax-android-rat-infects-220-000-users-via-meta-ads-creates-socks5-proxy-networ
+date: '2026-04-19'
+excerpt: >-
+  Mirax Android RAT reached over 220,000 users via Meta ads, turning infected
+  devices into SOCKS5 proxies for threat actors to route malicious traffic and
+  steal data from Spanish-speaking victims.
+category: malware
+tags:
+  - android
+  - rat
+  - malvertising
+  - socks5
+  - meta
+language: en
+source_urls:
+  - 'https://thehackernews.com/2026/04/mirax-android-rat-turns-devices-into.html'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-19-mirax-android-rat-infects-220-000-users-via-meta-ads-creates-socks5-proxy-networ
+severity: high
+threat_actor: Mirax
+affected_regions:
+  - Latin America
+  - Spain
+---
+## Executive Summary
+A new Android remote access trojan (RAT) named Mirax has infected over 220,000 users, primarily in Spanish-speaking regions, by distributing malicious advertisements on Meta's platforms, including Facebook, Instagram, Messenger, and Threads. According to analysis from The Hacker News, the malware provides attackers with full, real-time control over compromised devices and establishes a SOCKS5 proxy network, enabling threat actors to route malicious internet traffic through victims' phones.
+
+## Technical Analysis
+Mirax is a nascent but fully-featured Android RAT. Its core functionality grants operators remote, interactive control over an infected device's screen, allowing them to execute commands, navigate interfaces, and steal data in real time. A key feature, as reported by The Hacker News, is its ability to transform the compromised Android device into a SOCKS5 proxy server. This creates a covert channel for the threat actor to route their own internet traffic through the victim's IP address and mobile data connection. This proxy capability can be used to anonymize attacks, bypass IP-based geo-restrictions or security blocks, and potentially implicate the victim in malicious activities.
+
+The initial infection vector is malicious advertising (malvertising) on Meta's ad network. The campaign specifically targeted Spanish-speaking audiences. The advertisements, which reached more than 220,000 accounts, likely lured users to download and install the malicious APK file from a source outside the official Google Play Store.
+
+## Indicators of Compromise
+None identified in source material.
+
+## Tactics, Techniques & Procedures
+The primary TTP observed is the use of paid social media advertisements (T1583.001: Acquire Infrastructure: Social Media Accounts) to deliver the malicious payload (T1588.002: Obtain Capabilities: Malware). The malware employs the Accessibility Services feature on Android (T1548.001: Abuse Elevation Control Mechanism: Setuid and Setgid) to gain the persistent, high-level permissions necessary for its RAT and proxy functions. Establishing a SOCKS5 proxy on the device (T1090.001: Proxy: Internal Proxy) is a core technique for command and control obfuscation and traffic relay.
+
+## Threat Actor Context
+The threat actor behind the Mirax RAT campaign remains unidentified. The operational focus on Spanish-speaking countries, including nations in Latin America and Spain, indicates a clear targeting preference. The significant investment in a Meta ad campaign, which reached a reported 220,000 user accounts, suggests the operators have substantial financial resources or are expecting a high return on investment, potentially from selling access to the proxy network or stolen data.
+
+## Mitigations & Recommendations
+Users should be wary of advertisements, even on major social platforms, that prompt the download of Android application packages (APKs) from third-party websites. Installing apps only from the official Google Play Store significantly reduces this risk. Organizations with employees in affected regions should reinforce security awareness about this specific malvertising campaign. On the device level, users should scrutinize and restrict applications that request Accessibility Service permissions, as this is a common abuse vector for Android malware. Network monitoring for unexpected SOCKS5 proxy traffic originating from mobile devices may also help identify infections in a corporate environment.
+
+## References
+- https://thehackernews.com/2026/04/mirax-android-rat-turns-devices-into.html

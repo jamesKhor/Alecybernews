@@ -1,0 +1,50 @@
+---
+title: 'Mirax Android RAT 通过 Meta 广告感染 220,000 用户，创建 SOCKS5 代理'
+slug: >-
+  2026-04-19-mirax-android-rat-infects-220-000-users-via-meta-ads-creates-socks5-proxy-networ
+date: '2026-04-19'
+excerpt: >-
+  Mirax Android RAT 通过 Meta 广告感染了超过 220,000 用户，将受感染的设备变成 SOCKS5
+  代理，供威胁行为者路由恶意流量并从讲西班牙语的受害者那里窃取数据。
+category: malware
+tags:
+  - android
+  - rat
+  - malvertising
+  - socks5
+  - meta
+language: zh
+source_urls:
+  - 'https://thehackernews.com/2026/04/mirax-android-rat-turns-devices-into.html'
+author: ZCyberNews
+draft: false
+locale_pair: >-
+  2026-04-19-mirax-android-rat-infects-220-000-users-via-meta-ads-creates-socks5-proxy-networ
+severity: high
+threat_actor: Mirax
+affected_regions:
+  - Latin America
+  - Spain
+---
+## 执行摘要
+一种名为Mirax的新Android远程访问木马（RAT）通过在Meta平台（包括Facebook、Instagram、Messenger和Threads）上分发恶意广告，感染了超过220,000名用户，主要在西班牙语区域。根据The Hacker News的分析，该恶意软件为攻击者提供了对受感染设备的完整、实时控制，并建立了一个SOCKS5代理网络，使威胁行为者能够通过受害者的手机路由恶意互联网流量。
+
+## 技术分析
+Mirax是一个新兴但功能齐全的Android RAT。其核心功能允许操作者远程、交互式控制受感染设备的屏幕，使他们能够执行命令、导航界面并实时窃取数据。The Hacker News报告的一个关键特性是其将受感染的Android设备转变为SOCKS5代理服务器的能力。这为威胁行为者创建了一个隐蔽的通道，通过受害者的IP地址和移动数据连接路由他们自己的互联网流量。这种代理能力可以用来匿名攻击，绕过基于IP的地理限制或安全封锁，并可能使受害者卷入恶意活动。
+
+最初的感染向量是Meta广告网络上的恶意广告（malvertising）。该活动专门针对讲西班牙语的受众。这些广告影响了超过220,000个账户，可能诱使用户从官方Google Play商店之外的来源下载并安装恶意APK文件。
+
+## 入侵指标
+源材料中未识别出任何入侵指标。
+
+## 战术、技术与程序
+观察到的主要战术、技术与程序（TTP）是使用付费社交媒体广告（T1583.001: 获取基础设施：社交媒体账户）来传递恶意有效载荷（T1588.002: 获取能力：恶意软件）。恶意软件利用Android上的辅助功能服务（T1548.001: 滥用提升控制机制：Setuid和Setgid）来获得其RAT和代理功能所需的持续、高级权限。在设备上建立SOCKS5代理（T1090.001: 代理：内部代理）是命令和控制混淆以及流量中继的核心技术。
+
+## 威胁行为者背景
+Mirax RAT活动背后的威胁行为者身份不明。对包括拉丁美洲和西班牙在内的讲西班牙语国家的运营重点表明了一个明确的针对性偏好。在Meta广告活动上的大量投资，据报道影响了220,000个用户账户，表明操作者拥有雄厚的财务资源或期望从投资中获得高回报，可能来自出售代理网络访问权限或被盗数据。
+
+## 缓解措施与建议
+用户应警惕主要社交平台上提示从第三方网站下载Android应用程序包（APKs）的广告。仅从官方Google Play商店安装应用可以显著降低这种风险。在受影响地区的组织应加强关于这种特定恶意广告活动的安全意识。在设备层面，用户应审查并限制请求辅助功能服务权限的应用程序，因为这是Android恶意软件的常见滥用向量。对来自移动设备的意外SOCKS5代理流量进行网络监控也有助于在企业环境中识别感染。
+
+## 参考资料
+- https://thehackernews.com/2026/04/mirax-android-rat-turns-devices-into.html
